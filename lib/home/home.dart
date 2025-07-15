@@ -1,137 +1,102 @@
-import 'package:women_diary/common/constants/constants.dart';
-import 'package:women_diary/common/extension/date_time_extension.dart';
-import 'package:women_diary/common/extension/text_extension.dart';
-import 'package:women_diary/period/red_date.dart';
-import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'bloc/home_bloc.dart';
-import 'bloc/home_event.dart';
-import 'bloc/home_state.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+void main() => runApp(const MenstrualCycleApp());
+
+class MenstrualCycleApp extends StatelessWidget {
+  const MenstrualCycleApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<HomeBloc>(
-      create: (_) => HomeBloc()..add(const LoadBabyInformationEvent()),
-      child: const _HomePageStateful(),
-    );
-  }
-}
-
-class _HomePageStateful extends StatefulWidget {
-  const _HomePageStateful();
-
-  @override
-  State<_HomePageStateful> createState() => _HomePageStatefulState();
-}
-
-class _HomePageStatefulState extends State<_HomePageStateful> {
-  @override
-  Widget build(BuildContext context) {
-    return const HomeView();
-  }
-}
-
-class HomeView extends StatelessWidget {
-  const HomeView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              _babyInformation(),
-              _babyActions(),
-              _babySchedule()
-            ],
-          ),
-        )
+    return MaterialApp(
+      title: 'Chu kỳ kinh nguyệt',
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('🌸 Chu kỳ kinh nguyệt'),
+          backgroundColor: Colors.pinkAccent,
+        ),
+        body: const CycleTimeline(),
       ),
     );
   }
+}
 
-  Widget _babyInformation() {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      child: Column(
-        children: [
-          _babyInformationRow('Name', '--'),
-          _babyInformationRow('Age', '--'),
-          _babyInformationRow('Standard weight', '--'),
-          _babyInformationRow('Standard height', '--'),
-        ],
-      )
-    );
-  }
+class CycleTimeline extends StatelessWidget {
+  const CycleTimeline({super.key});
 
-  Widget _babyInformationRow(String title, String content) {
-    return Row(
-      children: [
-        Text(title).w400().text14().ellipsis(),
-        Constants.vSpacer4,
-        Expanded(child: Text(content).w500().text14().ellipsis().right())
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: const [
+        CycleCard(
+          title: '🩸 Hành kinh',
+          subtitle: 'Ngày 1–5',
+          description:
+          'Niêm mạc tử cung bong ra và được thải ra ngoài cơ thể. Cảm giác có thể mệt mỏi, đau bụng nhẹ.',
+          color: Colors.pinkAccent,
+        ),
+        CycleCard(
+          title: '🌱 Giai đoạn nang trứng',
+          subtitle: 'Ngày 6–13',
+          description:
+          'Cơ thể bắt đầu tạo trứng mới, niêm mạc tử cung dày lên. Cảm giác khỏe hơn và nhiều năng lượng.',
+          color: Colors.lightBlueAccent,
+        ),
+        CycleCard(
+          title: '🌼 Rụng trứng',
+          subtitle: 'Ngày 14',
+          description:
+          'Trứng rụng khỏi buồng trứng. Đây là thời điểm dễ thụ thai nhất. Có thể tăng ham muốn hoặc có dịch nhầy nhiều hơn.',
+          color: Colors.yellowAccent,
+        ),
+        CycleCard(
+          title: '🌙 Giai đoạn hoàng thể',
+          subtitle: 'Ngày 15–28',
+          description:
+          'Cơ thể chuẩn bị cho thai kỳ. Nếu không thụ thai, hormone giảm và chu kỳ sẽ lặp lại. Có thể có cảm giác nhạy cảm, khó chịu (PMS).',
+          color: Colors.deepPurpleAccent,
+        ),
       ],
     );
   }
+}
 
-  Widget _babyActions() {
-    return BlocBuilder(
-        buildWhen: (context, state) => state is LoadedRedDateState,
-        builder: (context, state) {
-          List<RedDateModel> actions = state is LoadedRedDateState ? state.redDate : [];
-          return ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: actions.length,
-            itemBuilder: (context, index) {
-              final action = actions[index];
-              return _babyActionRow(action);
-            },
-          );
-        }
-    );
-  }
+class CycleCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final String description;
+  final Color color;
 
-  Widget _babyActionRow(RedDateModel date) {
-    return Row(
-      children: [
-        Text(date.startTime.globalTimeFormat()).w500().text18().ellipsis(),
-        Constants.vSpacer4,
-        Expanded(child: Text(date.note).w400().text14().ellipsis().left())
-      ],
-    );
-  }
+  const CycleCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.description,
+    required this.color,
+  });
 
-  Widget _babySchedule() {
-    return BlocBuilder(
-        buildWhen: (context, state) => state is LoadedScheduleState,
-        builder: (context, state) {
-          List<ScheduleModel> schedules = state is LoadedScheduleState ? state.schedules : [];
-          return ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: schedules.length,
-            itemBuilder: (context, index) {
-              final schedule = schedules[index];
-              return _scheduleRow(schedule);
-            },
-          );
-        }
-    );
-  }
-
-  Widget _scheduleRow(ScheduleModel schedule) {
-    return Row(
-      children: [
-        Text(schedule.time.globalTimeFormat()).w500().text18().ellipsis(),
-        Constants.vSpacer4,
-        Expanded(child: Text(schedule.note).w400().text14().numberOfLines(6).left())
-      ],
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: color.withAlpha(50),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style: const TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Text(subtitle, style: TextStyle(color: Colors.grey[700])),
+            const SizedBox(height: 10),
+            Text(description,
+                style: const TextStyle(fontSize: 14, height: 1.5)),
+          ],
+        ),
+      ),
     );
   }
 }
