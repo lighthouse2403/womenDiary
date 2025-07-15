@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "842547168180",
+    "firebase_url": "https://baby-diary-8c5fb.firebaseio.com",
+    "project_id": "baby-diary-8c5fb",
+    "storage_bucket": "baby-diary-8c5fb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:842547168180:android:ea902e16cdac74284ea8e1",
+        "android_client_info": {
+          "package_name": "com.baby.diary.flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "842547168180-j0ml00fi3evcun6l6n1t1ev8ldtsq6jo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAL28aaqlx7eseBWxbi1kjmfPqDj3ahon4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "842547168180-j0ml00fi3evcun6l6n1t1ev8ldtsq6jo.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "842547168180-gimnk7t793bpcpcmhck7uc5cmksu4lbo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.baby.diary.flutter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
