@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:baby_diary/common/base/base_child_stateful_widget.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
+import 'package:women_diary/common/base/base_child_stateful_widget.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 
 class CustomButton extends BaseChildStatefulWidget {
   CustomButton({super.key, this.backgroundColor, required this.onTappedAction, required this.title, this.titleColor, this.titleAlignment, this.horizontalPadding, this.borderColor});

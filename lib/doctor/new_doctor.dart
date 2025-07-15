@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:baby_diary/chat/bloc/chat_bloc.dart';
-import 'package:baby_diary/common/base/base_app_bar.dart';
-import 'package:baby_diary/common/base/base_statefull_widget.dart';
-import 'package:baby_diary/common/constants/app_colors.dart';
-import 'package:baby_diary/common/extension/font_size_extension.dart';
-import 'package:baby_diary/common/extension/font_weight_extension.dart';
-import 'package:baby_diary/common/extension/text_color_extension.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
-import 'package:baby_diary/common/firebase/firebase_chat.dart';
-import 'package:baby_diary/doctor/doctor_model.dart';
+import 'package:women_diary/chat/bloc/chat_bloc.dart';
+import 'package:women_diary/common/base/base_app_bar.dart';
+import 'package:women_diary/common/base/base_statefull_widget.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/extension/font_size_extension.dart';
+import 'package:women_diary/common/extension/font_weight_extension.dart';
+import 'package:women_diary/common/extension/text_color_extension.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/common/firebase/firebase_chat.dart';
+import 'package:women_diary/doctor/doctor_model.dart';
 
 class DoctorDetail extends BaseStatefulWidget {
   const DoctorDetail({super.key, required this.doctor});

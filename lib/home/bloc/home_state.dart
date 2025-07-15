@@ -1,6 +1,5 @@
-import 'package:baby_diary/baby_action/baby_action_model.dart';
-import 'package:baby_diary/baby_information/baby_model.dart';
-import 'package:baby_diary/schedule/schedule_model.dart';
+import 'package:women_diary/period/red_date.dart';
+import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:equatable/equatable.dart';
 
 class HomeState extends Equatable {
@@ -9,20 +8,12 @@ class HomeState extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadedSelectedBabyState extends HomeState {
-  const LoadedSelectedBabyState(this.baby);
-  final BabyModel baby;
+class LoadedRedDateState extends HomeState {
+  const LoadedRedDateState(this.redDate);
+  final List<RedDateModel> redDate;
 
   @override
-  List<Object?> get props => [];
-}
-
-class LoadedBabyActionState extends HomeState {
-  const LoadedBabyActionState(this.actions);
-  final List<BabyActionModel> actions;
-
-  @override
-  List<Object?> get props => [actions.length];
+  List<Object?> get props => [redDate.length];
 }
 
 class LoadedScheduleState extends HomeState {

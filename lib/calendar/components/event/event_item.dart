@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:baby_diary/calendar/model/event_VO.dart';
-import 'package:baby_diary/calendar/utils/date_utils.dart';
-import 'package:baby_diary/calendar/utils/lunar_solar_utils.dart';
+import 'package:women_diary/calendar/model/event_VO.dart';
+import 'package:women_diary/calendar/utils/date_utils.dart';
+import 'package:women_diary/calendar/utils/lunar_solar_utils.dart';
 
 class EventItem extends StatelessWidget {
   const EventItem({super.key, required this.event});

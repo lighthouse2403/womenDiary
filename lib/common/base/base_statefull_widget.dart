@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:baby_diary/common/widgets/loading_view.dart';
+import 'package:women_diary/common/widgets/loading_view.dart';
 
 class BaseStatefulWidget extends StatefulWidget {
   const BaseStatefulWidget({super.key});

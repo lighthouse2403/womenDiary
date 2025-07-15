@@ -1,4 +1,4 @@
-import 'package:baby_diary/music/model/music_model.dart';
+import 'package:women_diary/music/model/music_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class MusicEvent extends Equatable {

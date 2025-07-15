@@ -1,16 +1,16 @@
-import 'package:baby_diary/chat/model/thread_model.dart';
+import 'package:women_diary/chat/model/thread_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:baby_diary/_gen/assets.gen.dart';
-import 'package:baby_diary/chat/bloc/chat_bloc.dart';
-import 'package:baby_diary/chat/bloc/chat_event.dart';
-import 'package:baby_diary/chat/bloc/chat_state.dart';
-import 'package:baby_diary/common/constants/app_colors.dart';
-import 'package:baby_diary/common/extension/font_size_extension.dart';
-import 'package:baby_diary/common/extension/font_weight_extension.dart';
-import 'package:baby_diary/common/extension/text_color_extension.dart';
-import 'package:baby_diary/common/widgets/loading_view.dart';
+import 'package:women_diary/_gen/assets.gen.dart';
+import 'package:women_diary/chat/bloc/chat_bloc.dart';
+import 'package:women_diary/chat/bloc/chat_event.dart';
+import 'package:women_diary/chat/bloc/chat_state.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/extension/font_size_extension.dart';
+import 'package:women_diary/common/extension/font_weight_extension.dart';
+import 'package:women_diary/common/extension/text_color_extension.dart';
+import 'package:women_diary/common/widgets/loading_view.dart';
 
 class NewComment extends StatefulWidget {
   NewComment({super.key, required this.thread, required this.sentComment});

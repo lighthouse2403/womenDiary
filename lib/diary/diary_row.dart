@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'package:baby_diary/diary/diary_model.dart';
+import 'package:women_diary/diary/diary_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:baby_diary/common/extension/date_time_extension.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 
 class DiaryRow extends StatelessWidget {
   const DiaryRow({super.key, required this.diary});

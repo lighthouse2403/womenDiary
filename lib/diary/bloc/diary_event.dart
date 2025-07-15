@@ -1,4 +1,4 @@
-import 'package:baby_diary/diary/diary_model.dart';
+import 'package:women_diary/diary/diary_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class DiaryEvent extends Equatable {

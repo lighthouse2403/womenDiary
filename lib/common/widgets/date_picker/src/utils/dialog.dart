@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:baby_diary/common/widgets/date_picker/src/models/calendar_date_picker2_config.dart';
-import 'package:baby_diary/common/widgets/date_picker/src/widgets/calendar_date_picker2_with_action_buttons.dart';
+import 'package:women_diary/common/widgets/date_picker/src/models/calendar_date_picker2_config.dart';
+import 'package:women_diary/common/widgets/date_picker/src/widgets/calendar_date_picker2_with_action_buttons.dart';
 
 Future<List<DateTime?>?> showCalendarDatePicker2Dialog({
   required BuildContext context,

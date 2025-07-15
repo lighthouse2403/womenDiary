@@ -1,4 +1,4 @@
-import 'package:baby_diary/chat/model/thread_model.dart';
+import 'package:women_diary/chat/model/thread_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class ChatEvent extends Equatable {

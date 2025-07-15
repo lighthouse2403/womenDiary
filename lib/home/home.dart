@@ -1,8 +1,8 @@
-import 'package:baby_diary/baby_action/baby_action_model.dart';
-import 'package:baby_diary/common/constants/constants.dart';
-import 'package:baby_diary/common/extension/date_time_extension.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
-import 'package:baby_diary/schedule/schedule_model.dart';
+import 'package:women_diary/common/constants/constants.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/period/red_date.dart';
+import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'bloc/home_bloc.dart';
@@ -81,9 +81,9 @@ class HomeView extends StatelessWidget {
 
   Widget _babyActions() {
     return BlocBuilder(
-        buildWhen: (context, state) => state is LoadedBabyActionState,
+        buildWhen: (context, state) => state is LoadedRedDateState,
         builder: (context, state) {
-          List<BabyActionModel> actions = state is LoadedBabyActionState ? state.actions : [];
+          List<RedDateModel> actions = state is LoadedRedDateState ? state.redDate : [];
           return ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -97,12 +97,12 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  Widget _babyActionRow(BabyActionModel action) {
+  Widget _babyActionRow(RedDateModel date) {
     return Row(
       children: [
-        Text(action.startTime.globalTimeFormat()).w500().text18().ellipsis(),
+        Text(date.startTime.globalTimeFormat()).w500().text18().ellipsis(),
         Constants.vSpacer4,
-        Expanded(child: Text(action.value).w400().text14().ellipsis().left())
+        Expanded(child: Text(date.note).w400().text14().ellipsis().left())
       ],
     );
   }

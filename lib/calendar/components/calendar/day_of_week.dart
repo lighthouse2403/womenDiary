@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 
 class DayOfWeek extends StatelessWidget {
   const DayOfWeek(this.title, this.width, {super.key});

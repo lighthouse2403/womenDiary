@@ -1,6 +1,6 @@
-import 'package:baby_diary/music/bloc/music_event.dart';
-import 'package:baby_diary/music/bloc/music_state.dart';
-import 'package:baby_diary/music/model/music_model.dart';
+import 'package:women_diary/music/bloc/music_event.dart';
+import 'package:women_diary/music/bloc/music_state.dart';
+import 'package:women_diary/music/model/music_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MusicBloc extends Bloc<MusicEvent, MusicState> {

@@ -1,7 +1,7 @@
-import 'package:baby_diary/chat/model/comment_model.dart';
-import 'package:baby_diary/chat/model/thread_model.dart';
+import 'package:women_diary/chat/model/comment_model.dart';
+import 'package:women_diary/chat/model/thread_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:baby_diary/common/firebase/firebase_user.dart';
+import 'package:women_diary/common/firebase/firebase_user.dart';
 
 class FirebaseChat {
   FirebaseChat._();

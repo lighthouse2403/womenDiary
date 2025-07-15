@@ -1,9 +1,9 @@
-import 'package:baby_diary/knowledge/components/src/liquid_custom_progress_indicator.dart';
+import 'package:women_diary/knowledge/components/src/liquid_custom_progress_indicator.dart';
 import 'package:flutter/material.dart';
-import 'package:baby_diary/common/constants/constants.dart';
-import 'package:baby_diary/common/extension/date_time_extension.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
-import 'package:baby_diary/database/data_handler.dart';
+import 'package:women_diary/common/constants/constants.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/database/data_handler.dart';
 
 class HeartIndicator extends StatefulWidget {
   HeartIndicator({super.key});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:baby_diary/calendar/model/event_VO.dart';
+import 'package:women_diary/calendar/model/event_VO.dart';
 import 'event_item.dart';
 
 class EventList extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async' show Future;
 
-import 'package:baby_diary/common/constants/constants.dart';
+import 'package:women_diary/common/constants/constants.dart';
 
 class InfoContainer extends StatefulWidget {
   @override

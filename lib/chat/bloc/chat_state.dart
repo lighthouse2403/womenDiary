@@ -1,4 +1,4 @@
-import 'package:baby_diary/chat/model/comment_model.dart';
+import 'package:women_diary/chat/model/comment_model.dart';
 import 'package:equatable/equatable.dart';
 
 class ChatState extends Equatable {

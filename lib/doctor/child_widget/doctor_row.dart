@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:baby_diary/_gen/assets.gen.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
-import 'package:baby_diary/doctor/doctor_model.dart';
+import 'package:women_diary/_gen/assets.gen.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/doctor/doctor_model.dart';
 
 class DoctorRow extends StatefulWidget {
   const DoctorRow({super.key, required this.doctor});

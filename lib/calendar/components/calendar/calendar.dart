@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:baby_diary/calendar/components/calendar/day.dart';
-import 'package:baby_diary/calendar/components/calendar/day_of_week.dart';
-import 'package:baby_diary/calendar/components/calendar/header.dart';
-import 'package:baby_diary/calendar/components/calendar/utils.dart';
-import 'package:baby_diary/calendar/components/swipe_detector.dart';
-import 'package:baby_diary/common/constants/constants.dart';
+import 'package:women_diary/calendar/components/calendar/day.dart';
+import 'package:women_diary/calendar/components/calendar/day_of_week.dart';
+import 'package:women_diary/calendar/components/calendar/header.dart';
+import 'package:women_diary/calendar/components/calendar/utils.dart';
+import 'package:women_diary/calendar/components/swipe_detector.dart';
+import 'package:women_diary/common/constants/constants.dart';
 
 class Calendar extends StatefulWidget {
   final List<DateTime> markedDays;

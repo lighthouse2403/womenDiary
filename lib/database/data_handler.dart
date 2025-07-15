@@ -1,15 +1,14 @@
-import 'package:baby_diary/baby_information/baby_model.dart';
-import 'package:baby_diary/database/baby_action_database.dart';
-import 'package:baby_diary/database/baby_index_database.dart';
-import 'package:baby_diary/database/mother_database.dart';
-import 'package:baby_diary/schedule/schedule_model.dart';
+import 'package:women_diary/diary/diary_model.dart';
+import 'package:women_diary/period/red_date.dart';
+import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 class DatabaseHandler {
-  static String databasePath = 'babyDiary.db';
-  static String babyTable = 'babiesTable';
+  static String databasePath = 'womenDiary.db';
+  static String periodTable = 'periodTable';
   static String scheduleTable = 'scheduleTable';
+  static String diaryTable = 'diaryTable';
 
   static Future<sql.Database> db(String tableName) async {
     return sql.openDatabase(
@@ -22,77 +21,67 @@ class DatabaseHandler {
   }
 
   static Future<void> createTables(sql.Database database) async {
-    await database.execute("CREATE TABLE $babyTable(babyId TEXT PRIMARY KEY, babyName TEXT, gender TEXT, birthDate INTEGER, createdTime INTEGER, updatedTime INTEGER, group INTEGER, selected INTEGER)");
-    await database.execute("CREATE TABLE $scheduleTable(babyId TEXT PRIMARY KEY, babyId TEXT, time INTEGER, content TEXT, createdTime INTEGER, updatedTime INTEGER, alarm INTEGER)");
-
-    /// Actions for baby
-    await BabyActionsDatabase.createBabyActionsTables(database);
-    await BabyIndexDatabase.createBabyIndexTables(database);
-    await MotherDatabase.createMotherTables(database);
+    await database.execute("CREATE TABLE $periodTable(id TEXT PRIMARY KEY, startTime INTEGER, endTime INTEGER, createdTime INTEGER, updatedTime INTEGER)");
+    await database.execute("CREATE TABLE $scheduleTable(id TEXT PRIMARY KEY, time INTEGER, content TEXT, createdTime INTEGER, updatedTime INTEGER, alarm INTEGER)");
+    await database.execute("CREATE TABLE $diaryTable(id TEXT PRIMARY KEY, time INTEGER, content TEXT, createdTime INTEGER, updatedTime INTEGER, url TEXT)");
   }
 
   static Future<void> clearData() async {
     sql.deleteDatabase(DatabaseHandler.databasePath);
   }
 
-  ///----------------------- BABIES --------------------------------------------
-  static Future<void> insertBaby(BabyModel baby) async {
-    final db = await DatabaseHandler.db(babyTable);
+  ///----------------------- RED DATE ------------------------------------------
+  static Future<void> insertRedDate(RedDateModel date) async {
+    final db = await DatabaseHandler.db(periodTable);
     await db.insert(
-      babyTable,
-      baby.toJson(),
+      periodTable,
+      date.toJson(),
       conflictAlgorithm: sql.ConflictAlgorithm.replace,
     );
   }
 
-  static Future<BabyModel> getBaby(String id) async {
-    final db = await DatabaseHandler.db(babyTable);
-    final List<Map<String, dynamic>> maps = await db.query(babyTable, where: 'babyId = ?', whereArgs: [id]);
-    return BabyModel.fromDatabase(maps.first);
+  static Future<RedDateModel> gedRedDate(String id) async {
+    final db = await DatabaseHandler.db(periodTable);
+    final List<Map<String, dynamic>> maps = await db.query(periodTable, where: 'id = ?', whereArgs: [id]);
+    return RedDateModel.fromDatabase(maps.first);
   }
 
-  static Future<BabyModel> getSelectedBaby() async {
-    final db = await DatabaseHandler.db(babyTable);
-    final List<Map<String, dynamic>> maps = await db.query(babyTable, where: 'selected = ?', whereArgs: [1]);
-    return BabyModel.fromDatabase(maps.first);
-  }
-
-  static Future<List<BabyModel>> getAllBaby() async {
-    final db = await DatabaseHandler.db(babyTable);
-    final List<Map<String, dynamic>> list = await db.query(babyTable);
-    return list.map((e) => BabyModel.fromDatabase(e)).toList();
+  static Future<List<RedDateModel>> getAllRedDate() async {
+    final db = await DatabaseHandler.db(periodTable);
+    final List<Map<String, dynamic>> list = await db.query(periodTable);
+    return list.map((e) => RedDateModel.fromDatabase(e)).toList();
   }
 
   // Update an item by id
-  static Future<void> updateBaby(BabyModel baby) async {
-    final db = await DatabaseHandler.db(babyTable);
+  static Future<void> updateRedDate(RedDateModel date) async {
+    final db = await DatabaseHandler.db(periodTable);
 
     await db.update(
-      babyTable,
-      baby.toJson(),
-      where: 'babyId = ?',
-      whereArgs: [baby.babyId],
+      periodTable,
+      date.toJson(),
+      where: 'id = ?',
+      whereArgs: [date.id],
     );
   }
 
   // Delete
-  static Future<void> deleteBaby(String babyId) async {
-    final db = await DatabaseHandler.db(babyTable);
+  static Future<void> deleteRedDate(String id) async {
+    final db = await DatabaseHandler.db(periodTable);
     try {
       await db.delete(
-          babyTable,
-          where: "babyId = ?",
-          whereArgs: [babyId]);
+          periodTable,
+          where: "id = ?",
+          whereArgs: [id]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
   }
 
-  static Future<void> deleteAllBaby() async {
-    final db = await DatabaseHandler.db(babyTable);
+  static Future<void> deleteAllRedDate() async {
+    final db = await DatabaseHandler.db(periodTable);
     try {
       await db.delete(
-          babyTable
+          periodTable
       );
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
@@ -167,6 +156,64 @@ class DatabaseHandler {
     try {
       await db.delete(
           scheduleTable
+      );
+    } catch (err) {
+      debugPrint("Something went wrong when deleting an item: $err");
+    }
+  }
+
+  ///----------------------- BABIES --------------------------------------------
+  static Future<void> insertDiary(DiaryModel diary) async {
+    final db = await DatabaseHandler.db(diaryTable);
+    await db.insert(
+      diaryTable,
+      diary.toJson(),
+      conflictAlgorithm: sql.ConflictAlgorithm.replace,
+    );
+  }
+
+  static Future<DiaryModel> gedDiary(String id) async {
+    final db = await DatabaseHandler.db(diaryTable);
+    final List<Map<String, dynamic>> maps = await db.query(diaryTable, where: 'id = ?', whereArgs: [id]);
+    return DiaryModel.fromDatabase(maps.first);
+  }
+
+  static Future<List<DiaryModel>> getAllDiary() async {
+    final db = await DatabaseHandler.db(diaryTable);
+    final List<Map<String, dynamic>> list = await db.query(diaryTable);
+    return list.map((e) => DiaryModel.fromDatabase(e)).toList();
+  }
+
+  // Update an item by id
+  static Future<void> updateDiary(DiaryModel diary) async {
+    final db = await DatabaseHandler.db(diaryTable);
+
+    await db.update(
+      diaryTable,
+      diary.toJson(),
+      where: 'id = ?',
+      whereArgs: [diary.id],
+    );
+  }
+
+  // Delete
+  static Future<void> deleteDiary(String id) async {
+    final db = await DatabaseHandler.db(diaryTable);
+    try {
+      await db.delete(
+          diaryTable,
+          where: "id = ?",
+          whereArgs: [id]);
+    } catch (err) {
+      debugPrint("Something went wrong when deleting an item: $err");
+    }
+  }
+
+  static Future<void> deleteAllDiary() async {
+    final db = await DatabaseHandler.db(diaryTable);
+    try {
+      await db.delete(
+          diaryTable
       );
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");

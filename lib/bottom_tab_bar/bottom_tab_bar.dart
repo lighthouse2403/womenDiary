@@ -1,10 +1,10 @@
-import 'package:baby_diary/_gen/assets.gen.dart';
-import 'package:baby_diary/common/constants/app_colors.dart';
-import 'package:baby_diary/common/extension/font_size_extension.dart';
-import 'package:baby_diary/common/extension/font_weight_extension.dart';
-import 'package:baby_diary/common/extension/text_color_extension.dart';
-import 'package:baby_diary/routes/route_name.dart';
-import 'package:baby_diary/routes/routes.dart';
+import 'package:women_diary/_gen/assets.gen.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/extension/font_size_extension.dart';
+import 'package:women_diary/common/extension/font_weight_extension.dart';
+import 'package:women_diary/common/extension/text_color_extension.dart';
+import 'package:women_diary/routes/route_name.dart';
+import 'package:women_diary/routes/routes.dart';
 import 'package:flutter/material.dart';
 
 class MainBottomTabBar extends StatefulWidget {
@@ -19,9 +19,9 @@ class MainBottomTabBar extends StatefulWidget {
 class MainBottomTabBarState extends State<MainBottomTabBar> {
   int selectedIndex = 0;
 
-  List<String> routeNames = [RoutesName.home, RoutesName.diaries, RoutesName.chat, RoutesName.audios, RoutesName.knowledge];
-  List<String> labels = ['Trang chủ','Lịch sử', 'Diễn đàn', 'Âm nhạc', 'Kiến thức'];
-  List<SvgGenImage> images = [Assets.icons.home, Assets.icons.diary, Assets.icons.chat, Assets.icons.music, Assets.icons.knowledge];
+  List<String> routeNames = [RoutesName.home, RoutesName.period, RoutesName.chat, RoutesName.diaries, RoutesName.knowledge];
+  List<String> labels = ['Trang chủ','Lịch sử', 'Diễn đàn', 'Nhật ký', 'Kiến thức'];
+  List<SvgGenImage> images = [Assets.icons.home, Assets.icons.diary, Assets.icons.chat, Assets.icons.diary, Assets.icons.knowledge];
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,7 @@
-import 'package:baby_diary/common/constants/app_colors.dart';
-import 'package:baby_diary/common/extension/font_size_extension.dart';
-import 'package:baby_diary/common/extension/font_weight_extension.dart';
-import 'package:baby_diary/common/extension/text_color_extension.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/extension/font_size_extension.dart';
+import 'package:women_diary/common/extension/font_weight_extension.dart';
+import 'package:women_diary/common/extension/text_color_extension.dart';
 import 'package:flutter/material.dart';
 
 class CommonButton extends StatelessWidget {

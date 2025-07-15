@@ -1,9 +1,9 @@
-import 'package:baby_diary/chat/model/thread_model.dart';
+import 'package:women_diary/chat/model/thread_model.dart';
 import 'package:flutter/material.dart';
-import 'package:baby_diary/_gen/assets.gen.dart';
-import 'package:baby_diary/common/constants/app_colors.dart';
-import 'package:baby_diary/common/extension/date_time_extension.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
+import 'package:women_diary/_gen/assets.gen.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 
 class ThreadRow extends StatefulWidget {
   const ThreadRow({super.key, required this.thread});

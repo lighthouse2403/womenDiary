@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'package:baby_diary/diary/component/aspect_video.dart';
+import 'package:women_diary/diary/component/aspect_video.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
-import 'package:baby_diary/_gen/assets.gen.dart';
+import 'package:women_diary/_gen/assets.gen.dart';
 import 'package:mime/mime.dart';
 import 'package:video_player/video_player.dart';
 

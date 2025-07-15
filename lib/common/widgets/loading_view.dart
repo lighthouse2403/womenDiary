@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:baby_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
 
 class LoadingView {
 

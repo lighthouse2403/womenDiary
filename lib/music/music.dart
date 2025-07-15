@@ -1,10 +1,10 @@
 import 'package:audio_session/audio_session.dart';
-import 'package:baby_diary/common/base/base_app_bar.dart';
-import 'package:baby_diary/common/base/base_statefull_widget.dart';
-import 'package:baby_diary/common/constants/constants.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
-import 'package:baby_diary/music/audio_handler.dart';
-import 'package:baby_diary/music/play_button.dart';
+import 'package:women_diary/common/base/base_app_bar.dart';
+import 'package:women_diary/common/base/base_statefull_widget.dart';
+import 'package:women_diary/common/constants/constants.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/music/audio_handler.dart';
+import 'package:women_diary/music/play_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';

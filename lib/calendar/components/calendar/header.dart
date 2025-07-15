@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:baby_diary/common/constants/constants.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
+import 'package:women_diary/common/constants/constants.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 
 class Header extends StatelessWidget {
   const Header({super.key, required this.currentMonth, required this.onPreviousPress, required this.onNextPress});

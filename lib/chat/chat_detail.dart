@@ -1,18 +1,18 @@
-import 'package:baby_diary/chat/component/comment_row.dart';
-import 'package:baby_diary/chat/component/new_comment.dart';
-import 'package:baby_diary/chat/component/thread_row.dart';
-import 'package:baby_diary/chat/model/comment_model.dart';
-import 'package:baby_diary/chat/model/thread_model.dart';
+import 'package:women_diary/chat/component/comment_row.dart';
+import 'package:women_diary/chat/component/new_comment.dart';
+import 'package:women_diary/chat/component/thread_row.dart';
+import 'package:women_diary/chat/model/comment_model.dart';
+import 'package:women_diary/chat/model/thread_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:baby_diary/chat/bloc/chat_bloc.dart';
-import 'package:baby_diary/chat/bloc/chat_event.dart';
-import 'package:baby_diary/chat/bloc/chat_state.dart';
-import 'package:baby_diary/common/base/base_app_bar.dart';
-import 'package:baby_diary/common/base/base_statefull_widget.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
-import 'package:baby_diary/common/firebase/firebase_chat.dart';
+import 'package:women_diary/chat/bloc/chat_bloc.dart';
+import 'package:women_diary/chat/bloc/chat_event.dart';
+import 'package:women_diary/chat/bloc/chat_state.dart';
+import 'package:women_diary/common/base/base_app_bar.dart';
+import 'package:women_diary/common/base/base_statefull_widget.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/common/firebase/firebase_chat.dart';
 
 class ChatDetail extends BaseStatefulWidget {
   const ChatDetail({super.key, required this.thread});

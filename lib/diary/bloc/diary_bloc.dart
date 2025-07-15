@@ -1,8 +1,8 @@
-import 'package:baby_diary/database/mother_database.dart';
-import 'package:baby_diary/diary/diary_model.dart';
+import 'package:women_diary/database/data_handler.dart';
+import 'package:women_diary/diary/diary_model.dart';
 import 'package:bloc/bloc.dart';
-import 'package:baby_diary/diary/bloc/diary_event.dart';
-import 'package:baby_diary/diary/bloc/diary_state.dart';
+import 'package:women_diary/diary/bloc/diary_event.dart';
+import 'package:women_diary/diary/bloc/diary_state.dart';
 
 
 class DiaryBloc extends Bloc<DiaryEvent, DiaryState> {
@@ -17,7 +17,7 @@ class DiaryBloc extends Bloc<DiaryEvent, DiaryState> {
   Future<void> _loadDiaries(LoadDiariesEvent event, Emitter<DiaryState> emit) async {
     try {
       emit(const StartLoadingState());
-      diaries = await MotherDatabase.getDiaries();
+      diaries = await DatabaseHandler.getAllDiary();
       emit(const LoadingSuccessfulState());
     } catch (error) {
       emit(const LoadingFailState());
@@ -26,7 +26,7 @@ class DiaryBloc extends Bloc<DiaryEvent, DiaryState> {
 
   Future<void> _deleteDiary(DeleteDiaryEvent event, Emitter<DiaryState> emit) async {
     emit(const StartDeleteDiary());
-    await MotherDatabase.deleteAllDiary(event.diaryId);
+    await DatabaseHandler.deleteDiary(event.diaryId);
     diaries.removeWhere((element) => element.id == event.diaryId);
     emit(const LoadingSuccessfulState());
   }

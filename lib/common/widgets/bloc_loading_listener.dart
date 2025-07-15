@@ -1,5 +1,5 @@
-import 'package:baby_diary/common/constants/app_colors.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:ui';

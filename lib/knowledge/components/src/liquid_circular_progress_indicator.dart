@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:baby_diary/knowledge/components/src/wave.dart';
+import 'package:women_diary/knowledge/components/src/wave.dart';
 
 const double _twoPi = math.pi * 2.0;
 const double _epsilon = .001;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:baby_diary/knowledge/components/src/wave.dart';
+import 'package:women_diary/knowledge/components/src/wave.dart';
 
 class LiquidCustomProgressIndicator extends ProgressIndicator {
   ///The widget to show in the center of the progress indicator.

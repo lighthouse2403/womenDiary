@@ -7,9 +7,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:baby_diary/_gen/assets.gen.dart';
-import 'package:baby_diary/common/constants/constants.dart';
-import 'package:baby_diary/common/extension/text_color_extension.dart';
+import 'package:women_diary/_gen/assets.gen.dart';
+import 'package:women_diary/common/constants/constants.dart';
+import 'package:women_diary/common/extension/text_color_extension.dart';
 
 const Duration _monthScrollDuration = Duration(milliseconds: 200);
 

@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
-import 'package:baby_diary/common/firebase/firebase_doctor.dart';
-import 'package:baby_diary/doctor/bloc/doctor_event.dart';
-import 'package:baby_diary/doctor/bloc/doctor_state.dart';
-import 'package:baby_diary/doctor/doctor_model.dart';
+import 'package:women_diary/common/firebase/firebase_doctor.dart';
+import 'package:women_diary/doctor/bloc/doctor_event.dart';
+import 'package:women_diary/doctor/bloc/doctor_state.dart';
+import 'package:women_diary/doctor/doctor_model.dart';
 
 class DoctorBloc extends Bloc<DoctorEvent, DoctorState> {
   List<DoctorModel> doctors = [];

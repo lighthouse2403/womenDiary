@@ -2,8 +2,8 @@ import 'dart:async' show Future;
 import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:baby_diary/calendar/model/event_VO.dart';
-import 'package:baby_diary/calendar/model/quote_VO.dart';
+import 'package:women_diary/calendar/model/event_VO.dart';
+import 'package:women_diary/calendar/model/quote_VO.dart';
 
 Future<String> loadAssets(name) async {
   return await rootBundle.loadString(name);

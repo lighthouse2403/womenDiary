@@ -1,12 +1,13 @@
-import 'package:baby_diary/bottom_tab_bar/bottom_tab_bar.dart';
-import 'package:baby_diary/chat/chat_detail.dart';
-import 'package:baby_diary/chat/chat_list.dart';
-import 'package:baby_diary/chat/model/thread_model.dart';
-import 'package:baby_diary/diary/diary_list.dart';
-import 'package:baby_diary/knowledge/knowledge.dart';
-import 'package:baby_diary/main.dart';
-import 'package:baby_diary/music/music.dart';
-import 'package:baby_diary/routes/route_name.dart';
+import 'package:women_diary/bottom_tab_bar/bottom_tab_bar.dart';
+import 'package:women_diary/chat/chat_detail.dart';
+import 'package:women_diary/chat/chat_list.dart';
+import 'package:women_diary/chat/model/thread_model.dart';
+import 'package:women_diary/diary/diary_list.dart';
+import 'package:women_diary/home/home.dart';
+import 'package:women_diary/knowledge/knowledge.dart';
+import 'package:women_diary/main.dart';
+import 'package:women_diary/music/music.dart';
+import 'package:women_diary/routes/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -34,7 +35,7 @@ class Routes {
     return GoRouter(
       navigatorKey: navigatorKey,
       initialLocation: init,
-      observers: [BabyDiary.observer],
+      observers: [WomenDiary.observer],
       routes: [
         ShellRoute(
           navigatorKey: _shellNavigatorKey,
@@ -46,12 +47,12 @@ class Routes {
               parentNavigatorKey: _shellNavigatorKey,
               path: RoutesName.home,
               pageBuilder: (context, state) {
-                return _createPageFadeTransition(state: state, child: const DiaryList());
+                return _createPageFadeTransition(state: state, child: const HomePage());
               },
             ),
             GoRoute(
               parentNavigatorKey: _shellNavigatorKey,
-              path: RoutesName.diaries,
+              path: RoutesName.period,
               pageBuilder: (context, state) {
                 return _createPageFadeTransition(state: state, child: const DiaryList());
               },
@@ -65,16 +66,16 @@ class Routes {
             ),
             GoRoute(
               parentNavigatorKey: _shellNavigatorKey,
-              path: RoutesName.audios,
+              path: RoutesName.diaries,
               pageBuilder: (context, state) {
-                return _createPageFadeTransition(state: state, child: const Audios());
+                return _createPageFadeTransition(state: state, child: const DiaryList());
               },
             ),
             GoRoute(
               parentNavigatorKey: _shellNavigatorKey,
               path: RoutesName.knowledge,
               pageBuilder: (context, state) {
-                return _createPageFadeTransition(state: state, child: const Knowledge());
+                return _createPageFadeTransition(state: state, child: Knowledge());
               },
             ),
           ],

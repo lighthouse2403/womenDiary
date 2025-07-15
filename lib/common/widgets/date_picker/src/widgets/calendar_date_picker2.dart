@@ -4,7 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:baby_diary/common/widgets/date_picker/src/models/calendar_date_picker2_config.dart';
+import 'package:women_diary/common/widgets/date_picker/src/models/calendar_date_picker2_config.dart';
 
 const Duration _monthScrollDuration = Duration(milliseconds: 200);
 

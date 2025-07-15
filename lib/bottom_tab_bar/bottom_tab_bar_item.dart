@@ -1,4 +1,4 @@
-import 'package:baby_diary/_gen/assets.gen.dart';
+import 'package:women_diary/_gen/assets.gen.dart';
 
 class BottomTabBarItem {
   SvgGenImage icon;

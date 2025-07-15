@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:baby_diary/_gen/assets.gen.dart';
-import 'package:baby_diary/common/base/base_app_bar.dart';
-import 'package:baby_diary/common/base/base_statefull_widget.dart';
-import 'package:baby_diary/diary/bloc/diary_bloc.dart';
-import 'package:baby_diary/diary/bloc/diary_event.dart';
-import 'package:baby_diary/diary/bloc/diary_state.dart';
-import 'package:baby_diary/diary/diary_row.dart';
-import 'package:baby_diary/routes/route_name.dart';
-import 'package:baby_diary/routes/routes.dart';
+import 'package:women_diary/_gen/assets.gen.dart';
+import 'package:women_diary/common/base/base_app_bar.dart';
+import 'package:women_diary/common/base/base_statefull_widget.dart';
+import 'package:women_diary/diary/bloc/diary_bloc.dart';
+import 'package:women_diary/diary/bloc/diary_event.dart';
+import 'package:women_diary/diary/bloc/diary_state.dart';
+import 'package:women_diary/diary/diary_row.dart';
+import 'package:women_diary/routes/route_name.dart';
+import 'package:women_diary/routes/routes.dart';
 
 class DiaryList extends BaseStatefulWidget {
   const DiaryList({super.key});

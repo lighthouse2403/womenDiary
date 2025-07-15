@@ -1,18 +1,18 @@
-import 'package:baby_diary/chat/component/new_thread.dart';
-import 'package:baby_diary/chat/component/thread_row.dart';
+import 'package:women_diary/chat/component/new_thread.dart';
+import 'package:women_diary/chat/component/thread_row.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:baby_diary/chat/bloc/chat_bloc.dart';
-import 'package:baby_diary/chat/bloc/chat_event.dart';
-import 'package:baby_diary/chat/bloc/chat_state.dart';
-import 'package:baby_diary/common/admob_handle.dart';
-import 'package:baby_diary/common/base/base_app_bar.dart';
-import 'package:baby_diary/common/base/base_statefull_widget.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
-import 'package:baby_diary/common/firebase/firebase_chat.dart';
-import 'package:baby_diary/routes/route_name.dart';
-import 'package:baby_diary/routes/routes.dart';
+import 'package:women_diary/chat/bloc/chat_bloc.dart';
+import 'package:women_diary/chat/bloc/chat_event.dart';
+import 'package:women_diary/chat/bloc/chat_state.dart';
+import 'package:women_diary/common/admob_handle.dart';
+import 'package:women_diary/common/base/base_app_bar.dart';
+import 'package:women_diary/common/base/base_statefull_widget.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/common/firebase/firebase_chat.dart';
+import 'package:women_diary/routes/route_name.dart';
+import 'package:women_diary/routes/routes.dart';
 
 class Chat extends BaseStatefulWidget {
   const Chat({super.key});

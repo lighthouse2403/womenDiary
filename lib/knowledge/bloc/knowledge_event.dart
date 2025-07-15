@@ -1,4 +1,4 @@
-import 'package:baby_diary/common/constants/constants.dart';
+import 'package:women_diary/common/constants/constants.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class KnowledgeEvent extends Equatable {

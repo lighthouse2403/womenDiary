@@ -8,11 +8,11 @@ import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:baby_diary/_gen/assets.gen.dart';
-import 'package:baby_diary/common/constants/constants.dart';
-import 'package:baby_diary/common/extension/date_time_extension.dart';
-import 'package:baby_diary/common/extension/text_extension.dart';
-import 'package:baby_diary/common/widgets/date_picker/calendar_date_picker2.dart';
+import 'package:women_diary/_gen/assets.gen.dart';
+import 'package:women_diary/common/constants/constants.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/common/widgets/date_picker/calendar_date_picker2.dart';
 
 const Size _calendarPortraitDialogSize = Size(330.0, 398.0);
 const Size _calendarLandscapeDialogSize = Size(344.0, 346.0);

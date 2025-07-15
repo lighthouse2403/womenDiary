@@ -1,13 +1,11 @@
-import 'package:baby_diary/chat/bloc/chat_event.dart';
-import 'package:baby_diary/chat/bloc/chat_state.dart';
-import 'package:baby_diary/chat/model/comment_model.dart';
-import 'package:baby_diary/chat/model/thread_model.dart';
-import 'package:baby_diary/common/firebase/firebase_chat.dart';
-import 'package:bloc/bloc.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:women_diary/chat/bloc/chat_event.dart';
+import 'package:women_diary/chat/bloc/chat_state.dart';
+import 'package:women_diary/chat/model/comment_model.dart';
+import 'package:women_diary/chat/model/thread_model.dart';
+import 'package:women_diary/common/firebase/firebase_chat.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
-
   int paging = 100;
   List<ThreadModel> threads = [];
 

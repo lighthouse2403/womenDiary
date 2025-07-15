@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:baby_diary/doctor/doctor_model.dart';
+import 'package:women_diary/doctor/doctor_model.dart';
 
 abstract class DoctorEvent extends Equatable {
   const DoctorEvent();
