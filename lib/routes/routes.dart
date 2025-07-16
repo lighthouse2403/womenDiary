@@ -47,7 +47,7 @@ class Routes {
               parentNavigatorKey: _shellNavigatorKey,
               path: RoutesName.home,
               pageBuilder: (context, state) {
-                return _createPageFadeTransition(state: state, child: const HomePage());
+                return _createPageFadeTransition(state: state, child: const Home());
               },
             ),
             GoRoute(

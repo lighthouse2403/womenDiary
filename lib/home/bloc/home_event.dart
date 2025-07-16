@@ -7,23 +7,11 @@ class HomeEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-///-------------------------------- Bath detail --------------------------------
-class LoadBabyInformationEvent extends HomeEvent {
-  const LoadBabyInformationEvent();
+class LoadCycleEvent extends HomeEvent {
+  final int currentDay;
+  final int cycleLength;
 
-  @override
-  List<Object?> get props => [];
-}
-
-class LoadTodayActionEvent extends HomeEvent {
-  const LoadTodayActionEvent();
-
-  @override
-  List<Object?> get props => [];
-}
-
-class LoadScheduleEvent extends HomeEvent {
-  const LoadScheduleEvent();
+  const LoadCycleEvent({required this.currentDay, required this.cycleLength});
 
   @override
   List<Object?> get props => [];

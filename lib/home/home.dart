@@ -1,101 +1,136 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:women_diary/home/bloc/home_bloc.dart';
+import 'package:women_diary/home/bloc/home_event.dart';
+import 'package:women_diary/home/bloc/home_state.dart';
 
-void main() => runApp(const MenstrualCycleApp());
-
-class MenstrualCycleApp extends StatelessWidget {
-  const MenstrualCycleApp({super.key});
+class Home extends StatelessWidget {
+  const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Chu kỳ kinh nguyệt',
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('🌸 Chu kỳ kinh nguyệt'),
-          backgroundColor: Colors.pinkAccent,
-        ),
-        body: const CycleTimeline(),
+    return BlocProvider(
+      create: (_) => HomeBloc()
+        ..add(LoadCycleEvent(currentDay: 13, cycleLength: 28)),
+      child: const HomeView(), // Tách phần UI + BlocBuilder
+    );
+  }
+}
+
+
+class HomeView extends StatefulWidget {
+  const HomeView({super.key});
+
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat(reverse: true);
+
+    _animation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.pink.shade50,
+      appBar: AppBar(
+        backgroundColor: Colors.pinkAccent,
+        title: const Text('🌸 Chu kỳ dạng đồng hồ cute'),
       ),
-    );
-  }
-}
+      body: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          if (state.phases.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-class CycleTimeline extends StatelessWidget {
-  const CycleTimeline({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: const [
-        CycleCard(
-          title: '🩸 Hành kinh',
-          subtitle: 'Ngày 1–5',
-          description:
-          'Niêm mạc tử cung bong ra và được thải ra ngoài cơ thể. Cảm giác có thể mệt mỏi, đau bụng nhẹ.',
-          color: Colors.pinkAccent,
-        ),
-        CycleCard(
-          title: '🌱 Giai đoạn nang trứng',
-          subtitle: 'Ngày 6–13',
-          description:
-          'Cơ thể bắt đầu tạo trứng mới, niêm mạc tử cung dày lên. Cảm giác khỏe hơn và nhiều năng lượng.',
-          color: Colors.lightBlueAccent,
-        ),
-        CycleCard(
-          title: '🌼 Rụng trứng',
-          subtitle: 'Ngày 14',
-          description:
-          'Trứng rụng khỏi buồng trứng. Đây là thời điểm dễ thụ thai nhất. Có thể tăng ham muốn hoặc có dịch nhầy nhiều hơn.',
-          color: Colors.yellowAccent,
-        ),
-        CycleCard(
-          title: '🌙 Giai đoạn hoàng thể',
-          subtitle: 'Ngày 15–28',
-          description:
-          'Cơ thể chuẩn bị cho thai kỳ. Nếu không thụ thai, hormone giảm và chu kỳ sẽ lặp lại. Có thể có cảm giác nhạy cảm, khó chịu (PMS).',
-          color: Colors.deepPurpleAccent,
-        ),
-      ],
-    );
-  }
-}
-
-class CycleCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String description;
-  final Color color;
-
-  const CycleCard({
-    super.key,
-    required this.title,
-    required this.subtitle,
-    required this.description,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: color.withAlpha(50),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: const TextStyle(
-                    fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Text(subtitle, style: TextStyle(color: Colors.grey[700])),
-            const SizedBox(height: 10),
-            Text(description,
-                style: const TextStyle(fontSize: 14, height: 1.5)),
-          ],
-        ),
+          return Center(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CustomPaint(
+                  size: const Size(320, 320),
+                  painter: PrettyCyclePainter(
+                    currentDay: state.currentDay,
+                    totalDays: state.cycleLength,
+                    phases: state.phases,
+                  ),
+                ),
+                ScaleTransition(
+                  scale: _animation,
+                  child: GestureDetector(
+                    onTap: () {
+                      _controller.stop();
+                      showDialog(
+                        context: context,
+                        builder: (dialogCtx) => AlertDialog(
+                          title: const Text("Thông tin giai đoạn"),
+                          content: Text(
+                            "Hôm nay là ngày ${state.currentDay}\n"
+                                "Giai đoạn hiện tại: ${state.currentPhase.emoji}\n"
+                                "Tiếp theo: ${state.nextPhase.emoji} (trong ${state.daysUntilNext} ngày)",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(dialogCtx).pop();
+                                _controller.repeat();
+                              },
+                              child: const Text("Đóng"),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: 160,
+                      height: 160,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.3),
+                        border: Border.all(color: Colors.white70, width: 1.5),
+                      ),
+                      alignment: Alignment.center,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text("Ngày hiện tại", style: TextStyle(fontSize: 14, color: Colors.black54)),
+                          Text("Ngày ${state.currentDay}", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87)),
+                          const SizedBox(height: 4),
+                          Text("Chu kỳ ${state.cycleLength} ngày", style: const TextStyle(fontSize: 12, color: Colors.black45)),
+                          const SizedBox(height: 6),
+                          Text("Giai đoạn: ${state.currentPhase.emoji}", style: const TextStyle(fontSize: 12, color: Colors.black87)),
+                          const SizedBox(height: 4),
+                          Text("Tiếp theo: ${state.nextPhase.emoji}", style: const TextStyle(fontSize: 12, color: Colors.deepOrange)),
+                          Text("Còn ${state.daysUntilNext} ngày", style: const TextStyle(fontSize: 12, color: Colors.orange)),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          );
+        },
       ),
     );
   }

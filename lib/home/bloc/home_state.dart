@@ -1,3 +1,4 @@
+import 'package:women_diary/home/phase_model.dart';
 import 'package:women_diary/period/red_date.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:equatable/equatable.dart';
@@ -9,11 +10,26 @@ class HomeState extends Equatable {
 }
 
 class LoadedRedDateState extends HomeState {
-  const LoadedRedDateState(this.redDate);
   final List<RedDateModel> redDate;
+  final int currentDay;
+  final int cycleLength;
+  final List<PhaseModel> phases;
+  final PhaseModel currentPhase;
+  final PhaseModel nextPhase;
+  final int daysUntilNext;
+
+  const LoadedRedDateState({
+    required this.currentDay,
+    required this.cycleLength,
+    required this.phases,
+    required this.currentPhase,
+    required this.nextPhase,
+    required this.daysUntilNext,
+    required this.redDate
+  });
 
   @override
-  List<Object?> get props => [redDate.length];
+  List<Object?> get props => [currentDay, cycleLength, phases, currentPhase, nextPhase, daysUntilNext, redDate.length];
 }
 
 class LoadedScheduleState extends HomeState {
