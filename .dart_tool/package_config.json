@@ -15,7 +15,7 @@
     },
     {
       "name": "_macros",
-      "rootUri": "file:///Users/golfzon/Downloads/flutter/bin/cache/dart-sdk/pkg/_macros",
+      "rootUri": "file:///Users/golfzon/Documents/flutter_sdk/bin/cache/dart-sdk/pkg/_macros",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
@@ -345,7 +345,7 @@
     },
     {
       "name": "flutter",
-      "rootUri": "file:///Users/golfzon/Downloads/flutter/packages/flutter",
+      "rootUri": "file:///Users/golfzon/Documents/flutter_sdk/packages/flutter",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -381,7 +381,7 @@
     },
     {
       "name": "flutter_localizations",
-      "rootUri": "file:///Users/golfzon/Downloads/flutter/packages/flutter_localizations",
+      "rootUri": "file:///Users/golfzon/Documents/flutter_sdk/packages/flutter_localizations",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -405,13 +405,13 @@
     },
     {
       "name": "flutter_test",
-      "rootUri": "file:///Users/golfzon/Downloads/flutter/packages/flutter_test",
+      "rootUri": "file:///Users/golfzon/Documents/flutter_sdk/packages/flutter_test",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
     {
       "name": "flutter_web_plugins",
-      "rootUri": "file:///Users/golfzon/Downloads/flutter/packages/flutter_web_plugins",
+      "rootUri": "file:///Users/golfzon/Documents/flutter_sdk/packages/flutter_web_plugins",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -831,7 +831,7 @@
     },
     {
       "name": "sky_engine",
-      "rootUri": "file:///Users/golfzon/Downloads/flutter/bin/cache/pkg/sky_engine",
+      "rootUri": "file:///Users/golfzon/Documents/flutter_sdk/bin/cache/pkg/sky_engine",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -1150,7 +1150,7 @@
   ],
   "generator": "pub",
   "generatorVersion": "3.8.1",
-  "flutterRoot": "file:///Users/golfzon/Downloads/flutter",
+  "flutterRoot": "file:///Users/golfzon/Documents/flutter_sdk",
   "flutterVersion": "3.32.1",
   "pubCache": "file:///Users/golfzon/.pub-cache"
 }
