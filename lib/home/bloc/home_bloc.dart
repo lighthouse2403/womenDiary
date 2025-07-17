@@ -1,11 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/phase_model.dart';
+import 'package:women_diary/period/red_date.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
+  List<PeriodModel> redDates = [];
+
   HomeBloc() : super(const HomeState()) {
+    on<LoadRedDateEvent>(_loadPeriods);
 
     on<LoadCycleEvent>((event, emit) {
       final phases = _buildPhases(event.cycleLength);
@@ -29,6 +34,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         redDate: [],
       ));
     });
+  }
+
+  Future<void> _loadPeriods(LoadRedDateEvent event, Emitter<HomeState> emit) async {
+    try {
+      redDates = await DatabaseHandler.getAllPeriod();
+    } catch (error) {
+    }
   }
 
   List<PhaseModel> _buildPhases(int length) {

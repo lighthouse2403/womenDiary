@@ -31,7 +31,7 @@ class DatabaseHandler {
   }
 
   ///----------------------- RED DATE ------------------------------------------
-  static Future<void> insertRedDate(RedDateModel date) async {
+  static Future<void> insertPeriod(PeriodModel date) async {
     final db = await DatabaseHandler.db(periodTable);
     await db.insert(
       periodTable,
@@ -40,20 +40,20 @@ class DatabaseHandler {
     );
   }
 
-  static Future<RedDateModel> gedRedDate(String id) async {
+  static Future<PeriodModel> gedPeriod(String id) async {
     final db = await DatabaseHandler.db(periodTable);
     final List<Map<String, dynamic>> maps = await db.query(periodTable, where: 'id = ?', whereArgs: [id]);
-    return RedDateModel.fromDatabase(maps.first);
+    return PeriodModel.fromDatabase(maps.first);
   }
 
-  static Future<List<RedDateModel>> getAllRedDate() async {
+  static Future<List<PeriodModel>> getAllPeriod() async {
     final db = await DatabaseHandler.db(periodTable);
     final List<Map<String, dynamic>> list = await db.query(periodTable);
-    return list.map((e) => RedDateModel.fromDatabase(e)).toList();
+    return list.map((e) => PeriodModel.fromDatabase(e)).toList();
   }
 
   // Update an item by id
-  static Future<void> updateRedDate(RedDateModel date) async {
+  static Future<void> updatePeriod(PeriodModel date) async {
     final db = await DatabaseHandler.db(periodTable);
 
     await db.update(
@@ -65,7 +65,7 @@ class DatabaseHandler {
   }
 
   // Delete
-  static Future<void> deleteRedDate(String id) async {
+  static Future<void> deletePeriod(String id) async {
     final db = await DatabaseHandler.db(periodTable);
     try {
       await db.delete(
@@ -77,7 +77,7 @@ class DatabaseHandler {
     }
   }
 
-  static Future<void> deleteAllRedDate() async {
+  static Future<void> deleteAllPeriod() async {
     final db = await DatabaseHandler.db(periodTable);
     try {
       await db.delete(

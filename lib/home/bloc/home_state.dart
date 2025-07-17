@@ -10,7 +10,7 @@ class HomeState extends Equatable {
 }
 
 class LoadedRedDateState extends HomeState {
-  final List<RedDateModel> redDate;
+  final List<PeriodModel> redDate;
   final int currentDay;
   final int cycleLength;
   final List<PhaseModel> phases;

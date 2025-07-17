@@ -1,5 +1,5 @@
 
-class RedDateModel {
+class PeriodModel {
   String id = '${DateTime.now().millisecondsSinceEpoch}';
   String note = '';
   DateTime stopTime = DateTime.now();
@@ -8,7 +8,7 @@ class RedDateModel {
   DateTime updatedTime = DateTime.now();
 
 
-  RedDateModel({
+  PeriodModel({
     required this.id,
     required this.note,
     required this.stopTime,
@@ -17,7 +17,7 @@ class RedDateModel {
     required this.updatedTime,
   });
 
-  RedDateModel.init() {
+  PeriodModel.init() {
     id = '${DateTime.now().millisecondsSinceEpoch}';
     note = '';
     stopTime = DateTime.now();
@@ -26,7 +26,7 @@ class RedDateModel {
     updatedTime = DateTime.now();
   }
 
-  RedDateModel.fromDatabase(Map<String, dynamic> json) {
+  PeriodModel.fromDatabase(Map<String, dynamic> json) {
     id = json['id'];
     note = json['note'];
     stopTime = DateTime.fromMillisecondsSinceEpoch(json['stopTime'] as int);

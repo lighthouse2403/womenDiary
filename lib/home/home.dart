@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:women_diary/home/bloc/home_bloc.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
+import 'package:women_diary/home/pretty_cycle_painter.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -13,7 +14,7 @@ class Home extends StatelessWidget {
     return BlocProvider(
       create: (_) => HomeBloc()
         ..add(LoadCycleEvent(currentDay: 13, cycleLength: 28)),
-      child: const HomeView(), // Tách phần UI + BlocBuilder
+      child: const HomeView(),
     );
   }
 }
@@ -106,7 +107,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                       height: 160,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withAlpha(70),
                         border: Border.all(color: Colors.white70, width: 1.5),
                       ),
                       alignment: Alignment.center,
