@@ -4,7 +4,7 @@ import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/phase_model.dart';
-import 'package:women_diary/period/red_date.dart';
+import 'package:women_diary/period/period_model.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   List<PeriodModel> redDates = [];
