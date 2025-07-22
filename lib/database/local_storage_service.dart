@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageService {
@@ -19,16 +21,17 @@ class LocalStorageService {
     await _prefs?.setInt('cycleLength', cycleLength);
   }
 
-  static Future<void> updateMenstrualLength(int menstrualLength) async {
-    await _prefs?.setInt('menstrualLength', menstrualLength);
+  static int getCycleLength() {
+    return _prefs?.getInt('cycleLength') ?? 30;
   }
 
-  static String? getString(String key) {
-    return _prefs?.getString(key);
+  /// Menstrual length
+  static Future<void> updateMenstruationLength(int menstrualLength) async {
+    await _prefs?.setInt('updateMenstruationLength', menstrualLength);
   }
 
-  static Future<void> remove(String key) async {
-    await _prefs?.remove(key);
+  static int getMenstruationLength() {
+    return _prefs?.getInt('updateMenstruationLength') ?? 7;
   }
 
   static Future<void> clear() async {

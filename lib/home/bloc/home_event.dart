@@ -8,10 +8,7 @@ class HomeEvent extends Equatable {
 }
 
 class LoadCycleEvent extends HomeEvent {
-  final int currentDay;
-  final int cycleLength;
-
-  const LoadCycleEvent({required this.currentDay, required this.cycleLength});
+  const LoadCycleEvent();
 
   @override
   List<Object?> get props => [];
