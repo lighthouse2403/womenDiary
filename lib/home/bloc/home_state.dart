@@ -9,8 +9,8 @@ class HomeState extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadedRedDateState extends HomeState {
-  final List<PeriodModel> redDate;
+class LoadedCycleState extends HomeState {
+  final List<PeriodModel> periodList;
   final int currentDay;
   final int cycleLength;
   final List<PhaseModel> phases;
@@ -18,18 +18,18 @@ class LoadedRedDateState extends HomeState {
   final PhaseModel nextPhase;
   final int daysUntilNext;
 
-  const LoadedRedDateState({
+  const LoadedCycleState({
     required this.currentDay,
     required this.cycleLength,
     required this.phases,
     required this.currentPhase,
     required this.nextPhase,
     required this.daysUntilNext,
-    required this.redDate
+    required this.periodList
   });
 
   @override
-  List<Object?> get props => [currentDay, cycleLength, phases, currentPhase, nextPhase, daysUntilNext, redDate.length];
+  List<Object?> get props => [currentDay, cycleLength, phases, currentPhase, nextPhase, daysUntilNext, periodList.length];
 }
 
 class LoadedScheduleState extends HomeState {

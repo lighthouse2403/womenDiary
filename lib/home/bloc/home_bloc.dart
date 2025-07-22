@@ -1,13 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:women_diary/database/data_handler.dart';
+import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/phase_model.dart';
 import 'package:women_diary/period/period_model.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  List<PeriodModel> redDates = [];
+  List<PeriodModel> periodList = [];
 
   HomeBloc() : super(const HomeState()) {
     on<LoadRedDateEvent>(_loadPeriods);
@@ -24,26 +25,27 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           ? next.startDay - event.currentDay
           : (event.cycleLength - event.currentDay + next.startDay);
 
-      emit(LoadedRedDateState(
+      emit(LoadedCycleState(
         currentDay: event.currentDay,
         cycleLength: event.cycleLength,
         phases: phases,
         currentPhase: current,
         nextPhase: next,
         daysUntilNext: daysUntilNext,
-        redDate: [],
+        periodList: [],
       ));
     });
   }
 
   Future<void> _loadPeriods(LoadRedDateEvent event, Emitter<HomeState> emit) async {
     try {
-      redDates = await DatabaseHandler.getAllPeriod();
+      periodList = await DatabaseHandler.getAllPeriod();
     } catch (error) {
     }
   }
 
   List<PhaseModel> _buildPhases(int length) {
+    int cycleLength = LocalStorageService.
     final menstruation = 5;
     final follicular = (length * 0.3).round();
     final ovulation = 1;

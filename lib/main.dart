@@ -1,5 +1,6 @@
 import 'package:women_diary/common/firebase/firebase_option.dart';
 import 'package:women_diary/common/firebase/firebase_user.dart';
+import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/l10n/app_localizations.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
@@ -11,6 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(name: 'WomenDiary',options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseUser.instance.addUser();
+  await LocalStorageService.init(); // <-- init SharedPreferences
 
   runApp(const WomenDiary());
 }

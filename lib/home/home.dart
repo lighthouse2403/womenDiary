@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:women_diary/home/bloc/home_bloc.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
+import 'package:women_diary/home/phase_model.dart';
 import 'package:women_diary/home/pretty_cycle_painter.dart';
 
 class Home extends StatelessWidget {
@@ -60,10 +61,6 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
       ),
       body: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
-          if (state.phases.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
           return Center(
             child: Stack(
               alignment: Alignment.center,
@@ -71,9 +68,14 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                 CustomPaint(
                   size: const Size(320, 320),
                   painter: PrettyCyclePainter(
-                    currentDay: state.currentDay,
-                    totalDays: state.cycleLength,
-                    phases: state.phases,
+                    currentDay: 8,
+                    totalDays: 40,
+                    phases: [
+                      PhaseModel("🩸", 5, Colors.pinkAccent, 6),
+                      PhaseModel("🌱", 10, Colors.lightBlueAccent, 16),
+                      PhaseModel("🌼", 1, Colors.yellowAccent, 17),
+                      PhaseModel("🌙", 5, Colors.deepPurpleAccent, 22),
+                    ],
                   ),
                 ),
                 ScaleTransition(
@@ -86,9 +88,9 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                         builder: (dialogCtx) => AlertDialog(
                           title: const Text("Thông tin giai đoạn"),
                           content: Text(
-                            "Hôm nay là ngày ${state.currentDay}\n"
-                                "Giai đoạn hiện tại: ${state.currentPhase.emoji}\n"
-                                "Tiếp theo: ${state.nextPhase.emoji} (trong ${state.daysUntilNext} ngày)",
+                            "Hôm nay là ngày 12\n"
+                                "Giai đoạn hiện tại: 🌱\n"
+                                "Tiếp theo: 🌼 (trong 5 ngày)",
                           ),
                           actions: [
                             TextButton(
@@ -115,14 +117,14 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Text("Ngày hiện tại", style: TextStyle(fontSize: 14, color: Colors.black54)),
-                          Text("Ngày ${state.currentDay}", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87)),
+                          Text("Ngày 10", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87)),
                           const SizedBox(height: 4),
-                          Text("Chu kỳ ${state.cycleLength} ngày", style: const TextStyle(fontSize: 12, color: Colors.black45)),
+                          Text("Chu kỳ 8 ngày", style: const TextStyle(fontSize: 12, color: Colors.black45)),
                           const SizedBox(height: 6),
-                          Text("Giai đoạn: ${state.currentPhase.emoji}", style: const TextStyle(fontSize: 12, color: Colors.black87)),
+                          Text("Giai đoạn: 🌼", style: const TextStyle(fontSize: 12, color: Colors.black87)),
                           const SizedBox(height: 4),
-                          Text("Tiếp theo: ${state.nextPhase.emoji}", style: const TextStyle(fontSize: 12, color: Colors.deepOrange)),
-                          Text("Còn ${state.daysUntilNext} ngày", style: const TextStyle(fontSize: 12, color: Colors.orange)),
+                          Text("Tiếp theo: 🌙", style: const TextStyle(fontSize: 12, color: Colors.deepOrange)),
+                          Text("Còn 3 ngày", style: const TextStyle(fontSize: 12, color: Colors.orange)),
                         ],
                       ),
                     ),

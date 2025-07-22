@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
 
 class FirebaseUser {
@@ -44,15 +44,15 @@ class FirebaseUser {
     final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     try {
       if (Platform.isAndroid) {
-        var build = await deviceInfoPlugin.androidInfo;
-        deviceName = build.model;
-        deviceVersion = build.version.toString();
-        identifier = build.androidId;  //UUID for Android
+        final build = await deviceInfoPlugin.androidInfo;
+        deviceName = build.model; // Tên thiết bị, ví dụ "Pixel 6"
+        deviceVersion = build.version.release; // Phiên bản Android, ví dụ "13"
+        identifier = build.id; // hoặc build.androidId nếu cần UUID ổn định
       } else if (Platform.isIOS) {
-        var data = await deviceInfoPlugin.iosInfo;
-        deviceName = data.utsname.nodename;
-        deviceVersion = data.systemVersion;
-        identifier = data.identifierForVendor;  //UUID for iOS
+        final data = await deviceInfoPlugin.iosInfo;
+        deviceName = data.name; // Tên thiết bị, ví dụ "iPhone"
+        deviceVersion = data.systemVersion; // Phiên bản iOS, ví dụ "16.5"
+        identifier = data.identifierForVendor ?? ''; // UUID ổn định
       }
     } on PlatformException {
       print('Failed to get platform version');
