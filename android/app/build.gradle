@@ -30,8 +30,8 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace 'com.baby.diary.flutter'
-    compileSdkVersion 34
+    namespace 'women.diary'
+    compileSdkVersion 35
     ndkVersion flutter.ndkVersion
 
     compileOptions {
