@@ -6,7 +6,7 @@ import 'package:women_diary/common/widgets/date_picker/src/widgets/calendar_date
 final today = DateUtils.dateOnly(DateTime.now());
 
 class MenstruationCalendar extends StatefulWidget {
-  const MenstruationCalendar({ Key? key }) : super(key: key);
+  const MenstruationCalendar({Key? key}) : super(key: key);
 
   @override
   State<MenstruationCalendar> createState() => _MenstruationCalendarState();
@@ -15,10 +15,13 @@ class MenstruationCalendar extends StatefulWidget {
 class _MenstruationCalendarState extends State<MenstruationCalendar> {
   final _scrollController = ScrollController();
 
-  List<DateTime?> _rangeDatePickerWithActionButtonsWithValue = [
-    DateTime.now(),
-    DateTime.now().add(const Duration(days: 5)),
+  // Danh sách các khoảng đã chọn
+  List<List<DateTime?>> _rangeList = [
+    [DateTime.now(), DateTime.now().add(const Duration(days: 5))],
   ];
+
+  // Range hiện tại đang chọn
+  List<DateTime?> _currentRangeDraft = [];
 
   @override
   void initState() {
@@ -28,49 +31,6 @@ class _MenstruationCalendarState extends State<MenstruationCalendar> {
       }
     });
     super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-          child: SingleChildScrollView(
-            child: _buildScrollCalendarWithActionButtons(),
-          )
-      ),
-    );
-  }
-
-  String _getValueText(
-      CalendarDatePicker2Type datePickerType,
-      List<DateTime?> values,
-      ) {
-    values =
-        values.map((e) => e != null ? DateUtils.dateOnly(e) : null).toList();
-    var valueText = (values.isNotEmpty ? values[0] : null)
-        .toString()
-        .replaceAll('00:00:00.000', '');
-
-    if (datePickerType == CalendarDatePicker2Type.multi) {
-      valueText = values.isNotEmpty
-          ? values
-          .map((v) => v.toString().replaceAll('00:00:00.000', ''))
-          .join(', ')
-          : 'null';
-    } else if (datePickerType == CalendarDatePicker2Type.range) {
-      if (values.isNotEmpty) {
-        final startDate = values[0].toString().replaceAll('00:00:00.000', '');
-        final endDate = values.length > 1
-            ? values[1].toString().replaceAll('00:00:00.000', '')
-            : 'null';
-        valueText = '$startDate to $endDate';
-      } else {
-        return 'null';
-      }
-    }
-
-    return valueText;
   }
 
   Widget _buildScrollCalendarWithActionButtons() {
@@ -119,37 +79,59 @@ class _MenstruationCalendarState extends State<MenstruationCalendar> {
       hideScrollViewMonthWeekHeader: true,
       disableModePicker: true,
     );
+
     return SizedBox(
       width: 375,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 10),
-          const Text('Date Picker With Action Buttons'),
+          const Text('Chọn khoảng ngày'),
           CalendarDatePicker2WithActionButtons(
             config: config,
-            value: _rangeDatePickerWithActionButtonsWithValue,
-            onValueChanged: (dates) => setState(
-                    () => _rangeDatePickerWithActionButtonsWithValue = dates),
+            value: _currentRangeDraft,
+            onValueChanged: (dates) {
+              setState(() {
+                _currentRangeDraft = dates;
+              });
+            },
           ),
           const SizedBox(height: 10),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Selection(s):  '),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  _getValueText(
-                    config.calendarType,
-                    _rangeDatePickerWithActionButtonsWithValue,
-                  ),
-                ),
-              ),
-            ],
+          ElevatedButton(
+            onPressed: () {
+              if (_currentRangeDraft.length == 2 &&
+                  _currentRangeDraft[0] != null &&
+                  _currentRangeDraft[1] != null) {
+                setState(() {
+                  _rangeList.add([..._currentRangeDraft]);
+                  _currentRangeDraft = [];
+                });
+              }
+            },
+            child: const Text("Thêm khoảng mới"),
           ),
+          const SizedBox(height: 20),
+          const Text('Các khoảng đã chọn:', style: TextStyle(fontWeight: FontWeight.bold)),
+          ..._rangeList.map((range) {
+            final start = range[0]?.toString().split(' ')[0] ?? '';
+            final end = range[1]?.toString().split(' ')[0] ?? '';
+            return Text('- $start đến $end');
+          }).toList(),
           const SizedBox(height: 25),
         ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: _buildScrollCalendarWithActionButtons(),
+        ),
       ),
     );
   }

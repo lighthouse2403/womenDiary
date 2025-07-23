@@ -92,7 +92,6 @@ class Routes {
         GoRoute(
           path: RoutesName.menstruationDetail,
           pageBuilder: (context, state) {
-            ThreadModel thread = state.extra as ThreadModel;
             return _createPageFadeTransition(state: state, child: MenstruationCalendar());
           },
         )
