@@ -1,9 +1,17 @@
-import 'package:women_diary/knowledge/bloc/knowledge_bloc.dart';
-import 'package:women_diary/knowledge/bloc/knowledge_state.dart';
-import 'package:women_diary/knowledge/components/heart_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:women_diary/_gen/assets.gen.dart';
+import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/base/base_statefull_widget.dart';
+import 'package:women_diary/diary/bloc/diary_bloc.dart';
+import 'package:women_diary/diary/bloc/diary_event.dart';
+import 'package:women_diary/diary/bloc/diary_state.dart';
+import 'package:women_diary/diary/diary_row.dart';
+import 'package:women_diary/menstruation/bloc/menstruation_bloc.dart';
+import 'package:women_diary/menstruation/bloc/menstruation_event.dart';
+import 'package:women_diary/menstruation/bloc/menstruation_state.dart';
+import 'package:women_diary/menstruation/menstruation_row.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 
@@ -15,55 +23,86 @@ class MenstruationHistory extends BaseStatefulWidget {
 }
 
 class _MenstruationHistoryState extends BaseStatefulState<MenstruationHistory> {
-  KnowledgeBloc knowledgeBloc = KnowledgeBloc();
+  MenstruationBloc menstruationBloc = MenstruationBloc()..add(const LoadAllMenstruationEvent());
+
+  @override
+  void initState() {
+    super.initState();
+  }
+  @override
+  PreferredSizeWidget? buildAppBar() {
+    return BaseAppBar(
+      title: 'Lịch sử',
+      actions: [
+        InkWell(
+          onTap: () {
+            context.navigateTo(
+                RoutesName.menstruationDetail
+            ).then((value) => menstruationBloc.add(const LoadAllMenstruationEvent()));
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Assets.icons.add.svg(width: 24, height: 24),
+          ),
+        )
+      ],
+    );
+  }
 
   @override
   Widget? buildBody() {
     return BlocProvider(
-        create: (context) => knowledgeBloc,
-        child: BlocListener<KnowledgeBloc, KnowledgeState> (
+        create: (context) => menstruationBloc,
+        child: BlocListener<MenstruationBloc, MenstruationState> (
             listener: (context, state) {
-              if (state is LoadingKnowledgeSuccessfullyState) {
+              if (state is LoadingSuccessfulState) {
                 setState(() {
                 });
               }
             },
-            child: InkWell(
-              onTap: () {
-                context.navigateTo(RoutesName.knowledgeDetail).then((value) {
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/images/pregnancy_backgroound_3.jpg'),
-                      fit: BoxFit.cover
-                  ),
-                ),
-                child: CustomScrollView(
-                  slivers: <Widget>[
-                    SliverToBoxAdapter(
-                      child: SafeArea(
-                        child: Container(
-                            height: 260.0,
-                            margin: const EdgeInsets.symmetric(vertical: 20),
-                            child: Row(
+            child: Container(
+              alignment: Alignment.topCenter,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/images/pregnancy_backgroound_3.jpg'),
+                    fit: BoxFit.cover),
+              ),
+              child: SafeArea(
+                  child: ListView.builder(
+                    itemCount: menstruationBloc.menstruationList.length,
+                    itemBuilder: (context, int index) {
+                      return
+                        InkWell(
+                          onTap: () {
+                            context.navigateTo(
+                                RoutesName.diaryDetail,
+                                arguments: menstruationBloc.menstruationList[index]
+                            ).then((value) => menstruationBloc.add(const LoadAllMenstruationEvent()));
+                          },
+                          child: Slidable(
+                            key: const ValueKey(0),
+                            endActionPane: ActionPane(
+                              motion: const ScrollMotion(),
                               children: [
-                                HeartIndicator(),
-                                const SizedBox(width: 20),
+                                SlidableAction(
+                                  flex: 2,
+                                  onPressed: (BuildContext context) {
+                                    String id = menstruationBloc.menstruationList[index].id ?? '';
+                                    menstruationBloc.add(DeleteMenstruationEvent(id: id));
+                                  },
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  icon: Icons.delete,
+                                  label: 'Xoá',
+                                )
                               ],
-                            )
-                        ),
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: Container(
-                        height: 20,
-                      ),
-                    )
-                  ],
-                ),
+                            ),
+                            child: MenstruationRow(menstruation: menstruationBloc.menstruationList[index]),
+                          ),
+                        );
+                    },
+                  )
               ),
             )
         )

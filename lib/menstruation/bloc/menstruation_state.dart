@@ -15,3 +15,5 @@ class LoadedAllMenstruationState extends MenstruationState {
   @override
   List<Object?> get props => [menstruationList.length];
 }
+
+

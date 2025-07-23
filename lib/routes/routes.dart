@@ -6,6 +6,7 @@ import 'package:women_diary/diary/diary_list.dart';
 import 'package:women_diary/home/home.dart';
 import 'package:women_diary/knowledge/knowledge.dart';
 import 'package:women_diary/main.dart';
+import 'package:women_diary/menstruation/menstruation_calendar.dart';
 import 'package:women_diary/menstruation/menstruation_history.dart';
 import 'package:women_diary/music/music.dart';
 import 'package:women_diary/routes/route_name.dart';
@@ -86,6 +87,13 @@ class Routes {
           pageBuilder: (context, state) {
             ThreadModel thread = state.extra as ThreadModel;
             return _createPageFadeTransition(state: state, child: ChatDetail(thread: thread));
+          },
+        ),
+        GoRoute(
+          path: RoutesName.menstruationDetail,
+          pageBuilder: (context, state) {
+            ThreadModel thread = state.extra as ThreadModel;
+            return _createPageFadeTransition(state: state, child: MenstruationCalendar());
           },
         )
       ],

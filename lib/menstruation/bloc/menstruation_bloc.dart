@@ -9,11 +9,22 @@ class MenstruationBloc extends Bloc<MenstruationEvent, MenstruationState> {
 
   MenstruationBloc() : super(const MenstruationState()) {
     on<LoadAllMenstruationEvent>(_loadAllMenstruation);
+    on<DeleteMenstruationEvent>(_deleteMenstruation);
+
   }
 
   Future<void> _loadAllMenstruation(LoadAllMenstruationEvent event, Emitter<MenstruationState> emit) async {
     try {
       menstruationList = await DatabaseHandler.getAllMenstruation();
+    } catch (error) {
+    }
+  }
+
+  Future<void> _deleteMenstruation(DeleteMenstruationEvent event, Emitter<MenstruationState> emit) async {
+    try {
+      await DatabaseHandler.deleteMenstruation(event.id);
+      menstruationList.removeWhere((e) => e.id == event.id);
+      emit(LoadedAllMenstruationState(menstruationList: menstruationList));
     } catch (error) {
     }
   }

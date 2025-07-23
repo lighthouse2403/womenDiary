@@ -1,50 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:women_diary/common/widgets/date_picker/src/models/calendar_date_picker2_config.dart';
 import 'package:women_diary/common/widgets/date_picker/src/utils/date_util.dart';
 import 'package:women_diary/common/widgets/date_picker/src/widgets/calendar_date_picker2_with_action_buttons.dart';
 
 final today = DateUtils.dateOnly(DateTime.now());
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MenstruationCalendar extends StatefulWidget {
+  const MenstruationCalendar({ Key? key }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'CalendarDatePicker2 Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      supportedLocales: const [
-        Locale('en', ''),
-        Locale('zh', ''),
-        Locale('he', ''),
-        Locale('es', ''),
-        Locale('ru', ''),
-        Locale('ko', ''),
-        Locale('hi', ''),
-      ],
-      home: const MyHomePage(title: 'CalendarDatePicker2 Demo'),
-    );
-  }
+  State<MenstruationCalendar> createState() => _MenstruationCalendarState();
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
+class _MenstruationCalendarState extends State<MenstruationCalendar> {
   final _scrollController = ScrollController();
 
   List<DateTime?> _rangeDatePickerWithActionButtonsWithValue = [
@@ -66,12 +34,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Text(widget.title),
-      ),
-      body: SingleChildScrollView(
-        child: _buildScrollCalendarWithActionButtons(),
+      body: SafeArea(
+          child: SingleChildScrollView(
+            child: _buildScrollCalendarWithActionButtons(),
+          )
       ),
     );
   }

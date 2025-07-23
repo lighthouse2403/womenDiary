@@ -13,3 +13,11 @@ class LoadAllMenstruationEvent extends MenstruationEvent {
   @override
   List<Object?> get props => [];
 }
+
+class DeleteMenstruationEvent extends MenstruationEvent {
+  const DeleteMenstruationEvent({required this.id });
+
+  final String id;
+  @override
+  List<Object?> get props => [id];
+}
