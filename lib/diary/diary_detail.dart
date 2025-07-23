@@ -1,3 +1,5 @@
+import 'package:women_diary/common/widgets/date_picker/src/models/calendar_date_picker2_config.dart';
+import 'package:women_diary/common/widgets/date_picker/src/widgets/calendar_date_picker2.dart';
 import 'package:women_diary/diary/bloc/diary_bloc.dart';
 import 'package:women_diary/diary/diary_model.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,7 +18,6 @@ import 'package:women_diary/common/widgets/action_sheet/bottom_sheet_alert.dart'
 import 'package:women_diary/common/widgets/action_sheet/cancel_action.dart';
 import 'package:women_diary/common/widgets/customTextField.dart';
 import 'package:women_diary/common/widgets/custom_button.dart';
-import 'package:women_diary/common/widgets/date_picker/date_picker_2.dart';
 import 'package:women_diary/diary/bloc/diary_event.dart';
 import 'package:women_diary/diary/bloc/diary_state.dart';
 import 'package:women_diary/routes/routes.dart';
@@ -48,15 +49,8 @@ class _DiaryState extends BaseStatefulState<DiaryDetail> {
     return AppBar(
       title: InkWell(
         onTap: () async {
-          final date = await showDatePicker2(
-            context: context,
-            initialDate: currentTime,
-            firstDate: DateTime(DateTime.now().year - 1),
-            currentDate: DateTime.now(),
-            lastDate: DateTime(DateTime.now().year + 2),
-            cancelText: 'Huỷ',
-            confirmText: 'Xong',
-          );
+          final date = await showCustomDatePicker(context, currentTime);
+
           setState(() {
             diaryBloc.currentDiary?.time = date ?? DateTime.now();
           });
@@ -212,4 +206,38 @@ class _DiaryState extends BaseStatefulState<DiaryDetail> {
       },
     );
   }
+
+  Future<DateTime?> showCustomDatePicker(BuildContext context, DateTime initialDate) async {
+    DateTime? selectedDate = initialDate;
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Chọn ngày'),
+          content: CalendarDatePicker2(
+            config: CalendarDatePicker2Config(),
+            value: [initialDate],
+            onValueChanged: (dates) {
+              selectedDate = dates.first;
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Huỷ'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Xong'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return selectedDate;
+  }
+
 }
+

@@ -6,8 +6,8 @@ import 'package:women_diary/common/extension/text_color_extension.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/common/widgets/common_button.dart';
 import 'package:flutter/material.dart';
-import 'package:women_diary/common/widgets/date_picker/date_picker_2.dart';
-
+import 'package:women_diary/common/widgets/date_picker/src/models/calendar_date_picker2_config.dart';
+import 'package:women_diary/common/widgets/date_picker/src/widgets/calendar_date_picker2.dart';
 import '../constants/app_colors.dart';
 
 class DobPicker extends StatelessWidget {
@@ -34,15 +34,7 @@ class DobPicker extends StatelessWidget {
               backgroundColor: AppColors.disableColor.withAlpha(40),
               buttonText: selectedDob.globalDateFormat(),
               onClick: () async {
-                final date = await showDatePicker2(
-                  context: context,
-                  initialDate: selectedDob,
-                  firstDate: DateTime(DateTime.now().year - 40),
-                  currentDate: DateTime.now().startOfDay(),
-                  lastDate: DateTime(DateTime.now().year + 1),
-                  cancelText: 'Huỷ',
-                  confirmText: 'Xong',
-                );
+                final date = await showCustomDatePicker(context, selectedDob);
                 if (date != null) {
                   onDobChanged(date);
                 }
@@ -53,4 +45,36 @@ class DobPicker extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<DateTime?> showCustomDatePicker(BuildContext context, DateTime initialDate) async {
+  DateTime? selectedDate = initialDate;
+
+  await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Chọn ngày'),
+        content: CalendarDatePicker2(
+          config: CalendarDatePicker2Config(),
+          value: [initialDate],
+          onValueChanged: (dates) {
+            selectedDate = dates.first;
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Huỷ'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Xong'),
+          ),
+        ],
+      );
+    },
+  );
+
+  return selectedDate;
 }
