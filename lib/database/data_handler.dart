@@ -1,5 +1,5 @@
 import 'package:women_diary/diary/diary_model.dart';
-import 'package:women_diary/menstruation/period_model.dart';
+import 'package:women_diary/menstruation/menstruation_model.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart' as sql;

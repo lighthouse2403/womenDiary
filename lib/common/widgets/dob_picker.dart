@@ -5,7 +5,6 @@ import 'package:women_diary/common/extension/font_weight_extension.dart';
 import 'package:women_diary/common/extension/text_color_extension.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/common/widgets/common_button.dart';
-import 'package:women_diary/common/widgets/date_picker/date_picker_2.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/app_colors.dart';

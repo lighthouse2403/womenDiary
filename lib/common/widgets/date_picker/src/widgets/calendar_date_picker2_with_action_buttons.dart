@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:women_diary/common/constants/constants.dart';
-import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/common/widgets/date_picker/src/models/calendar_date_picker2_config.dart';
 import 'package:women_diary/common/widgets/date_picker/src/widgets/calendar_date_picker2.dart';
 
+/// Display CalendarDatePicker with action buttons
 class CalendarDatePicker2WithActionButtons extends StatefulWidget {
-  const CalendarDatePicker2WithActionButtons({
+  CalendarDatePicker2WithActionButtons({
     required this.value,
     required this.config,
     this.onValueChanged,
@@ -13,18 +12,31 @@ class CalendarDatePicker2WithActionButtons extends StatefulWidget {
     this.onCancelTapped,
     this.onOkTapped,
     Key? key,
-  }) : super(key: key);
+  }) : super(key: key) {
+    if (config.calendarViewMode == CalendarDatePicker2Mode.scroll) {
+      assert(
+        config.scrollViewConstraints?.maxHeight != null,
+        'scrollViewConstraint with maxHeight must be provided when used withCalendarDatePicker2WithActionButtons under scroll mode',
+      );
+    }
+  }
 
+  /// The selected [DateTime]s that the picker should display.
   final List<DateTime?> value;
 
+  /// Called when the user taps 'OK' button
   final ValueChanged<List<DateTime?>>? onValueChanged;
 
+  /// Called when the user navigates to a new month/year in the picker under non-scroll mode
   final ValueChanged<DateTime>? onDisplayedMonthChanged;
 
+  /// The calendar configurations including action buttons
   final CalendarDatePicker2WithActionButtonsConfig config;
 
+  /// The callback when cancel button is tapped
   final Function? onCancelTapped;
 
+  /// The callback when ok button is tapped
   final Function? onOkTapped;
 
   @override
@@ -70,45 +82,36 @@ class _CalendarDatePicker2WithActionButtonsState
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(8),
-            bottomRight: Radius.circular(8)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          MediaQuery.removePadding(
-            context: context,
-            child: CalendarDatePicker2(
-              value: [..._editCache],
-              config: widget.config,
-              onValueChanged: (values) => _editCache = values,
-              onDisplayedMonthChanged: widget.onDisplayedMonthChanged,
-            ),
+    final MaterialLocalizations localizations =
+        MaterialLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        MediaQuery.removePadding(
+          context: context,
+          child: CalendarDatePicker2(
+            value: [..._editCache],
+            config: widget.config,
+            onValueChanged: (values) => _editCache = values,
+            onDisplayedMonthChanged: widget.onDisplayedMonthChanged,
           ),
-          Container(height: 1, color: Constants.mainColor()),
-          Container(
-            height: 68,
-            margin: const EdgeInsets.only(left: 12, right: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                _buildCancelButton(),
-                if ((widget.config.gapBetweenCalendarAndButtons ?? 0) > 0)
-                  SizedBox(width: widget.config.gapBetweenCalendarAndButtons),
-                _buildOkButton(),
-              ],
-            ),
-          )
-        ],
-      ),
+        ),
+        SizedBox(height: widget.config.gapBetweenCalendarAndButtons ?? 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            _buildCancelButton(Theme.of(context).colorScheme, localizations),
+            if ((widget.config.gapBetweenCalendarAndButtons ?? 0) > 0)
+              SizedBox(width: widget.config.gapBetweenCalendarAndButtons),
+            _buildOkButton(Theme.of(context).colorScheme, localizations),
+          ],
+        ),
+      ],
     );
   }
 
-  Widget _buildCancelButton() {
+  Widget _buildCancelButton(
+      ColorScheme colorScheme, MaterialLocalizations localizations) {
     return InkWell(
       borderRadius: BorderRadius.circular(5),
       onTap: () => setState(() {
@@ -124,11 +127,12 @@ class _CalendarDatePicker2WithActionButtonsState
             const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         child: widget.config.cancelButton ??
             Text(
-              'Huỷ',
+              localizations.cancelButtonLabel.toUpperCase(),
               style: widget.config.cancelButtonTextStyle ??
                   TextStyle(
-                    color: widget.config.selectedDayHighlightColor ?? Constants.primaryTextColor(),
-                    fontWeight: FontWeight.w500,
+                    color: widget.config.selectedDayHighlightColor ??
+                        colorScheme.primary,
+                    fontWeight: FontWeight.w700,
                     fontSize: 14,
                   ),
             ),
@@ -136,7 +140,8 @@ class _CalendarDatePicker2WithActionButtonsState
     );
   }
 
-  Widget _buildOkButton() {
+  Widget _buildOkButton(
+      ColorScheme colorScheme, MaterialLocalizations localizations) {
     return InkWell(
       borderRadius: BorderRadius.circular(5),
       onTap: () => setState(() {
@@ -150,14 +155,15 @@ class _CalendarDatePicker2WithActionButtonsState
       }),
       child: Container(
         padding: widget.config.buttonPadding ??
-            const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
         child: widget.config.okButton ??
             Text(
-              'OK',
+              localizations.okButtonLabel.toUpperCase(),
               style: widget.config.okButtonTextStyle ??
                   TextStyle(
-                    color: widget.config.selectedDayHighlightColor ?? Constants.primaryTextColor(),
-                    fontWeight: FontWeight.w500,
+                    color: widget.config.selectedDayHighlightColor ??
+                        colorScheme.primary,
+                    fontWeight: FontWeight.w700,
                     fontSize: 14,
                   ),
             ),

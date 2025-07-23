@@ -5,7 +5,7 @@ import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/phase_model.dart';
-import 'package:women_diary/menstruation/period_model.dart';
+import 'package:women_diary/menstruation/menstruation_model.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   List<MenstruationModel> menstruationList = [];
