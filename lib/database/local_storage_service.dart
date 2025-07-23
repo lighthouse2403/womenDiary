@@ -25,6 +25,15 @@ class LocalStorageService {
     return _prefs?.getInt('cycleLength') ?? 30;
   }
 
+  /// Everage Cycle length
+  static Future<void> updateAverageCycleLength(int cycleLength) async {
+    await _prefs?.setInt('averageCycleLength', cycleLength);
+  }
+
+  static int getAverageCycleLength() {
+    return _prefs?.getInt('averageCycleLength') ?? 30;
+  }
+
   /// Menstrual length
   static Future<void> updateMenstruationLength(int menstrualLength) async {
     await _prefs?.setInt('updateMenstruationLength', menstrualLength);
@@ -32,6 +41,15 @@ class LocalStorageService {
 
   static int getMenstruationLength() {
     return _prefs?.getInt('updateMenstruationLength') ?? 7;
+  }
+
+  /// Everage Mestruation length
+  static Future<void> updateAverageMenstruationLength(int cycleLength) async {
+    await _prefs?.setInt('averageAverageMenstruationLength', cycleLength);
+  }
+
+  static int getAverageMenstruationLength() {
+    return _prefs?.getInt('averageAverageMenstruationLength') ?? 7;
   }
 
   static Future<void> clear() async {

@@ -17,22 +17,21 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final phases = _buildPhases();
       int cycleLength = LocalStorageService.getCycleLength();
       int currentDay = 10;
-      final current = phases.firstWhere((p) => cycleLength >= p.startDay && currentDay < p.startDay + p.days);
-      final currentPhaseEnd = current.startDay + current.days - 1;
-      final next = phases.firstWhere(
+      final currentPhase = phases.firstWhere((p) => cycleLength >= p.startDay && currentDay < p.startDay + p.days);
+      final nextPhase = phases.firstWhere(
             (p) => p.startDay > currentDay,
         orElse: () => phases.first,
       );
-      final daysUntilNext = next.startDay > currentDay
-          ? next.startDay - currentDay
-          : (cycleLength - currentDay + next.startDay);
+      final daysUntilNext = nextPhase.startDay > currentDay
+          ? nextPhase.startDay - currentDay
+          : (cycleLength - currentDay + nextPhase.startDay);
 
       emit(LoadedCycleState(
         currentDay: currentDay,
         cycleLength: cycleLength,
         phases: phases,
-        currentPhase: current,
-        nextPhase: next,
+        currentPhase: currentPhase,
+        nextPhase: nextPhase,
         daysUntilNext: daysUntilNext,
         periodList: [],
       ));
@@ -49,9 +48,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   List<PhaseModel> _buildPhases() {
     int cycleLength = LocalStorageService.getCycleLength();
     int menstruationLength = LocalStorageService.getMenstruationLength();
-    int ovulationDay = cycleLength - 14; // ngày rụng trứng
+    int ovulationDay = cycleLength - 14;
     int follicularLength = ovulationDay - menstruationLength;
-    int lutealLength = cycleLength - ovulationDay - 1; // trừ 1 vì rụng trứng 1 ngày
+    int lutealLength = cycleLength - ovulationDay - 1;
 
     List<PhaseModel> phases = [
       PhaseModel("🩸", menstruationLength, Colors.pinkAccent, 1), // ngày bắt đầu

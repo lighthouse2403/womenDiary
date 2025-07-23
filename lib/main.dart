@@ -33,7 +33,7 @@ class WomenDiary extends StatelessWidget {
         themeMode: ThemeMode.light,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        routerConfig: Routes.generateRouter(RoutesName.diaries)
+        routerConfig: Routes.generateRouter(RoutesName.home)
     );
   }
 }
