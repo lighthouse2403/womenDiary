@@ -8,8 +8,8 @@ class RoutesName {
   static const String newDiary = '/diaries/newDiary';
 
   /// Period
-  static const String period = '/period';
-  static const String periodDetail = '/periodDetail';
+  static const String menstruationHistory = '/menstruationHistory';
+  static const String menstruationDetail = '/menstruationDetail';
 
   /// Chat
   static const String chat = '/chat';

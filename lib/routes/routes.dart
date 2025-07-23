@@ -6,6 +6,7 @@ import 'package:women_diary/diary/diary_list.dart';
 import 'package:women_diary/home/home.dart';
 import 'package:women_diary/knowledge/knowledge.dart';
 import 'package:women_diary/main.dart';
+import 'package:women_diary/menstruation/menstruation_history.dart';
 import 'package:women_diary/music/music.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:flutter/material.dart';
@@ -52,9 +53,9 @@ class Routes {
             ),
             GoRoute(
               parentNavigatorKey: _shellNavigatorKey,
-              path: RoutesName.period,
+              path: RoutesName.menstruationHistory,
               pageBuilder: (context, state) {
-                return _createPageFadeTransition(state: state, child: const DiaryList());
+                return _createPageFadeTransition(state: state, child: const MenstruationHistory());
               },
             ),
             GoRoute(

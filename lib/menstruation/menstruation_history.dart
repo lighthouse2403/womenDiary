@@ -7,14 +7,14 @@ import 'package:women_diary/common/base/base_statefull_widget.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 
-class Period extends BaseStatefulWidget {
-  const Period({super.key});
+class MenstruationHistory extends BaseStatefulWidget {
+  const MenstruationHistory({super.key});
 
   @override
-  State<Period> createState() => _KnowledgeState();
+  State<MenstruationHistory> createState() => _MenstruationHistoryState();
 }
 
-class _KnowledgeState extends BaseStatefulState<Period> {
+class _MenstruationHistoryState extends BaseStatefulState<MenstruationHistory> {
   KnowledgeBloc knowledgeBloc = KnowledgeBloc();
 
   @override

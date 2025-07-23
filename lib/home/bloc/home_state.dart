@@ -1,5 +1,5 @@
 import 'package:women_diary/home/phase_model.dart';
-import 'package:women_diary/period/period_model.dart';
+import 'package:women_diary/menstruation/period_model.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:equatable/equatable.dart';
 
@@ -10,7 +10,7 @@ class HomeState extends Equatable {
 }
 
 class LoadedCycleState extends HomeState {
-  final List<PeriodModel> periodList;
+  final List<MenstruationModel> periodList;
   final int currentDay;
   final int cycleLength;
   final List<PhaseModel> phases;

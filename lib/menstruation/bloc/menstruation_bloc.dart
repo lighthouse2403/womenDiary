@@ -5,40 +5,18 @@ import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/phase_model.dart';
+import 'package:women_diary/menstruation/bloc/menstruation_event.dart';
+import 'package:women_diary/menstruation/bloc/menstruation_state.dart';
 import 'package:women_diary/menstruation/period_model.dart';
 
-class HomeBloc extends Bloc<HomeEvent, HomeState> {
+class MenstruationBloc extends Bloc<MenstruationEvent, MenstruationState> {
   List<MenstruationModel> menstruationList = [];
 
-  HomeBloc() : super(const HomeState()) {
-    on<LoadRedDateEvent>(_loadPeriods);
-
-    on<LoadCycleEvent>((event, emit) {
-      final phases = _buildPhases();
-      int cycleLength = LocalStorageService.getCycleLength();
-      int currentDay = 10;
-      final currentPhase = phases.firstWhere((p) => cycleLength >= p.startDay && currentDay < p.startDay + p.days);
-      final nextPhase = phases.firstWhere(
-            (p) => p.startDay > currentDay,
-        orElse: () => phases.first,
-      );
-      final daysUntilNext = nextPhase.startDay > currentDay
-          ? nextPhase.startDay - currentDay
-          : (cycleLength - currentDay + nextPhase.startDay);
-
-      emit(LoadedCycleState(
-        currentDay: currentDay,
-        cycleLength: cycleLength,
-        phases: phases,
-        currentPhase: currentPhase,
-        nextPhase: nextPhase,
-        daysUntilNext: daysUntilNext,
-        periodList: [],
-      ));
-    });
+  MenstruationBloc() : super(const MenstruationState()) {
+    on<LoadAllMenstruationEvent>(_loadAllMenstruation);
   }
 
-  Future<void> _loadPeriods(LoadRedDateEvent event, Emitter<HomeState> emit) async {
+  Future<void> _loadAllMenstruation(LoadAllMenstruationEvent event, Emitter<MenstruationState> emit) async {
     try {
       menstruationList = await DatabaseHandler.getAllMenstruation();
     } catch (error) {

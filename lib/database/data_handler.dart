@@ -1,12 +1,12 @@
 import 'package:women_diary/diary/diary_model.dart';
-import 'package:women_diary/period/period_model.dart';
+import 'package:women_diary/menstruation/period_model.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 class DatabaseHandler {
   static String databasePath = 'womenDiary.db';
-  static String periodTable = 'periodTable';
+  static String menstruationTable = 'menstruationTable';
   static String scheduleTable = 'scheduleTable';
   static String diaryTable = 'diaryTable';
 
@@ -21,7 +21,7 @@ class DatabaseHandler {
   }
 
   static Future<void> createTables(sql.Database database) async {
-    await database.execute("CREATE TABLE $periodTable(id TEXT PRIMARY KEY, startTime INTEGER, endTime INTEGER, createdTime INTEGER, updatedTime INTEGER)");
+    await database.execute("CREATE TABLE $menstruationTable(id TEXT PRIMARY KEY, startTime INTEGER, length INTEGER, createdTime INTEGER, updatedTime INTEGER)");
     await database.execute("CREATE TABLE $scheduleTable(id TEXT PRIMARY KEY, time INTEGER, content TEXT, createdTime INTEGER, updatedTime INTEGER, alarm INTEGER)");
     await database.execute("CREATE TABLE $diaryTable(id TEXT PRIMARY KEY, time INTEGER, content TEXT, createdTime INTEGER, updatedTime INTEGER, url TEXT)");
   }
@@ -31,45 +31,45 @@ class DatabaseHandler {
   }
 
   ///----------------------- RED DATE ------------------------------------------
-  static Future<void> insertPeriod(PeriodModel date) async {
-    final db = await DatabaseHandler.db(periodTable);
+  static Future<void> insertMenstruation(MenstruationModel date) async {
+    final db = await DatabaseHandler.db(menstruationTable);
     await db.insert(
-      periodTable,
+      menstruationTable,
       date.toJson(),
       conflictAlgorithm: sql.ConflictAlgorithm.replace,
     );
   }
 
-  static Future<PeriodModel> gedPeriod(String id) async {
-    final db = await DatabaseHandler.db(periodTable);
-    final List<Map<String, dynamic>> maps = await db.query(periodTable, where: 'id = ?', whereArgs: [id]);
-    return PeriodModel.fromDatabase(maps.first);
+  static Future<MenstruationModel> getMenstruation(String id) async {
+    final db = await DatabaseHandler.db(menstruationTable);
+    final List<Map<String, dynamic>> maps = await db.query(menstruationTable, where: 'id = ?', whereArgs: [id]);
+    return MenstruationModel.fromDatabase(maps.first);
   }
 
-  static Future<List<PeriodModel>> getAllPeriod() async {
-    final db = await DatabaseHandler.db(periodTable);
-    final List<Map<String, dynamic>> list = await db.query(periodTable);
-    return list.map((e) => PeriodModel.fromDatabase(e)).toList();
+  static Future<List<MenstruationModel>> getAllMenstruation() async {
+    final db = await DatabaseHandler.db(menstruationTable);
+    final List<Map<String, dynamic>> list = await db.query(menstruationTable);
+    return list.map((e) => MenstruationModel.fromDatabase(e)).toList();
   }
 
   // Update an item by id
-  static Future<void> updatePeriod(PeriodModel date) async {
-    final db = await DatabaseHandler.db(periodTable);
+  static Future<void> updateMenstruation(MenstruationModel menstruation) async {
+    final db = await DatabaseHandler.db(menstruationTable);
 
     await db.update(
-      periodTable,
-      date.toJson(),
+      menstruationTable,
+      menstruation.toJson(),
       where: 'id = ?',
-      whereArgs: [date.id],
+      whereArgs: [menstruation.id],
     );
   }
 
   // Delete
-  static Future<void> deletePeriod(String id) async {
-    final db = await DatabaseHandler.db(periodTable);
+  static Future<void> deleteMenstruation(String id) async {
+    final db = await DatabaseHandler.db(menstruationTable);
     try {
       await db.delete(
-          periodTable,
+          menstruationTable,
           where: "id = ?",
           whereArgs: [id]);
     } catch (err) {
@@ -77,11 +77,11 @@ class DatabaseHandler {
     }
   }
 
-  static Future<void> deleteAllPeriod() async {
-    final db = await DatabaseHandler.db(periodTable);
+  static Future<void> deleteAllMenstruation() async {
+    final db = await DatabaseHandler.db(menstruationTable);
     try {
       await db.delete(
-          periodTable
+          menstruationTable
       );
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
