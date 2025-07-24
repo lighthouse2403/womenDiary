@@ -54,10 +54,6 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.pink.shade50,
-      appBar: AppBar(
-        backgroundColor: Colors.pinkAccent,
-        title: const Text('🌸 Chu kỳ dạng đồng hồ cute'),
-      ),
       body: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
           List<PhaseModel> phases = state is LoadedCycleState ? state.phases : [];
