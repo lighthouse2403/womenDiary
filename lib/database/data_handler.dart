@@ -21,7 +21,7 @@ class DatabaseHandler {
   }
 
   static Future<void> createTables(sql.Database database) async {
-    await database.execute("CREATE TABLE $menstruationTable(id TEXT PRIMARY KEY, startTime INTEGER, length INTEGER, createdTime INTEGER, updatedTime INTEGER)");
+    await database.execute("CREATE TABLE $menstruationTable(startTime INTEGER, endTime INTEGER, note TEXT, createdTime INTEGER, updatedTime INTEGER)");
     await database.execute("CREATE TABLE $scheduleTable(id TEXT PRIMARY KEY, time INTEGER, content TEXT, createdTime INTEGER, updatedTime INTEGER, alarm INTEGER)");
     await database.execute("CREATE TABLE $diaryTable(id TEXT PRIMARY KEY, time INTEGER, content TEXT, createdTime INTEGER, updatedTime INTEGER, url TEXT)");
   }
@@ -31,18 +31,18 @@ class DatabaseHandler {
   }
 
   ///----------------------- RED DATE ------------------------------------------
-  static Future<void> insertMenstruation(MenstruationModel date) async {
+  static Future<void> insertMenstruation(MenstruationModel menstruation) async {
     final db = await DatabaseHandler.db(menstruationTable);
     await db.insert(
       menstruationTable,
-      date.toJson(),
+      menstruation.toJson(),
       conflictAlgorithm: sql.ConflictAlgorithm.replace,
     );
   }
 
-  static Future<MenstruationModel> getMenstruation(String id) async {
+  static Future<MenstruationModel> getMenstruation(int startTime, int endTime) async {
     final db = await DatabaseHandler.db(menstruationTable);
-    final List<Map<String, dynamic>> maps = await db.query(menstruationTable, where: 'id = ?', whereArgs: [id]);
+    final List<Map<String, dynamic>> maps = await db.query(menstruationTable, where: 'startTime = ? AND endTime = ?', whereArgs: [startTime, endTime]);
     return MenstruationModel.fromDatabase(maps.first);
   }
 
@@ -59,19 +59,19 @@ class DatabaseHandler {
     await db.update(
       menstruationTable,
       menstruation.toJson(),
-      where: 'id = ?',
-      whereArgs: [menstruation.id],
+      where: 'startTime = ? AND endTime = ?',
+      whereArgs: [menstruation.startTime, menstruation.endTime],
     );
   }
 
   // Delete
-  static Future<void> deleteMenstruation(String id) async {
+  static Future<void> deleteMenstruation(int startTime, int endTime) async {
     final db = await DatabaseHandler.db(menstruationTable);
     try {
       await db.delete(
           menstruationTable,
-          where: "id = ?",
-          whereArgs: [id]);
+          where: 'startTime = ? AND endTime = ?',
+          whereArgs: [startTime, endTime]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }

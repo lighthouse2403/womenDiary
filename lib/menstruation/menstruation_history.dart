@@ -11,6 +11,7 @@ import 'package:women_diary/diary/diary_row.dart';
 import 'package:women_diary/menstruation/bloc/menstruation_bloc.dart';
 import 'package:women_diary/menstruation/bloc/menstruation_event.dart';
 import 'package:women_diary/menstruation/bloc/menstruation_state.dart';
+import 'package:women_diary/menstruation/menstruation_model.dart';
 import 'package:women_diary/menstruation/menstruation_row.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
@@ -88,8 +89,8 @@ class _MenstruationHistoryState extends BaseStatefulState<MenstruationHistory> {
                                 SlidableAction(
                                   flex: 2,
                                   onPressed: (BuildContext context) {
-                                    String id = menstruationBloc.menstruationList[index].id ?? '';
-                                    menstruationBloc.add(DeleteMenstruationEvent(id: id));
+                                    MenstruationModel menstruation = menstruationBloc.menstruationList[index];
+                                    menstruationBloc.add(DeleteMenstruationEvent(startTime: menstruation.startTime.millisecondsSinceEpoch, endTime: menstruation.endTime.millisecondsSinceEpoch));
                                   },
                                   backgroundColor: Colors.red,
                                   foregroundColor: Colors.white,

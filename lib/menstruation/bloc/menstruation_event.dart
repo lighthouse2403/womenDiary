@@ -15,9 +15,11 @@ class LoadAllMenstruationEvent extends MenstruationEvent {
 }
 
 class DeleteMenstruationEvent extends MenstruationEvent {
-  const DeleteMenstruationEvent({required this.id });
+  const DeleteMenstruationEvent({ required this.startTime, required this.endTime });
 
-  final String id;
+  final int startTime;
+  final int endTime;
+
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [startTime, endTime];
 }

@@ -3,12 +3,14 @@ import 'package:intl/intl.dart';
 
 class MultiRangeCalendar extends StatefulWidget {
   final List<DateTimeRange> initialRanges;
-  final void Function(List<DateTimeRange>) onChanged;
+  final void Function(DateTimeRange) onAddRange;
+  final void Function(List<DateTimeRange>) onDeleteRange;
 
   const MultiRangeCalendar({
     super.key,
     this.initialRanges = const [],
-    required this.onChanged,
+    required this.onAddRange,
+    required this.onDeleteRange,
   });
 
   @override
@@ -18,7 +20,6 @@ class MultiRangeCalendar extends StatefulWidget {
 class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
   late List<DateTimeRange> _ranges;
   DateTime? _pendingStart;
-
   @override
   void initState() {
     super.initState();
@@ -41,9 +42,10 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
 
       if (index != -1) {
         // Xóa range đã chọn
-        _ranges.removeAt(index);
         _pendingStart = null;
-        widget.onChanged(_ranges);
+        widget.onDeleteRange([_ranges[index]]);
+        _ranges.removeAt(index);
+
         return;
       }
 
@@ -59,16 +61,16 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
         );
         _ranges.add(newRange);
         _pendingStart = null;
-        widget.onChanged(_ranges);
+        widget.onAddRange(newRange);
       }
     });
   }
 
   void _resetRanges() {
     setState(() {
+      widget.onDeleteRange(_ranges);
       _ranges.clear();
       _pendingStart = null;
-      widget.onChanged(_ranges);
     });
   }
 
@@ -147,9 +149,9 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
                         color: isStart || isEnd
                             ? Colors.blue
                             : isInRange
-                            ? Colors.blue.withOpacity(0.3)
+                            ? Colors.blue.withAlpha(70)
                             : isPending
-                            ? Colors.orange.withOpacity(0.5)
+                            ? Colors.orange.withAlpha(70)
                             : null,
                         border: isToday
                             ? Border.all(color: Colors.red, width: 1.5)

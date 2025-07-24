@@ -27,7 +27,7 @@ class MenstruationRow extends StatelessWidget {
               .text12()
               .primaryTextColor()
               .ellipsis(),
-          Text('Ngày Kết thúc: ${menstruation.startTime.add(Duration(days: menstruation.length)).globalDateFormat()}')
+          Text('Ngày Kết thúc: ${menstruation.endTime.globalDateFormat()}')
               .w400()
               .text12()
               .primaryTextColor()

@@ -22,8 +22,8 @@ class MenstruationBloc extends Bloc<MenstruationEvent, MenstruationState> {
 
   Future<void> _deleteMenstruation(DeleteMenstruationEvent event, Emitter<MenstruationState> emit) async {
     try {
-      await DatabaseHandler.deleteMenstruation(event.id);
-      menstruationList.removeWhere((e) => e.id == event.id);
+      await DatabaseHandler.deleteMenstruation(event.startTime, event.endTime);
+      menstruationList.removeWhere((e) => e.startTime == event.startTime && e.endTime == event.endTime);
       emit(LoadedAllMenstruationState(menstruationList: menstruationList));
     } catch (error) {
     }
