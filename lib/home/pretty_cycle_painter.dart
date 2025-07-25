@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:women_diary/home/phase_model.dart';
 
@@ -6,74 +7,94 @@ class PrettyCyclePainter extends CustomPainter {
   final int currentDay;
   final int totalDays;
   final List<PhaseModel> phases;
+  final double rotation;
 
   PrettyCyclePainter({
     required this.currentDay,
     required this.totalDays,
     required this.phases,
+    required this.rotation,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
-    final progressWidth = size.width * 0.12; // dày hơn, tỷ lệ theo màn hình
-    final outerRadius = size.width / 2 - 10;
-    final innerRadius = outerRadius - progressWidth;
-    final middleRadius = outerRadius;
-
+    final progressWidth = size.width * 0.12;
+    final outerRadius = size.width / 2 - progressWidth / 2;
     final arcRect = Rect.fromCircle(center: center, radius: outerRadius);
+    final dotRadiusBase = size.width * 0.009;
 
     double startAngle = -pi / 2;
     int dayIndex = 0;
 
-    final arcPaint = Paint()
+    final basePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = progressWidth
-      ..strokeCap = StrokeCap.round;
+      ..strokeCap = StrokeCap.butt;
 
-    for (final phase in phases) {
+    for (int i = 0; i < phases.length; i++) {
+      final phase = phases[i];
+      final nextColor = phases[(i + 1) % phases.length].color;
       final sweep = 2 * pi * phase.days / totalDays;
 
-      // Vẽ vùng progress
-      arcPaint.shader = SweepGradient(
+      final gradient = SweepGradient(
         startAngle: startAngle,
         endAngle: startAngle + sweep,
-        colors: [phase.color.withAlpha(100), phase.color.withAlpha(200)],
-      ).createShader(arcRect);
-      canvas.drawArc(arcRect, startAngle, sweep, false, arcPaint);
+        colors: [
+          phase.color.withAlpha(210),
+          Color.lerp(phase.color, nextColor, 0.5)!.withAlpha(210),
+        ],
+        transform: GradientRotation(rotation * 2 * pi + i * 0.3),
+      );
 
-      // Vẽ emoji và số ngày
+      basePaint.shader = gradient.createShader(arcRect);
+      canvas.drawArc(arcRect, startAngle, sweep, false, basePaint);
+
+      // Emoji + text
       final midAngle = startAngle + sweep / 2;
       final labelOffset = Offset(
-        center.dx + cos(midAngle) * (innerRadius - 8),
-        center.dy + sin(midAngle) * (innerRadius - 8),
+        center.dx + cos(midAngle) * (outerRadius - progressWidth - 8),
+        center.dy + sin(midAngle) * (outerRadius - progressWidth - 8),
       );
       _drawText(canvas, "${phase.emoji}\n${phase.days} ngày", labelOffset);
 
-      // Vẽ các chấm nhỏ mỗi ngày
-      for (int i = 0; i < phase.days; i++) {
-        final angle = startAngle + i * 2 * pi / totalDays + pi / totalDays;
+      // Vẽ dot từng ngày
+      for (int j = 0; j < phase.days; j++) {
+        final angle = startAngle + j * 2 * pi / totalDays + pi / totalDays;
         final dotOffset = Offset(
-          center.dx + cos(angle) * middleRadius,
-          center.dy + sin(angle) * middleRadius,
+          center.dx + cos(angle) * outerRadius,
+          center.dy + sin(angle) * outerRadius,
         );
 
         final isCurrent = (dayIndex + 1 == currentDay);
+        final scale = isCurrent ? 1.5 + sin(rotation * 2 * pi) * 0.2 : 1.0;
+        final dotRadius = isCurrent ? dotRadiusBase * 2.2 * scale : dotRadiusBase;
 
-        final dotRadius = isCurrent ? 10.0 : 2.0;
+        // ripple effect nếu là ngày hiện tại
+        if (isCurrent) {
+          final rippleRadius = dotRadius * 2.8 + sin(rotation * 2 * pi) * 2.5;
+          canvas.drawCircle(
+            dotOffset,
+            rippleRadius,
+            Paint()
+              ..color = Colors.white.withAlpha(70)
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1.5,
+          );
+        }
+
+        canvas.drawCircle(dotOffset, dotRadius, Paint()..color = Colors.white);
 
         if (isCurrent) {
-          // Vẽ viền ngoài to
-          canvas.drawCircle(dotOffset, dotRadius, Paint()..color = Colors.white);
           canvas.drawCircle(
-              dotOffset,
-              dotRadius,
-              Paint()
-                ..color = Colors.black
-                ..style = PaintingStyle.stroke
-                ..strokeWidth = 1);
+            dotOffset,
+            dotRadius,
+            Paint()
+              ..color = Colors.black
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1.2,
+          );
 
-          // Vẽ số ngày
           final span = TextSpan(
             text: '${dayIndex + 1}',
             style: const TextStyle(
@@ -86,8 +107,6 @@ class PrettyCyclePainter extends CustomPainter {
           final tp = TextPainter(text: span, textAlign: TextAlign.center, textDirection: TextDirection.ltr);
           tp.layout();
           tp.paint(canvas, dotOffset - Offset(tp.width / 2, tp.height / 2));
-        } else {
-          canvas.drawCircle(dotOffset, dotRadius, Paint()..color = Colors.white);
         }
 
         dayIndex++;
@@ -111,5 +130,8 @@ class PrettyCyclePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant PrettyCyclePainter oldDelegate) =>
+      oldDelegate.rotation != rotation ||
+          oldDelegate.phases != phases ||
+          oldDelegate.currentDay != currentDay;
 }

@@ -70,7 +70,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                   painter: PrettyCyclePainter(
                     currentDay: currentDay,
                     totalDays: cycleLength,
-                    phases: phases,
+                    phases: phases, rotation: 0.6,
                   ),
                 ),
                 ScaleTransition(
