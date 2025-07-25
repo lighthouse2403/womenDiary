@@ -30,7 +30,7 @@ class PrettyCyclePainter extends CustomPainter {
     final basePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = progressWidth
-      ..strokeCap = StrokeCap.butt;
+      ..strokeCap = StrokeCap.round;
 
     for (int i = 0; i < phases.length; i++) {
       final phase = phases[i];

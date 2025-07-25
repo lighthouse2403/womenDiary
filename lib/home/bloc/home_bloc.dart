@@ -53,7 +53,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     int lutealLength = cycleLength - ovulationDay - 1;
 
     List<PhaseModel> phases = [
-      PhaseModel("🩸", menstruationLength, Colors.pink.shade100, 1), // ngày bắt đầu
+      PhaseModel("🩸", menstruationLength, Colors.red.shade200, 1),
       PhaseModel("🌱", follicularLength, Colors.lightBlueAccent, menstruationLength + 1),
       PhaseModel("🌼", 1, Colors.yellowAccent, ovulationDay),
       PhaseModel("🌙", lutealLength, Colors.deepOrange.shade200, ovulationDay + 1),
