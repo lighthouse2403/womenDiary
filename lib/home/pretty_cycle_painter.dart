@@ -41,10 +41,12 @@ class PrettyCyclePainter extends CustomPainter {
         startAngle: startAngle,
         endAngle: startAngle + sweep,
         colors: [
-          phase.color.withAlpha(210),
-          Color.lerp(phase.color, nextColor, 0.5)!.withAlpha(210),
+          phase.color.withAlpha(180),
+          Color.lerp(phase.color, nextColor, 0.5)!.withAlpha(180),
+          nextColor.withAlpha(120),
         ],
-        transform: GradientRotation(rotation * 2 * pi + i * 0.3),
+        stops: const [0.0, 0.5, 1.0],
+        transform: GradientRotation(rotation * 2 * pi + i * 0.4),
       );
 
       basePaint.shader = gradient.createShader(arcRect);
@@ -70,7 +72,7 @@ class PrettyCyclePainter extends CustomPainter {
         final scale = isCurrent ? 1.5 + sin(rotation * 2 * pi) * 0.2 : 1.0;
         final dotRadius = isCurrent ? dotRadiusBase * 2.2 * scale : dotRadiusBase;
 
-        // ripple effect nếu là ngày hiện tại
+        // Ripple effect nếu là ngày hiện tại
         if (isCurrent) {
           final rippleRadius = dotRadius * 2.8 + sin(rotation * 2 * pi) * 2.5;
           canvas.drawCircle(
@@ -83,18 +85,19 @@ class PrettyCyclePainter extends CustomPainter {
           );
         }
 
+        // Dot trắng với viền mượt
         canvas.drawCircle(dotOffset, dotRadius, Paint()..color = Colors.white);
+        canvas.drawCircle(
+          dotOffset,
+          dotRadius,
+          Paint()
+            ..color = Colors.black.withAlpha(isCurrent ? 255 : 80)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = isCurrent ? 1.2 : 0.6,
+        );
 
+        // Số thứ tự ngày
         if (isCurrent) {
-          canvas.drawCircle(
-            dotOffset,
-            dotRadius,
-            Paint()
-              ..color = Colors.black
-              ..style = PaintingStyle.stroke
-              ..strokeWidth = 1.2,
-          );
-
           final span = TextSpan(
             text: '${dayIndex + 1}',
             style: const TextStyle(
@@ -104,7 +107,11 @@ class PrettyCyclePainter extends CustomPainter {
               height: 1,
             ),
           );
-          final tp = TextPainter(text: span, textAlign: TextAlign.center, textDirection: TextDirection.ltr);
+          final tp = TextPainter(
+            text: span,
+            textAlign: TextAlign.center,
+            textDirection: TextDirection.ltr,
+          );
           tp.layout();
           tp.paint(canvas, dotOffset - Offset(tp.width / 2, tp.height / 2));
         }
