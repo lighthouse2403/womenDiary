@@ -20,7 +20,10 @@ class MenstruationRow extends StatelessWidget {
           color: Colors.white.withAlpha(70),
           borderRadius: const BorderRadius.all(Radius.circular(6))
       ),
-      child: Row(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Text('Ngày bắt đầu: ${menstruation.startTime.globalDateFormat()}')
               .w400()

@@ -16,6 +16,7 @@ class MenstruationBloc extends Bloc<MenstruationEvent, MenstruationState> {
   Future<void> _loadAllMenstruation(LoadAllMenstruationEvent event, Emitter<MenstruationState> emit) async {
     try {
       menstruationList = await DatabaseHandler.getAllMenstruation();
+      emit(LoadedAllMenstruationState(menstruationList: menstruationList));
     } catch (error) {
     }
   }

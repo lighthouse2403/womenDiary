@@ -10,6 +10,7 @@ class RoutesName {
   /// Period
   static const String menstruationHistory = '/menstruationHistory';
   static const String menstruationDetail = '/menstruationDetail';
+  static const String menstruationCalendar = '/menstruationCalendar';
 
   /// Chat
   static const String chat = '/chat';

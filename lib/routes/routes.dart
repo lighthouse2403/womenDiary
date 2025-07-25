@@ -7,7 +7,9 @@ import 'package:women_diary/home/home.dart';
 import 'package:women_diary/knowledge/knowledge.dart';
 import 'package:women_diary/main.dart';
 import 'package:women_diary/menstruation/menstruation_calendar.dart';
+import 'package:women_diary/menstruation/menstruation_detail.dart';
 import 'package:women_diary/menstruation/menstruation_history.dart';
+import 'package:women_diary/menstruation/menstruation_model.dart';
 import 'package:women_diary/music/music.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:flutter/material.dart';
@@ -90,9 +92,16 @@ class Routes {
           },
         ),
         GoRoute(
-          path: RoutesName.menstruationDetail,
+          path: RoutesName.menstruationCalendar,
           pageBuilder: (context, state) {
             return _createPageFadeTransition(state: state, child: MenstruationCalendar());
+          },
+        ),
+        GoRoute(
+          path: RoutesName.menstruationDetail,
+          pageBuilder: (context, state) {
+            MenstruationModel menstruation = state.extra as MenstruationModel;
+            return _createPageFadeTransition(state: state, child: MenstruationDetail(menstruation: menstruation));
           },
         )
       ],
