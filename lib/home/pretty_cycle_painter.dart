@@ -27,32 +27,30 @@ class PrettyCyclePainter extends CustomPainter {
     double startAngle = -pi / 2;
     int dayIndex = 0;
 
-    final basePaint = Paint()
+    // Gradient toàn bộ vòng tròn chuyển động liên tục
+    final fullGradient = SweepGradient(
+      startAngle: 0,
+      endAngle: 2 * pi,
+      tileMode: TileMode.repeated,
+      transform: GradientRotation(rotation * 2 * pi),
+      colors: _buildFullGradientColors(phases),
+      stops: _buildGradientStops(phases),
+    );
+
+    final Paint basePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = progressWidth
-      ..strokeCap = StrokeCap.round;
+      ..strokeCap = StrokeCap.round
+      ..shader = fullGradient.createShader(arcRect);
 
+    // Vẽ từng phase như đoạn cắt trong vòng gradient
     for (int i = 0; i < phases.length; i++) {
       final phase = phases[i];
-      final nextColor = phases[(i + 1) % phases.length].color;
       final sweep = 2 * pi * phase.days / totalDays;
 
-      final gradient = SweepGradient(
-        startAngle: startAngle,
-        endAngle: startAngle + sweep,
-        colors: [
-          phase.color.withAlpha(180),
-          Color.lerp(phase.color, nextColor, 0.5)!.withAlpha(180),
-          nextColor.withAlpha(120),
-        ],
-        stops: const [0.0, 0.5, 1.0],
-        transform: GradientRotation(rotation * 2 * pi + i * 0.4),
-      );
-
-      basePaint.shader = gradient.createShader(arcRect);
       canvas.drawArc(arcRect, startAngle, sweep, false, basePaint);
 
-      // Emoji + text
+      // Emoji + số ngày
       final midAngle = startAngle + sweep / 2;
       final labelOffset = Offset(
         center.dx + cos(midAngle) * (outerRadius - progressWidth - 8),
@@ -60,7 +58,7 @@ class PrettyCyclePainter extends CustomPainter {
       );
       _drawText(canvas, "${phase.emoji}\n${phase.days} ngày", labelOffset);
 
-      // Vẽ dot từng ngày
+      // Dot từng ngày + ripple
       for (int j = 0; j < phase.days; j++) {
         final angle = startAngle + j * 2 * pi / totalDays + pi / totalDays;
         final dotOffset = Offset(
@@ -72,7 +70,7 @@ class PrettyCyclePainter extends CustomPainter {
         final scale = isCurrent ? 1.5 + sin(rotation * 2 * pi) * 0.2 : 1.0;
         final dotRadius = isCurrent ? dotRadiusBase * 2.2 * scale : dotRadiusBase;
 
-        // Ripple effect nếu là ngày hiện tại
+        // Ripple effect
         if (isCurrent) {
           final rippleRadius = dotRadius * 2.8 + sin(rotation * 2 * pi) * 2.5;
           canvas.drawCircle(
@@ -85,19 +83,21 @@ class PrettyCyclePainter extends CustomPainter {
           );
         }
 
-        // Dot trắng với viền mượt
+        // Dot
         canvas.drawCircle(dotOffset, dotRadius, Paint()..color = Colors.white);
-        canvas.drawCircle(
-          dotOffset,
-          dotRadius,
-          Paint()
-            ..color = Colors.black.withAlpha(isCurrent ? 255 : 80)
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = isCurrent ? 1.2 : 0.6,
-        );
 
-        // Số thứ tự ngày
         if (isCurrent) {
+          // Outline
+          canvas.drawCircle(
+            dotOffset,
+            dotRadius,
+            Paint()
+              ..color = Colors.black
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1.2,
+          );
+
+          // Hiển thị ngày
           final span = TextSpan(
             text: '${dayIndex + 1}',
             style: const TextStyle(
@@ -128,12 +128,41 @@ class PrettyCyclePainter extends CustomPainter {
       text: text,
       style: const TextStyle(fontSize: 11, color: Colors.black87, height: 1.3),
     );
-    final tp = TextPainter(text: span, textAlign: TextAlign.center, textDirection: TextDirection.ltr);
+    final tp = TextPainter(
+      text: span,
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
     tp.layout();
     canvas.save();
     canvas.translate(offset.dx - tp.width / 2, offset.dy - tp.height / 2);
     tp.paint(canvas, Offset.zero);
     canvas.restore();
+  }
+
+  List<Color> _buildFullGradientColors(List<PhaseModel> phases) {
+    final colors = <Color>[];
+    for (int i = 0; i < phases.length; i++) {
+      final c1 = phases[i].color.withAlpha(210);
+      final c2 = i + 1 < phases.length
+          ? phases[i + 1].color.withAlpha(160)
+          : phases.first.color.withAlpha(160);
+      colors.addAll([c1, Color.lerp(c1, c2, 0.5)!, c2]);
+    }
+    return colors;
+  }
+
+  List<double> _buildGradientStops(List<PhaseModel> phases) {
+    final stops = <double>[];
+    double current = 0;
+    for (var phase in phases) {
+      final sweepRatio = phase.days / totalDays;
+      stops.add(current);
+      stops.add(current + sweepRatio / 2);
+      stops.add(current + sweepRatio);
+      current += sweepRatio;
+    }
+    return stops;
   }
 
   @override
