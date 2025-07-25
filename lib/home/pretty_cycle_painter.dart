@@ -27,13 +27,12 @@ class PrettyCyclePainter extends CustomPainter {
     double startAngle = -pi / 2;
     int dayIndex = 0;
 
-    // Gradient toàn bộ vòng tròn chuyển động liên tục
-    final fullGradient = SweepGradient(
+    final dynamicGradient = SweepGradient(
       startAngle: 0,
       endAngle: 2 * pi,
       tileMode: TileMode.repeated,
       transform: GradientRotation(rotation * 2 * pi),
-      colors: _buildFullGradientColors(phases),
+      colors: _buildDynamicGradientColors(phases),
       stops: _buildGradientStops(phases),
     );
 
@@ -41,16 +40,14 @@ class PrettyCyclePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = progressWidth
       ..strokeCap = StrokeCap.round
-      ..shader = fullGradient.createShader(arcRect);
+      ..shader = dynamicGradient.createShader(arcRect);
 
-    // Vẽ từng phase như đoạn cắt trong vòng gradient
     for (int i = 0; i < phases.length; i++) {
       final phase = phases[i];
       final sweep = 2 * pi * phase.days / totalDays;
 
       canvas.drawArc(arcRect, startAngle, sweep, false, basePaint);
 
-      // Emoji + số ngày
       final midAngle = startAngle + sweep / 2;
       final labelOffset = Offset(
         center.dx + cos(midAngle) * (outerRadius - progressWidth - 8),
@@ -58,7 +55,6 @@ class PrettyCyclePainter extends CustomPainter {
       );
       _drawText(canvas, "${phase.emoji}\n${phase.days} ngày", labelOffset);
 
-      // Dot từng ngày + ripple
       for (int j = 0; j < phase.days; j++) {
         final angle = startAngle + j * 2 * pi / totalDays + pi / totalDays;
         final dotOffset = Offset(
@@ -70,24 +66,21 @@ class PrettyCyclePainter extends CustomPainter {
         final scale = isCurrent ? 1.5 + sin(rotation * 2 * pi) * 0.2 : 1.0;
         final dotRadius = isCurrent ? dotRadiusBase * 2.2 * scale : dotRadiusBase;
 
-        // Ripple effect
         if (isCurrent) {
           final rippleRadius = dotRadius * 2.8 + sin(rotation * 2 * pi) * 2.5;
           canvas.drawCircle(
             dotOffset,
             rippleRadius,
             Paint()
-              ..color = Colors.white.withAlpha(70)
+              ..color = Colors.white.withOpacity(0.3)
               ..style = PaintingStyle.stroke
               ..strokeWidth = 1.5,
           );
         }
 
-        // Dot
         canvas.drawCircle(dotOffset, dotRadius, Paint()..color = Colors.white);
 
         if (isCurrent) {
-          // Outline
           canvas.drawCircle(
             dotOffset,
             dotRadius,
@@ -97,7 +90,6 @@ class PrettyCyclePainter extends CustomPainter {
               ..strokeWidth = 1.2,
           );
 
-          // Hiển thị ngày
           final span = TextSpan(
             text: '${dayIndex + 1}',
             style: const TextStyle(
@@ -140,13 +132,13 @@ class PrettyCyclePainter extends CustomPainter {
     canvas.restore();
   }
 
-  List<Color> _buildFullGradientColors(List<PhaseModel> phases) {
+  List<Color> _buildDynamicGradientColors(List<PhaseModel> phases) {
     final colors = <Color>[];
     for (int i = 0; i < phases.length; i++) {
-      final c1 = phases[i].color.withAlpha(210);
+      final c1 = phases[i].color.withOpacity(0.8);
       final c2 = i + 1 < phases.length
-          ? phases[i + 1].color.withAlpha(160)
-          : phases.first.color.withAlpha(160);
+          ? phases[i + 1].color.withOpacity(0.6)
+          : phases.first.color.withOpacity(0.6);
       colors.addAll([c1, Color.lerp(c1, c2, 0.5)!, c2]);
     }
     return colors;
