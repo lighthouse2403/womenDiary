@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
+
 import 'package:women_diary/home/phase_model.dart';
 import 'package:women_diary/home/pretty_cycle_painter.dart';
 
@@ -18,7 +20,8 @@ class AnimatedCycleView extends StatefulWidget {
   State<AnimatedCycleView> createState() => _AnimatedCycleViewState();
 }
 
-class _AnimatedCycleViewState extends State<AnimatedCycleView> with SingleTickerProviderStateMixin {
+class _AnimatedCycleViewState extends State<AnimatedCycleView>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
   @override
@@ -27,7 +30,7 @@ class _AnimatedCycleViewState extends State<AnimatedCycleView> with SingleTicker
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
-    )..repeat(); // Xoay mãi mãi
+    )..repeat(); // Lặp vô hạn để tạo hiệu ứng xoay gradient
   }
 
   @override
@@ -42,15 +45,18 @@ class _AnimatedCycleViewState extends State<AnimatedCycleView> with SingleTicker
 
     return AnimatedBuilder(
       animation: _controller,
-      builder: (_, __) {
+      builder: (context, child) {
         return CustomPaint(
           size: Size.square(width),
           painter: PrettyCyclePainter(
             currentDay: widget.currentDay,
             totalDays: widget.totalDays,
             phases: widget.phases,
-            rotation: _controller.value,
+            rotation: _controller.value * 2 * pi, // chuyển thành radian
           ),
+          // ⚠️ repaint bằng controller để vẽ lại liên tục
+          isComplex: true,
+          willChange: true,
         );
       },
     );

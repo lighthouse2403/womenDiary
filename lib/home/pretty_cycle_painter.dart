@@ -30,29 +30,32 @@ class PrettyCyclePainter extends CustomPainter {
     final dynamicGradient = SweepGradient(
       startAngle: 0,
       endAngle: 2 * pi,
-      tileMode: TileMode.repeated,
+      tileMode: TileMode.clamp,
       transform: GradientRotation(rotation * 2 * pi),
       colors: _buildDynamicGradientColors(phases),
       stops: _buildGradientStops(phases),
     );
 
-    final Paint basePaint = Paint()
+    final basePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = progressWidth
       ..strokeCap = StrokeCap.round
       ..shader = dynamicGradient.createShader(arcRect);
 
+    // Draw dynamic gradient arc
+    canvas.drawArc(arcRect, 0, 2 * pi, false, basePaint);
+
+    // Draw each day dot and labels
     for (int i = 0; i < phases.length; i++) {
       final phase = phases[i];
       final sweep = 2 * pi * phase.days / totalDays;
-
-      canvas.drawArc(arcRect, startAngle, sweep, false, basePaint);
 
       final midAngle = startAngle + sweep / 2;
       final labelOffset = Offset(
         center.dx + cos(midAngle) * (outerRadius - progressWidth - 8),
         center.dy + sin(midAngle) * (outerRadius - progressWidth - 8),
       );
+
       _drawText(canvas, "${phase.emoji}\n${phase.days} ngày", labelOffset);
 
       for (int j = 0; j < phase.days; j++) {
@@ -72,7 +75,7 @@ class PrettyCyclePainter extends CustomPainter {
             dotOffset,
             rippleRadius,
             Paint()
-              ..color = Colors.white.withOpacity(0.3)
+              ..color = const Color.fromRGBO(255, 255, 255, 0.3)
               ..style = PaintingStyle.stroke
               ..strokeWidth = 1.5,
           );
@@ -135,10 +138,10 @@ class PrettyCyclePainter extends CustomPainter {
   List<Color> _buildDynamicGradientColors(List<PhaseModel> phases) {
     final colors = <Color>[];
     for (int i = 0; i < phases.length; i++) {
-      final c1 = phases[i].color.withOpacity(0.8);
+      final c1 = phases[i].color.withAlpha((0.8 * 255).round());
       final c2 = i + 1 < phases.length
-          ? phases[i + 1].color.withOpacity(0.6)
-          : phases.first.color.withOpacity(0.6);
+          ? phases[i + 1].color.withAlpha((0.6 * 255).round())
+          : phases.first.color.withAlpha((0.6 * 255).round());
       colors.addAll([c1, Color.lerp(c1, c2, 0.5)!, c2]);
     }
     return colors;
