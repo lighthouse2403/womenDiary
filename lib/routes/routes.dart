@@ -1,5 +1,6 @@
 import 'package:women_diary/actions_diary/action_detail.dart';
 import 'package:women_diary/actions_diary/action_history.dart';
+import 'package:women_diary/actions_diary/user_action_model.dart';
 import 'package:women_diary/bottom_tab_bar/bottom_tab_bar.dart';
 import 'package:women_diary/chat/chat_detail.dart';
 import 'package:women_diary/chat/chat_list.dart';
@@ -72,7 +73,7 @@ class Routes {
               parentNavigatorKey: _shellNavigatorKey,
               path: RoutesName.actionHistory,
               pageBuilder: (context, state) {
-                return _createPageFadeTransition(state: state, child: const ActionHistory());
+                return _createPageFadeTransition(state: state, child: ActionHistory());
               },
             ),
             GoRoute(

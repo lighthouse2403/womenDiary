@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:women_diary/actions_diary/new_action.dart';
+import 'package:women_diary/actions_diary/user_action_model.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 
@@ -151,13 +152,4 @@ class ActionHistory extends StatelessWidget {
       ]
     };
   }
-}
-
-class UserAction {
-  final String emoji;
-  final String title;
-  final String note;
-  final DateTime time;
-
-  UserAction(this.emoji, this.title, this.note, this.time);
 }
