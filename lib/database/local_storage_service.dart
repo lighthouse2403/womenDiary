@@ -43,6 +43,14 @@ class LocalStorageService {
     return _prefs?.getInt('updateMenstruationLength') ?? 7;
   }
 
+  static Future<void> updateUsingFixedOvulation(bool isUsingFixedOvulation) async {
+    await _prefs?.setBool('isUsingFixedOvulation', isUsingFixedOvulation);
+  }
+
+  static bool getUsingFixedOvulation() {
+    return _prefs?.getBool('isUsingFixedOvulation') ?? true;
+  }
+
   /// Everage Mestruation length
   static Future<void> updateAverageMenstruationLength(int cycleLength) async {
     await _prefs?.setInt('averageAverageMenstruationLength', cycleLength);

@@ -1,3 +1,4 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:women_diary/common/firebase/firebase_option.dart';
 import 'package:women_diary/common/firebase/firebase_user.dart';
 import 'package:women_diary/database/local_storage_service.dart';
@@ -13,16 +14,19 @@ void main() async {
   await Firebase.initializeApp(name: 'WomenDiary',options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseUser.instance.addUser();
   await LocalStorageService.init(); // <-- init SharedPreferences
+  final storage = FlutterSecureStorage();
+  String? pin = await storage.read(key: 'pin_code');
 
-  runApp(const WomenDiary());
+  runApp(WomenDiary());
 }
 
 class WomenDiary extends StatelessWidget {
-  const WomenDiary({super.key});
+  WomenDiary({super.key});
 
   static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   static FirebaseAnalyticsObserver observer =
   FirebaseAnalyticsObserver(analytics: analytics);
+  bool unlocked = false;
 
   void saveUserLog() async {
   }

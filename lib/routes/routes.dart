@@ -14,6 +14,7 @@ import 'package:women_diary/music/music.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:women_diary/setting/setting.dart';
 
 class Routes {
   static const GlobalObjectKey<NavigatorState> _rootNavigatorKey = GlobalObjectKey<NavigatorState>('root');
@@ -77,9 +78,9 @@ class Routes {
             ),
             GoRoute(
               parentNavigatorKey: _shellNavigatorKey,
-              path: RoutesName.knowledge,
+              path: RoutesName.setting,
               pageBuilder: (context, state) {
-                return _createPageFadeTransition(state: state, child: Knowledge());
+                return _createPageFadeTransition(state: state, child: Setting());
               },
             ),
           ],
