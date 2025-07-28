@@ -60,6 +60,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
           int currentDay = state is LoadedCycleState ? state.currentDay : 0;
           int cycleLength = state is LoadedCycleState ? state.cycleLength : 30;
           int daysUntilNext = state is LoadedCycleState ? state.daysUntilNext : 30;
+          int ovulationDay = cycleLength - 14;
 
           return Center(
             child: Stack(
@@ -71,6 +72,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                     currentDay: currentDay,
                     totalDays: cycleLength,
                     phases: phases, rotation: 0.6,
+                    ovulationDay: ovulationDay,
                   ),
                 ),
                 ScaleTransition(

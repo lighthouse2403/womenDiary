@@ -46,18 +46,46 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   List<PhaseModel> _buildPhases() {
-    int cycleLength = LocalStorageService.getCycleLength();
-    int menstruationLength = LocalStorageService.getMenstruationLength();
-    int ovulationDay = cycleLength - 14;
-    int follicularLength = ovulationDay - menstruationLength;
-    int lutealLength = cycleLength - ovulationDay - 1;
+    final int cycleLength = LocalStorageService.getCycleLength(); // VD: 28
+    final int menstruationLength = LocalStorageService.getMenstruationLength(); // VD: 5
 
-    List<PhaseModel> phases = [
-      PhaseModel("🩸", menstruationLength, Colors.red.shade200, 1),
-      PhaseModel("🌱", follicularLength, Colors.lightBlueAccent, menstruationLength + 1),
-      PhaseModel("🌼", 1, Colors.yellowAccent, ovulationDay),
-      PhaseModel("🌙", lutealLength, Colors.deepOrange.shade200, ovulationDay + 1),
-    ];
+    final int ovulationDay = cycleLength - 14; // VD: ngày 14
+    final int fertileStart = ovulationDay - 5; // VD: ngày 9
+    final int fertileEnd = ovulationDay + 1;   // VD: ngày 15
+    final int afterFertileStart = fertileEnd + 1;
+
+    final List<PhaseModel> phases = [];
+
+    // 🩸 Giai đoạn kinh nguyệt
+    phases.add(
+      PhaseModel("🩸", menstruationLength, Colors.pink.shade200, 1),
+    );
+
+    // 🌱 Giai đoạn an toàn đầu kỳ
+    final int safeEarlyStart = menstruationLength + 1;
+    final int safeEarlyLength = fertileStart - safeEarlyStart;
+    if (safeEarlyLength > 0) {
+      phases.add(
+        PhaseModel("🌱", safeEarlyLength, Colors.green.shade200, safeEarlyStart),
+      );
+    }
+
+    // 🌼 Giai đoạn nguy hiểm (rụng trứng)
+    final int fertileLength = fertileEnd - fertileStart + 1; // luôn = 7
+    phases.add(
+      PhaseModel("🌼", fertileLength, Colors.yellow.shade300, fertileStart),
+    );
+
+    // 🌙 Giai đoạn an toàn cuối kỳ
+    final int safeLateLength = cycleLength - fertileEnd;
+    if (safeLateLength > 0) {
+      phases.add(
+        PhaseModel("🌙", safeLateLength, Colors.blue.shade200, afterFertileStart),
+      );
+    }
+
     return phases;
   }
+
+
 }

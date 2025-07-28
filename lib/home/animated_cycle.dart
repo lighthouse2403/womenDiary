@@ -52,9 +52,9 @@ class _AnimatedCycleViewState extends State<AnimatedCycleView>
             currentDay: widget.currentDay,
             totalDays: widget.totalDays,
             phases: widget.phases,
-            rotation: _controller.value * 2 * pi, // chuyển thành radian
+            rotation: _controller.value * 2 * pi,
+            ovulationDay: widget.totalDays - 14,
           ),
-          // ⚠️ repaint bằng controller để vẽ lại liên tục
           isComplex: true,
           willChange: true,
         );
