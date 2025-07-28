@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:women_diary/actions_diary/action_history.dart';
 
@@ -12,46 +13,168 @@ class ActionDetail extends StatefulWidget {
 }
 
 class _ActionDetailState extends State<ActionDetail> {
-  late TextEditingController _titleController;
-  late TextEditingController _noteController;
-  late DateTime _selectedDateTime;
-  bool _isEditing = false;
+  late TextEditingController titleController;
+  late TextEditingController noteController;
+  late DateTime selectedDateTime;
+  late String selectedEmoji;
+
+  final List<String> emojis = ['💊', '🩸', '💧', '😣', '🥴', '😌'];
 
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.action.title);
-    _noteController = TextEditingController(text: widget.action.note);
-    _selectedDateTime = widget.action.time;
+    selectedEmoji = widget.action.emoji;
+    titleController = TextEditingController(text: widget.action.title);
+    noteController = TextEditingController(text: widget.action.note);
+    selectedDateTime = widget.action.time;
   }
 
   @override
-  void dispose() {
-    _titleController.dispose();
-    _noteController.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    final dateText = DateFormat("dd/MM/yyyy – HH:mm").format(selectedDateTime);
+
+    return CupertinoPageScaffold(
+      backgroundColor: CupertinoColors.extraLightBackgroundGray,
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text("📝 Chi tiết hành động"),
+        trailing: GestureDetector(
+          onTap: _onDelete,
+          child: const Icon(
+            CupertinoIcons.delete_simple,
+            color: CupertinoColors.systemRed,
+          ),
+        ),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle("Biểu tượng"),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: emojis.map((emoji) {
+                    final isSelected = selectedEmoji == emoji;
+                    return GestureDetector(
+                      onTap: () => setState(() => selectedEmoji = emoji),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? CupertinoColors.systemPink.withOpacity(0.15)
+                              : CupertinoColors.systemGrey6,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isSelected
+                                ? CupertinoColors.systemPink
+                                : Colors.transparent,
+                            width: 2,
+                          ),
+                        ),
+                        child: Text(
+                          emoji,
+                          style: const TextStyle(fontSize: 26),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 28),
+                _buildSectionTitle("Tiêu đề"),
+                const SizedBox(height: 8),
+                CupertinoTextField(
+                  controller: titleController,
+                  placeholder: "Nhập tiêu đề...",
+                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: CupertinoColors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _buildSectionTitle("Ghi chú"),
+                const SizedBox(height: 8),
+                CupertinoTextField(
+                  controller: noteController,
+                  placeholder: "Ghi chú chi tiết...",
+                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  maxLines: null,
+                  decoration: BoxDecoration(
+                    color: CupertinoColors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _buildSectionTitle("Thời gian"),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: _pickDateTime,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: CupertinoColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(CupertinoIcons.time, size: 20, color: CupertinoColors.systemGrey),
+                        const SizedBox(width: 8),
+                        Text(dateText, style: const TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Center(
+                  child: CupertinoButton.filled(
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                    borderRadius: BorderRadius.circular(30),
+                    onPressed: _onSave,
+                    child: const Text("💾 Lưu lại", style: TextStyle(fontSize: 18)),
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
-  void _toggleEdit() {
-    setState(() => _isEditing = !_isEditing);
-  }
-
-  void _saveChanges() {
-    setState(() {
-      _isEditing = false;
-    });
-
-    showCupertinoDialog(
-      context: context,
-      builder: (_) => CupertinoAlertDialog(
-        title: const Text("Đã lưu"),
-        content: const Text("Hành động đã được cập nhật."),
-        actions: [
-          CupertinoDialogAction(
-            child: const Text("OK"),
-            onPressed: () => Navigator.of(context).pop(),
-          )
-        ],
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: CupertinoColors.systemPink,
       ),
     );
   }
@@ -60,146 +183,49 @@ class _ActionDetailState extends State<ActionDetail> {
     showCupertinoModalPopup(
       context: context,
       builder: (_) => Container(
-        height: 300,
-        color: CupertinoColors.systemBackground.resolveFrom(context),
+        height: 250,
+        color: CupertinoColors.systemGroupedBackground,
         child: CupertinoDatePicker(
+          initialDateTime: selectedDateTime,
+          maximumDate: DateTime.now(),
+          onDateTimeChanged: (value) => setState(() => selectedDateTime = value),
           mode: CupertinoDatePickerMode.dateAndTime,
-          initialDateTime: _selectedDateTime,
-          onDateTimeChanged: (dt) => setState(() => _selectedDateTime = dt),
         ),
       ),
     );
   }
 
-  void _confirmDelete() {
-    showCupertinoDialog(
+  void _onSave() {
+    final updatedAction = UserAction(
+      selectedEmoji,
+      titleController.text,
+      noteController.text,
+      selectedDateTime,
+    );
+    Navigator.of(context).pop(updatedAction);
+  }
+
+  void _onDelete() {
+    showCupertinoModalPopup(
       context: context,
-      builder: (_) => CupertinoAlertDialog(
-        title: const Text("Xoá hành động"),
-        content: const Text("Bạn có chắc muốn xoá bản ghi này?"),
+      builder: (_) => CupertinoActionSheet(
+        title: const Text("Xoá bản ghi"),
+        message: const Text("Bạn có chắc muốn xoá hành động này không?"),
         actions: [
-          CupertinoDialogAction(
+          CupertinoActionSheetAction(
             isDestructiveAction: true,
-            child: const Text("Xoá"),
             onPressed: () {
-              // TODO: Handle delete
-              Navigator.of(context)
-                ..pop()
-                ..pop();
+              Navigator.of(context).pop(); // close sheet
+              Navigator.of(context).pop(null); // return null
             },
-          ),
-          CupertinoDialogAction(
-            child: const Text("Huỷ"),
-            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Xoá"),
           ),
         ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: const Text("Chi tiết hành động"),
-        trailing: _isEditing
-            ? CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: const Text("Lưu"),
-          onPressed: _saveChanges,
-        )
-            : CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.pencil, size: 22),
-          onPressed: _toggleEdit,
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text("Huỷ"),
         ),
       ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                widget.action.emoji,
-                style: const TextStyle(fontSize: 64),
-              ),
-              const SizedBox(height: 16),
-              _buildInputCard(context),
-              const Spacer(),
-              CupertinoButton.filled(
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
-                borderRadius: BorderRadius.circular(30),
-                child: const Text("🗑️ Xoá hành động"),
-                onPressed: _confirmDelete,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInputCard(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: CupertinoColors.systemGrey6,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        children: [
-          _isEditing
-              ? CupertinoTextField(
-            controller: _titleController,
-            placeholder: "Tiêu đề",
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          )
-              : _infoRow("📝 Tiêu đề", _titleController.text),
-          const SizedBox(height: 12),
-          _isEditing
-              ? CupertinoTextField(
-            controller: _noteController,
-            placeholder: "Ghi chú",
-            maxLines: 3,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          )
-              : _infoRow("📌 Ghi chú", _noteController.text),
-          const SizedBox(height: 12),
-          _isEditing
-              ? GestureDetector(
-            onTap: _pickDateTime,
-            child: _infoRow("📅 Ngày", DateFormat('dd MMMM yyyy, HH:mm').format(_selectedDateTime)),
-          )
-              : _infoRow("📅 Ngày", DateFormat('dd MMMM yyyy, HH:mm').format(_selectedDateTime)),
-        ],
-      ),
-    );
-  }
-
-  Widget _infoRow(String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            color: CupertinoColors.systemPink,
-            fontSize: 16,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              color: CupertinoColors.label,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
