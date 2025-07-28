@@ -9,6 +9,7 @@ class DatabaseHandler {
   static String menstruationTable = 'menstruationTable';
   static String scheduleTable = 'scheduleTable';
   static String diaryTable = 'diaryTable';
+  static String userActionTable = 'userActionTable';
 
   static Future<sql.Database> db(String tableName) async {
     return sql.openDatabase(
@@ -24,13 +25,14 @@ class DatabaseHandler {
     await database.execute("CREATE TABLE $menstruationTable(startTime INTEGER, endTime INTEGER, note TEXT, createdTime INTEGER, updatedTime INTEGER)");
     await database.execute("CREATE TABLE $scheduleTable(id TEXT PRIMARY KEY, time INTEGER, content TEXT, createdTime INTEGER, updatedTime INTEGER, alarm INTEGER)");
     await database.execute("CREATE TABLE $diaryTable(id TEXT PRIMARY KEY, time INTEGER, content TEXT, createdTime INTEGER, updatedTime INTEGER, url TEXT)");
+    await database.execute("CREATE TABLE $userActionTable(id TEXT PRIMARY KEY, time INTEGER, emoji TEXT, note TEXT, title TEXT, createdTime INTEGER, updatedTime INTEGER)");
   }
 
   static Future<void> clearData() async {
     sql.deleteDatabase(DatabaseHandler.databasePath);
   }
 
-  ///----------------------- RED DATE ------------------------------------------
+  ///----------------------- Menstruation PERIOD -------------------------------
   static Future<void> insertMenstruation(MenstruationModel menstruation) async {
     final db = await DatabaseHandler.db(menstruationTable);
     await db.insert(
@@ -162,7 +164,7 @@ class DatabaseHandler {
     }
   }
 
-  ///----------------------- BABIES --------------------------------------------
+  ///----------------------- DIARIES -------------------------------------------
   static Future<void> insertDiary(DiaryModel diary) async {
     final db = await DatabaseHandler.db(diaryTable);
     await db.insert(
