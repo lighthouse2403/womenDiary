@@ -56,7 +56,7 @@ class _TimePickerState extends State<TimePicker> {
     );
     return Container(
       height: double.infinity,
-      color: Constants.secondaryTextColor().withOpacity(0.4),
+      color: Constants.secondaryTextColor().withAlpha(100),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

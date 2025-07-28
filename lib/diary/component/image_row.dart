@@ -19,7 +19,7 @@ class _ImageRowState extends BaseStatefulState<ImageRow> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.6),
+          color: Colors.white.withAlpha(160),
           borderRadius: const BorderRadius.all(Radius.circular(6))
       ),
       child: Stack(

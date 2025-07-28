@@ -28,7 +28,7 @@ class _HeartIndicatorState extends State<HeartIndicator> with SingleTickerProvid
       child: LiquidCustomProgressIndicator(
         value: percent,
         direction: Axis.vertical,
-        backgroundColor: Constants.secondaryTextColor().withOpacity(0.5),
+        backgroundColor: Constants.secondaryTextColor().withAlpha(130),
         valueColor: AlwaysStoppedAnimation(Constants.pinkTextColor()),
         shapePath: _buildHeartPath(),
         center: Text("${(100*percent).toInt()}%").w600().whiteColor().text20(),

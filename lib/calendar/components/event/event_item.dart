@@ -27,7 +27,7 @@ class EventItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withAlpha(130),
                 ),
             child: Text(title, style: titleStyle),
           ),

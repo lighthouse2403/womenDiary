@@ -1,16 +1,15 @@
+import 'package:women_diary/actions_diary/action_detail.dart';
+import 'package:women_diary/actions_diary/action_history.dart';
 import 'package:women_diary/bottom_tab_bar/bottom_tab_bar.dart';
 import 'package:women_diary/chat/chat_detail.dart';
 import 'package:women_diary/chat/chat_list.dart';
 import 'package:women_diary/chat/model/thread_model.dart';
-import 'package:women_diary/diary/diary_list.dart';
 import 'package:women_diary/home/home.dart';
-import 'package:women_diary/knowledge/knowledge.dart';
 import 'package:women_diary/main.dart';
 import 'package:women_diary/menstruation/menstruation_calendar.dart';
 import 'package:women_diary/menstruation/menstruation_detail.dart';
 import 'package:women_diary/menstruation/menstruation_history.dart';
 import 'package:women_diary/menstruation/menstruation_model.dart';
-import 'package:women_diary/music/music.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -71,9 +70,9 @@ class Routes {
             ),
             GoRoute(
               parentNavigatorKey: _shellNavigatorKey,
-              path: RoutesName.diaries,
+              path: RoutesName.actionHistory,
               pageBuilder: (context, state) {
-                return _createPageFadeTransition(state: state, child: const DiaryList());
+                return _createPageFadeTransition(state: state, child: const ActionHistory());
               },
             ),
             GoRoute(
@@ -103,6 +102,13 @@ class Routes {
           pageBuilder: (context, state) {
             MenstruationModel menstruation = state.extra as MenstruationModel;
             return _createPageFadeTransition(state: state, child: MenstruationDetail(menstruation: menstruation));
+          },
+        ),
+        GoRoute(
+          path: RoutesName.actionDetail,
+          pageBuilder: (context, state) {
+            UserAction action = state.extra as UserAction;
+            return _createPageFadeTransition(state: state, child: ActionDetail(action: action));
           },
         )
       ],

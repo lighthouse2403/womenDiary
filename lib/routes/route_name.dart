@@ -25,4 +25,10 @@ class RoutesName {
   /// Knowledge
   static const String knowledge = '/knowledge';
   static const String knowledgeDetail = '/knowledge/knowledgeDetail';
+
+  /// History
+  static const String actionHistory = '/actionHistory';
+  static const String actionDetail = '/actionHistory/actionDetail';
+  static const String newAction = '/actionHistory/newAction';
+
 }

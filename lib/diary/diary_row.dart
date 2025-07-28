@@ -16,7 +16,7 @@ class DiaryRow extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.4),
+          color: Colors.white.withAlpha(100),
           borderRadius: const BorderRadius.all(Radius.circular(6))
       ),
       child: Row(

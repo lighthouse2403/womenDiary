@@ -20,7 +20,7 @@ class LoadingView {
               Stack(
                 children: <Widget>[
                   Container(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withAlpha(60),
                   ),
                   Positioned(
                     top: screenHeight(context) / 2,

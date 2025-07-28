@@ -43,7 +43,7 @@ class ChatRowState extends State<ChatRow> {
             ],
           ),
           const SizedBox(height: 10),
-          Container(height: 1, color: Colors.grey.withOpacity(0.6))
+          Container(height: 1, color: Colors.grey.withAlpha(160))
         ],
       ),
     );
