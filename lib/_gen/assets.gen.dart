@@ -49,9 +49,6 @@ class $AssetsIconsGen {
   /// File path: assets/icons/comments.svg
   SvgGenImage get comments => const SvgGenImage('assets/icons/comments.svg');
 
-  /// File path: assets/icons/delete.svg
-  SvgGenImage get delete => const SvgGenImage('assets/icons/delete.svg');
-
   /// File path: assets/icons/diary.svg
   SvgGenImage get diary => const SvgGenImage('assets/icons/diary.svg');
 
@@ -73,9 +70,6 @@ class $AssetsIconsGen {
 
   /// File path: assets/icons/knowledge.svg
   SvgGenImage get knowledge => const SvgGenImage('assets/icons/knowledge.svg');
-
-  /// File path: assets/icons/mobile_app.svg
-  SvgGenImage get mobileApp => const SvgGenImage('assets/icons/mobile_app.svg');
 
   /// File path: assets/icons/music.svg
   SvgGenImage get music => const SvgGenImage('assets/icons/music.svg');
@@ -117,7 +111,6 @@ class $AssetsIconsGen {
         chat,
         clinic,
         comments,
-        delete,
         diary,
         favorite,
         favoriteSelected,
@@ -125,7 +118,6 @@ class $AssetsIconsGen {
         home,
         injection,
         knowledge,
-        mobileApp,
         music,
         phone,
         pregnancy,
@@ -134,39 +126,6 @@ class $AssetsIconsGen {
         tick,
         time,
         weight
-      ];
-}
-
-class $AssetsImagesGen {
-  const $AssetsImagesGen();
-
-  /// File path: assets/images/cute_little_baby.jpg
-  AssetGenImage get cuteLittleBaby =>
-      const AssetGenImage('assets/images/cute_little_baby.jpg');
-
-  /// File path: assets/images/home_background.png
-  AssetGenImage get homeBackground =>
-      const AssetGenImage('assets/images/home_background.png');
-
-  /// File path: assets/images/pregnancy_backgroound_1.jpg
-  AssetGenImage get pregnancyBackgroound1 =>
-      const AssetGenImage('assets/images/pregnancy_backgroound_1.jpg');
-
-  /// File path: assets/images/pregnancy_backgroound_2.jpg
-  AssetGenImage get pregnancyBackgroound2 =>
-      const AssetGenImage('assets/images/pregnancy_backgroound_2.jpg');
-
-  /// File path: assets/images/pregnancy_backgroound_3.jpg
-  AssetGenImage get pregnancyBackgroound3 =>
-      const AssetGenImage('assets/images/pregnancy_backgroound_3.jpg');
-
-  /// List of all assets
-  List<AssetGenImage> get values => [
-        cuteLittleBaby,
-        homeBackground,
-        pregnancyBackgroound1,
-        pregnancyBackgroound2,
-        pregnancyBackgroound3
       ];
 }
 
@@ -185,7 +144,6 @@ class Assets {
   const Assets._();
 
   static const $AssetsIconsGen icons = $AssetsIconsGen();
-  static const $AssetsImagesGen images = $AssetsImagesGen();
 }
 
 class AssetGenImage {

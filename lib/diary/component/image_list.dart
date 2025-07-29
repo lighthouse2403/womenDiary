@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:women_diary/diary/component/aspect_video.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:women_diary/_gen/assets.gen.dart';
 import 'package:mime/mime.dart';
@@ -48,7 +47,7 @@ class _ImageListState extends State<ImageList> {
                     child: Container(
                       width: 30,
                       height: 30,
-                      child: Assets.icons.delete.svg(width: 24, height: 24),
+                      child: Assets.icons.tick.svg(width: 24, height: 24),
                     ),
                   ),
                 )
