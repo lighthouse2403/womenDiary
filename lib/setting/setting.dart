@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/setting/bloc/setting_event.dart';
 import 'package:women_diary/setting/bloc/setting_state.dart';
 import 'bloc/setting_bloc.dart';
@@ -18,15 +19,13 @@ class Setting extends StatelessWidget {
 }
 
 class _SettingView extends StatelessWidget {
-  const _SettingView({super.key});
+  const _SettingView();
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text("Cài đặt"),
-      ),
-      child: SafeArea(
+    return Scaffold(
+      appBar: BaseAppBar(title: 'Cài đặt'),
+      body: SafeArea(
         child: BlocBuilder<SettingBloc, SettingState>(
           builder: (context, state) {
             final bloc = context.read<SettingBloc>();

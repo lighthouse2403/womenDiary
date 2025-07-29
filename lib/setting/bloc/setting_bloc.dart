@@ -13,6 +13,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     isPinEnabled: false,
     goal: UserGoal.avoidPregnancy,
   )) {
+    on<LoadLocalDataEvent>(_onLoadLocalData);
     on<UpdateCycleLength>(_onUpdateCycleLength);
     on<UpdateMenstruationLength>(_onUpdateMenstruationLength);
     on<ToggleFixedOvulation>(_onToggleFixedOvulation);
@@ -21,29 +22,28 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     on<UpdateUserGoal>(_onUpdateUserGoal);
   }
 
-  void _onUpdateCycleLength(UpdateCycleLength event, Emitter<SettingState> emit) {
+  void _onLoadLocalData(LoadLocalDataEvent event, Emitter<SettingState> emit) {
     LocalStorageService.updateCycleLength(event.value);
     emit(state.copyWith(cycleLength: event.value));
   }
 
+  void _onUpdateCycleLength(UpdateCycleLength event, Emitter<SettingState> emit) {
+    LocalStorageService.updateCycleLength(event.value);
+  }
+
   void _onUpdateMenstruationLength(UpdateMenstruationLength event, Emitter<SettingState> emit) {
     LocalStorageService.updateMenstruationLength(event.value);
-    emit(state.copyWith(menstruationLength: event.value));
   }
 
   void _onToggleFixedOvulation(ToggleFixedOvulation event, Emitter<SettingState> emit) {
-    emit(state.copyWith(useFixedOvulation: event.value));
   }
 
   void _onUpdateOvulationDay(UpdateOvulationDay event, Emitter<SettingState> emit) {
-    emit(state.copyWith(ovulationDay: event.value));
   }
 
   void _onTogglePinEnabled(TogglePinEnabled event, Emitter<SettingState> emit) {
-    emit(state.copyWith(isPinEnabled: event.value));
   }
 
   void _onUpdateUserGoal(UpdateUserGoal event, Emitter<SettingState> emit) {
-    emit(state.copyWith(goal: event.goal));
   }
 }

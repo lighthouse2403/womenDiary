@@ -1,7 +1,8 @@
-// setting_state.dart
+import 'package:equatable/equatable.dart';
+
 enum UserGoal { avoidPregnancy, tryingToConceive }
 
-class SettingState {
+class SettingState extends Equatable {
   final int cycleLength;
   final int menstruationLength;
   final bool useFixedOvulation;
@@ -9,7 +10,7 @@ class SettingState {
   final bool isPinEnabled;
   final UserGoal goal;
 
-  SettingState({
+  const SettingState({
     required this.cycleLength,
     required this.menstruationLength,
     required this.useFixedOvulation,
@@ -18,21 +19,13 @@ class SettingState {
     required this.goal,
   });
 
-  SettingState copyWith({
-    int? cycleLength,
-    int? menstruationLength,
-    bool? useFixedOvulation,
-    int? ovulationDay,
-    bool? isPinEnabled,
-    UserGoal? goal,
-  }) {
-    return SettingState(
-      cycleLength: cycleLength ?? this.cycleLength,
-      menstruationLength: menstruationLength ?? this.menstruationLength,
-      useFixedOvulation: useFixedOvulation ?? this.useFixedOvulation,
-      ovulationDay: ovulationDay ?? this.ovulationDay,
-      isPinEnabled: isPinEnabled ?? this.isPinEnabled,
-      goal: goal ?? this.goal,
-    );
-  }
+  @override
+  List<Object> get props => [
+    cycleLength,
+    menstruationLength,
+    useFixedOvulation,
+    ovulationDay,
+    isPinEnabled,
+    goal,
+  ];
 }
