@@ -20,8 +20,8 @@ class MainBottomTabBarState extends State<MainBottomTabBar> {
   int selectedIndex = 0;
 
   List<String> routeNames = [RoutesName.home, RoutesName.menstruationHistory, RoutesName.chat, RoutesName.actionHistory, RoutesName.setting];
-  List<String> labels = ['Trang chủ','Lịch sử', 'Diễn đàn', 'Nhật ký', 'Kiến thức'];
-  List<SvgGenImage> images = [Assets.icons.home, Assets.icons.diary, Assets.icons.chat, Assets.icons.diary, Assets.icons.knowledge];
+  List<String> labels = ['Trang chủ','Lịch sử', 'Diễn đàn', 'Hoạt động', 'Cài đặt'];
+  List<SvgGenImage> images = [Assets.icons.home, Assets.icons.history, Assets.icons.chat, Assets.icons.actions, Assets.icons.setting];
 
   @override
   Widget build(BuildContext context) {

@@ -15,6 +15,9 @@ import 'package:vector_graphics/vector_graphics.dart' as _vg;
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
+  /// File path: assets/icons/actions.svg
+  SvgGenImage get actions => const SvgGenImage('assets/icons/actions.svg');
+
   /// File path: assets/icons/add.svg
   SvgGenImage get add => const SvgGenImage('assets/icons/add.svg');
 
@@ -34,19 +37,6 @@ class $AssetsIconsGen {
   SvgGenImage get arrowForward =>
       const SvgGenImage('assets/icons/arrow_forward.svg');
 
-  /// File path: assets/icons/baby.svg
-  SvgGenImage get baby => const SvgGenImage('assets/icons/baby.svg');
-
-  /// File path: assets/icons/baby_clothes.svg
-  SvgGenImage get babyClothes =>
-      const SvgGenImage('assets/icons/baby_clothes.svg');
-
-  /// File path: assets/icons/baby_kick.svg
-  SvgGenImage get babyKick => const SvgGenImage('assets/icons/baby_kick.svg');
-
-  /// File path: assets/icons/baby_name.svg
-  SvgGenImage get babyName => const SvgGenImage('assets/icons/baby_name.svg');
-
   /// File path: assets/icons/calendar.svg
   SvgGenImage get calendar => const SvgGenImage('assets/icons/calendar.svg');
 
@@ -65,10 +55,6 @@ class $AssetsIconsGen {
   /// File path: assets/icons/diary.svg
   SvgGenImage get diary => const SvgGenImage('assets/icons/diary.svg');
 
-  /// File path: assets/icons/driver_license.svg
-  SvgGenImage get driverLicense =>
-      const SvgGenImage('assets/icons/driver_license.svg');
-
   /// File path: assets/icons/favorite.svg
   SvgGenImage get favorite => const SvgGenImage('assets/icons/favorite.svg');
 
@@ -76,8 +62,8 @@ class $AssetsIconsGen {
   SvgGenImage get favoriteSelected =>
       const SvgGenImage('assets/icons/favorite_selected.svg');
 
-  /// File path: assets/icons/group.svg
-  SvgGenImage get group => const SvgGenImage('assets/icons/group.svg');
+  /// File path: assets/icons/history.svg
+  SvgGenImage get history => const SvgGenImage('assets/icons/history.svg');
 
   /// File path: assets/icons/home.svg
   SvgGenImage get home => const SvgGenImage('assets/icons/home.svg');
@@ -106,6 +92,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/send.svg
   SvgGenImage get send => const SvgGenImage('assets/icons/send.svg');
 
+  /// File path: assets/icons/setting.svg
+  SvgGenImage get setting => const SvgGenImage('assets/icons/setting.svg');
+
   /// File path: assets/icons/tick.svg
   SvgGenImage get tick => const SvgGenImage('assets/icons/tick.svg');
 
@@ -117,26 +106,22 @@ class $AssetsIconsGen {
 
   /// List of all assets
   List<SvgGenImage> get values => [
+        actions,
         add,
         address,
         alarm,
         arrowBack,
         arrowDown,
         arrowForward,
-        baby,
-        babyClothes,
-        babyKick,
-        babyName,
         calendar,
         chat,
         clinic,
         comments,
         delete,
         diary,
-        driverLicense,
         favorite,
         favoriteSelected,
-        group,
+        history,
         home,
         injection,
         knowledge,
@@ -145,6 +130,7 @@ class $AssetsIconsGen {
         phone,
         pregnancy,
         send,
+        setting,
         tick,
         time,
         weight
@@ -184,74 +170,6 @@ class $AssetsImagesGen {
       ];
 }
 
-class $AssetsNewRecordIconGen {
-  const $AssetsNewRecordIconGen();
-
-  /// File path: assets/new_record_icon/bath.png
-  AssetGenImage get bath =>
-      const AssetGenImage('assets/new_record_icon/bath.png');
-
-  /// File path: assets/new_record_icon/breast_milk_pumping.png
-  AssetGenImage get breastMilkPumping =>
-      const AssetGenImage('assets/new_record_icon/breast_milk_pumping.png');
-
-  /// File path: assets/new_record_icon/drink_bottle.png
-  AssetGenImage get drinkBottle =>
-      const AssetGenImage('assets/new_record_icon/drink_bottle.png');
-
-  /// File path: assets/new_record_icon/eating.png
-  AssetGenImage get eating =>
-      const AssetGenImage('assets/new_record_icon/eating.png');
-
-  /// File path: assets/new_record_icon/height.png
-  AssetGenImage get height =>
-      const AssetGenImage('assets/new_record_icon/height.png');
-
-  /// File path: assets/new_record_icon/mother_milk.png
-  AssetGenImage get motherMilk =>
-      const AssetGenImage('assets/new_record_icon/mother_milk.png');
-
-  /// File path: assets/new_record_icon/other.png
-  AssetGenImage get other =>
-      const AssetGenImage('assets/new_record_icon/other.png');
-
-  /// File path: assets/new_record_icon/pee_poo.png
-  AssetGenImage get peePoo =>
-      const AssetGenImage('assets/new_record_icon/pee_poo.png');
-
-  /// File path: assets/new_record_icon/sleep.png
-  AssetGenImage get sleep =>
-      const AssetGenImage('assets/new_record_icon/sleep.png');
-
-  /// File path: assets/new_record_icon/temperature.png
-  AssetGenImage get temperature =>
-      const AssetGenImage('assets/new_record_icon/temperature.png');
-
-  /// File path: assets/new_record_icon/vaccination.png
-  AssetGenImage get vaccination =>
-      const AssetGenImage('assets/new_record_icon/vaccination.png');
-
-  /// File path: assets/new_record_icon/weight.png
-  AssetGenImage get weight =>
-      const AssetGenImage('assets/new_record_icon/weight.png');
-
-  /// List of all assets
-  List<AssetGenImage> get values => [
-        bath,
-        breastMilkPumping,
-        drinkBottle,
-        eating,
-        height,
-        motherMilk,
-        other,
-        peePoo,
-        sleep,
-        temperature,
-        vaccination,
-        weight
-      ];
-}
-
 class $AssetsIconsPngGen {
   const $AssetsIconsPngGen();
 
@@ -259,25 +177,15 @@ class $AssetsIconsPngGen {
   AssetGenImage get camera =>
       const AssetGenImage('assets/icons/png/camera.png');
 
-  /// File path: assets/icons/png/feet.png
-  AssetGenImage get feet => const AssetGenImage('assets/icons/png/feet.png');
-
   /// List of all assets
-  List<AssetGenImage> get values => [camera, feet];
+  List<AssetGenImage> get values => [camera];
 }
 
 class Assets {
-  Assets._();
+  const Assets._();
 
-  static const String events = 'assets/events.json';
   static const $AssetsIconsGen icons = $AssetsIconsGen();
   static const $AssetsImagesGen images = $AssetsImagesGen();
-  static const $AssetsNewRecordIconGen newRecordIcon =
-      $AssetsNewRecordIconGen();
-  static const String quotes = 'assets/quotes.json';
-
-  /// List of all assets
-  static List<String> get values => [events, quotes];
 }
 
 class AssetGenImage {
@@ -313,7 +221,7 @@ class AssetGenImage {
     bool gaplessPlayback = true,
     bool isAntiAlias = false,
     String? package,
-    FilterQuality filterQuality = FilterQuality.low,
+    FilterQuality filterQuality = FilterQuality.medium,
     int? cacheWidth,
     int? cacheHeight,
   }) {
