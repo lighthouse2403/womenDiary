@@ -9,7 +9,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     on<UpdateCycleLengthEvent>(_onUpdateCycleLength);
     on<UpdateMenstruationLengthEvent>(_onUpdateMenstruationLength);
     on<ToggleAverageEvent>(_onToggleAverage);
-    on<TogglePinEnabled>(_onTogglePinEnabled);
+    on<UpdatePINEvent>(_onTogglePinEnabled);
     on<UpdateUserGoal>(_onUpdateUserGoal);
   }
 
@@ -43,9 +43,9 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     emit(UpdateUsingAverageState(event.value));
   }
 
-  void _onTogglePinEnabled(TogglePinEnabled event, Emitter<SettingState> emit) {
-    emit(UpdateUsingPINState(event.value));
-
+  void _onTogglePinEnabled(UpdatePINEvent event, Emitter<SettingState> emit) {
+    LocalStorageService.updatePIN(event.value);
+    emit(UpdateUsingPINState(event.value.isNotEmpty));
   }
 
   void _onUpdateUserGoal(UpdateUserGoal event, Emitter<SettingState> emit) {

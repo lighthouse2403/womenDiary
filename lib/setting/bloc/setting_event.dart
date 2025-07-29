@@ -48,10 +48,10 @@ class UpdateOvulationDay extends SettingEvent {
   List<Object?> get props => [value];
 }
 
-class TogglePinEnabled extends SettingEvent {
-  final bool value;
+class UpdatePINEvent extends SettingEvent {
+  final String value;
 
-  const TogglePinEnabled(this.value);
+  const UpdatePINEvent(this.value);
 
   @override
   List<Object?> get props => [value];

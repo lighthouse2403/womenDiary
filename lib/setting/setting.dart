@@ -5,6 +5,7 @@ import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/setting/bloc/setting_bloc.dart';
 import 'package:women_diary/setting/bloc/setting_event.dart';
 import 'package:women_diary/setting/bloc/setting_state.dart';
+import 'package:women_diary/setting/pin_input.dart';
 import 'package:women_diary/setting/slider_title.dart';
 import 'package:women_diary/setting/switch_title.dart';
 
@@ -43,7 +44,7 @@ class _SettingViewState extends State<SettingView> {
             _title("🩷 "),
             _averageSwitch(),
             _title("🔐 Bảo mật"),
-            _pin(),
+            _pin(context),
             _title("🎯 Mục tiêu của bạn"),
             _goalSegmented(),
             SizedBox(height: 20),
@@ -115,19 +116,32 @@ class _SettingViewState extends State<SettingView> {
     );
   }
 
-  Widget _pin() {
+  Widget _pin(BuildContext context) {
     return BlocBuilder<SettingBloc, SettingState>(
       buildWhen: (previous, current) => current is UpdateUsingPINState,
       builder: (context, state) {
-        bool isEnabled = (state is UpdateUsingPINState) ? state.isUsingPIN : false;
+        final isEnabled = state is UpdateUsingPINState ? state.isUsingPIN : false;
         return SwitchTile(
           label: "Bật mã PIN khi mở app",
           value: isEnabled,
-          onChanged: (val) => context.read<SettingBloc>().add(TogglePinEnabled(val)),
+          onChanged: (val) async {
+            if (val) {
+              final result = await showDialog<String>(
+                context: context,
+                builder: (_) => const PinInputDialog(),
+              );
+
+              context.read<SettingBloc>().add(UpdatePINEvent(result ?? ''));
+
+            } else {
+              context.read<SettingBloc>().add(UpdatePINEvent(''));
+            }
+          },
         );
       },
     );
   }
+
 
   Widget _averageSwitch() {
     return BlocBuilder<SettingBloc, SettingState>(
