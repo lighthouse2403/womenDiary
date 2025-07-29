@@ -1,8 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:women_diary/_gen/assets.gen.dart';
-import 'package:women_diary/bottom_tab_bar/bottom_tab_bar_item.dart';
-import 'package:women_diary/common/constants/models/homeItem.dart';
 
 class Constants {
   /// Color
@@ -66,24 +62,4 @@ class Constants {
     'Đà Nẵng',
     'Hải Phòng'
   ];
-}
-
-enum KnowLedgeType {
-  story(0),
-  beforePregnancy(1),
-  inPregnancy(2),
-  inHospital(3),
-  afterPregnancy(4),
-  experiences(5),
-  nutrition(6),
-  makeFood(7);
-
-  final int value;
-
-  const KnowLedgeType(this.value);
-
-  @override
-  int toInt() {
-    return value;
-  }
 }
