@@ -51,6 +51,5 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
   void _onUpdateUserGoal(UpdateUserGoal event, Emitter<SettingState> emit) {
     LocalStorageService.updateGoal(event.goal);
     emit(UpdateGoalState(event.goal));
-
   }
 }

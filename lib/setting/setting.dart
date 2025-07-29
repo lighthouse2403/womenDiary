@@ -81,7 +81,7 @@ class _SettingViewState extends State<SettingView> {
     return BlocBuilder<SettingBloc, SettingState>(
       buildWhen: (previous, current) => current is UpdateCycleLengthState,
       builder: (context, state) {
-        int length = (state as UpdateCycleLengthState).value;
+        int length = (state is UpdateCycleLengthState) ? state.value : 30;
         return SliderTile(
           label: "Độ dài chu kỳ",
           value: length,
@@ -97,7 +97,7 @@ class _SettingViewState extends State<SettingView> {
     return BlocBuilder<SettingBloc, SettingState>(
       buildWhen: (previous, current) => current is UpdateGoalState,
       builder: (context, state) {
-        UserGoal goal = (state as UpdateGoalState).goal;
+        UserGoal goal = (state is UpdateGoalState) ? state.goal : UserGoal.avoidPregnancy;
 
         return CupertinoSlidingSegmentedControl<UserGoal>(
           groupValue: goal,
@@ -119,7 +119,7 @@ class _SettingViewState extends State<SettingView> {
     return BlocBuilder<SettingBloc, SettingState>(
       buildWhen: (previous, current) => current is UpdateUsingPINState,
       builder: (context, state) {
-        bool isEnabled = (state as UpdateUsingPINState).isUsingPIN;
+        bool isEnabled = (state is UpdateUsingPINState) ? state.isUsingPIN : false;
         return SwitchTile(
           label: "Bật mã PIN khi mở app",
           value: isEnabled,
@@ -133,7 +133,7 @@ class _SettingViewState extends State<SettingView> {
     return BlocBuilder<SettingBloc, SettingState>(
       buildWhen: (previous, current) => current is UpdateUsingAverageState,
       builder: (context, state) {
-        bool isEnabled = (state as UpdateUsingAverageState).isUsingAverage;
+        bool isEnabled = (state is UpdateUsingAverageState) ? state.isUsingAverage : false;
 
         return SwitchTile(
           label: "Sử dụng giá trị trung bình",
@@ -148,7 +148,7 @@ class _SettingViewState extends State<SettingView> {
     return BlocBuilder<SettingBloc, SettingState>(
       buildWhen: (previous, current) => current is UpdateMenstruationLengthState,
       builder: (context, state) {
-        int menstruationLength = (state as UpdateMenstruationLengthState).value;
+        int menstruationLength = (state is UpdateMenstruationLengthState) ? state.value: 7;
         return SliderTile(
           label: "Số ngày hành kinh",
           value: menstruationLength,
