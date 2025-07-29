@@ -12,28 +12,28 @@ class LoadLocalDataEvent extends SettingEvent {
   const LoadLocalDataEvent();
 }
 
-class UpdateCycleLength extends SettingEvent {
+class UpdateCycleLengthEvent extends SettingEvent {
   final int value;
 
-  const UpdateCycleLength(this.value);
+  const UpdateCycleLengthEvent(this.value);
 
   @override
   List<Object?> get props => [value];
 }
 
-class UpdateMenstruationLength extends SettingEvent {
+class UpdateMenstruationLengthEvent extends SettingEvent {
   final int value;
 
-  const UpdateMenstruationLength(this.value);
+  const UpdateMenstruationLengthEvent(this.value);
 
   @override
   List<Object?> get props => [value];
 }
 
-class ToggleFixedOvulation extends SettingEvent {
+class ToggleAverageEvent extends SettingEvent {
   final bool value;
 
-  const ToggleFixedOvulation(this.value);
+  const ToggleAverageEvent(this.value);
 
   @override
   List<Object?> get props => [value];

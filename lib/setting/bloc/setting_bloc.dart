@@ -4,46 +4,53 @@ import 'setting_event.dart';
 import 'setting_state.dart';
 
 class SettingBloc extends Bloc<SettingEvent, SettingState> {
-  SettingBloc()
-      : super(SettingState(
-    cycleLength: 28,
-    menstruationLength: 5,
-    useFixedOvulation: false,
-    ovulationDay: 14,
-    isPinEnabled: false,
-    goal: UserGoal.avoidPregnancy,
-  )) {
+  SettingBloc() : super(SettingState()) {
     on<LoadLocalDataEvent>(_onLoadLocalData);
-    on<UpdateCycleLength>(_onUpdateCycleLength);
-    on<UpdateMenstruationLength>(_onUpdateMenstruationLength);
-    on<ToggleFixedOvulation>(_onToggleFixedOvulation);
-    on<UpdateOvulationDay>(_onUpdateOvulationDay);
+    on<UpdateCycleLengthEvent>(_onUpdateCycleLength);
+    on<UpdateMenstruationLengthEvent>(_onUpdateMenstruationLength);
+    on<ToggleAverageEvent>(_onToggleAverage);
     on<TogglePinEnabled>(_onTogglePinEnabled);
     on<UpdateUserGoal>(_onUpdateUserGoal);
   }
 
   void _onLoadLocalData(LoadLocalDataEvent event, Emitter<SettingState> emit) {
-    LocalStorageService.updateCycleLength(event.value);
-    emit(state.copyWith(cycleLength: event.value));
+    bool isUsingAverageValue = LocalStorageService.isUsingAverageValue();
+    int cycleLength = LocalStorageService.getCycleLength();
+    int menstruationLength = LocalStorageService.getMenstruationLength();
+
+    UserGoal goal = LocalStorageService.getGoal();
+    String pin = LocalStorageService.getPIN();
+
+    emit(UpdateCycleLengthState(cycleLength));
+    emit(UpdateMenstruationLengthState(menstruationLength));
+    emit(UpdateUsingAverageState(isUsingAverageValue));
+    emit(UpdateUsingPINState(pin.isNotEmpty));
+    emit(UpdateGoalState(goal));
   }
 
-  void _onUpdateCycleLength(UpdateCycleLength event, Emitter<SettingState> emit) {
+  void _onUpdateCycleLength(UpdateCycleLengthEvent event, Emitter<SettingState> emit) {
     LocalStorageService.updateCycleLength(event.value);
+    emit(UpdateCycleLengthState(event.value));
   }
 
-  void _onUpdateMenstruationLength(UpdateMenstruationLength event, Emitter<SettingState> emit) {
+  void _onUpdateMenstruationLength(UpdateMenstruationLengthEvent event, Emitter<SettingState> emit) {
     LocalStorageService.updateMenstruationLength(event.value);
+    emit(UpdateMenstruationLengthState(event.value));
   }
 
-  void _onToggleFixedOvulation(ToggleFixedOvulation event, Emitter<SettingState> emit) {
-  }
-
-  void _onUpdateOvulationDay(UpdateOvulationDay event, Emitter<SettingState> emit) {
+  void _onToggleAverage(ToggleAverageEvent event, Emitter<SettingState> emit) {
+    LocalStorageService.updateUsingAverageValue(event.value);
+    emit(UpdateUsingAverageState(event.value));
   }
 
   void _onTogglePinEnabled(TogglePinEnabled event, Emitter<SettingState> emit) {
+    emit(UpdateUsingPINState(event.value));
+
   }
 
   void _onUpdateUserGoal(UpdateUserGoal event, Emitter<SettingState> emit) {
+    LocalStorageService.updateGoal(event.goal);
+    emit(UpdateGoalState(event.goal));
+
   }
 }

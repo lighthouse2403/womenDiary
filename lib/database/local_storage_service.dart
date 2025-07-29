@@ -1,37 +1,22 @@
-import 'dart:ffi';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:women_diary/setting/bloc/setting_state.dart';
 
 class LocalStorageService {
   static SharedPreferences? _prefs;
   String cycleLengthKey = 'cycleLength';
-  String useCertainCycleLength = 'useCertainCycleLength';
 
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  /// Using certain cycle
-  static Future<void> useCertainCycle(bool value) async {
-    await _prefs?.setBool('useCertainCycleLength', value);
-  }
-
-  /// Cycle length
+  /// ----------------------------- FIXED VALUES -------------------------------
   static Future<void> updateCycleLength(int cycleLength) async {
     await _prefs?.setInt('cycleLength', cycleLength);
   }
 
   static int getCycleLength() {
     return _prefs?.getInt('cycleLength') ?? 30;
-  }
-
-  /// Everage Cycle length
-  static Future<void> updateAverageCycleLength(int cycleLength) async {
-    await _prefs?.setInt('averageCycleLength', cycleLength);
-  }
-
-  static int getAverageCycleLength() {
-    return _prefs?.getInt('averageCycleLength') ?? 30;
   }
 
   /// Menstrual length
@@ -43,22 +28,53 @@ class LocalStorageService {
     return _prefs?.getInt('updateMenstruationLength') ?? 7;
   }
 
-  static Future<void> updateUsingFixedOvulation(bool isUsingFixedOvulation) async {
-    await _prefs?.setBool('isUsingFixedOvulation', isUsingFixedOvulation);
+  /// Goal
+  static Future<void> updateGoal(UserGoal goal) async {
+    await _prefs?.setInt('goal', goal.value);
   }
 
-  static bool getUsingFixedOvulation() {
-    return _prefs?.getBool('isUsingFixedOvulation') ?? true;
+  static UserGoal getGoal() {
+    int goalValue = _prefs?.getInt('goal') ?? 0;
+    return UserGoal.fromInt(goalValue);
   }
 
-  /// Everage Mestruation length
+  /// Goal
+  static Future<void> updatePIN(String pin) async {
+    await _prefs?.setString('PIN', pin);
+  }
+
+  static String getPIN() {
+    return _prefs?.getString('PIN') ?? '';
+  }
+
+  /// ----------------------------- AVERAGE VALUES -----------------------------
+
+  static Future<void> updateUsingAverageValue(bool isUsingAverageValue) async {
+    await _prefs?.setBool('isUsingAverageValue', isUsingAverageValue);
+  }
+
+  static bool isUsingAverageValue() {
+    return _prefs?.getBool('isUsingAverageValue') ?? false;
+  }
+
+  /// Average Mestruation length
   static Future<void> updateAverageMenstruationLength(int cycleLength) async {
-    await _prefs?.setInt('averageAverageMenstruationLength', cycleLength);
+    await _prefs?.setInt('averageMenstruationLength', cycleLength);
   }
 
   static int getAverageMenstruationLength() {
-    return _prefs?.getInt('averageAverageMenstruationLength') ?? 7;
+    return _prefs?.getInt('averageMenstruationLength') ?? 7;
   }
+
+  /// Average Cycle length
+  static Future<void> updateAverageCycleLength(int cycleLength) async {
+    await _prefs?.setInt('averageCycleLength', cycleLength);
+  }
+
+  static int getAverageCycleLength() {
+    return _prefs?.getInt('averageCycleLength') ?? 30;
+  }
+
 
   static Future<void> clear() async {
     await _prefs?.clear();
