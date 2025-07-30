@@ -132,7 +132,6 @@ class _SettingViewState extends State<SettingView> {
     );
   }
 
-
   Widget _averageSwitch() {
     return BlocBuilder<SettingBloc, SettingState>(
       buildWhen: (previous, current) => current is UpdateUsingAverageState,

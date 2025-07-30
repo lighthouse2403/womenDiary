@@ -21,7 +21,7 @@ void main() async {
   await FirebaseUser.instance.addUser();
   await LocalStorageService.init();
 
-  final useBiometric = LocalStorageService.checkUsingBiometric();
+  final useBiometric = await LocalStorageService.checkUsingBiometric();
 
   runApp(AppStarter(useBiometric: useBiometric));
 }
