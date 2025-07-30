@@ -21,7 +21,7 @@ class PrettyCyclePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final strokeWidth = 30.0;
+    final strokeWidth = 34.0;
     final radius = min(size.width, size.height) / 2 - strokeWidth / 2;
     final arcRect = Rect.fromCircle(center: center, radius: radius);
     final dotRadiusBase = size.width * 0.009;
@@ -34,7 +34,6 @@ class PrettyCyclePainter extends CustomPainter {
     double startAngle = -pi / 2;
     int dayIndex = 0;
 
-    // Vẽ từng giai đoạn với màu đậm, không gradient
     for (final phase in phases) {
       final sweep = 2 * pi * phase.days / totalDays;
       paint.color = phase.color;
@@ -42,7 +41,6 @@ class PrettyCyclePainter extends CustomPainter {
       startAngle += sweep;
     }
 
-    // Vẽ từng chấm tròn cho mỗi ngày
     startAngle = -pi / 2;
     for (final phase in phases) {
       for (int j = 0; j < phase.days; j++) {

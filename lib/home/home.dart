@@ -63,7 +63,7 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
           int ovulationDay = cycleLength - 14;
 
           final screenWidth = MediaQuery.of(context).size.width;
-          final padding = 30.0;
+          final padding = 60.0;
           final width = screenWidth - padding;
 
           return Center(
