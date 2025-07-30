@@ -20,3 +20,17 @@ class LoadRedDateEvent extends HomeEvent {
   @override
   List<Object?> get props => [];
 }
+
+class StartNewCycleEvent extends HomeEvent {
+  const StartNewCycleEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class EndMenstruationEvent extends HomeEvent {
+  const EndMenstruationEvent();
+
+  @override
+  List<Object?> get props => [];
+}

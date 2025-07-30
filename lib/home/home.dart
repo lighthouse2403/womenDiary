@@ -27,26 +27,48 @@ class HomeView extends StatefulWidget {
   State<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin {
+class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
+  late Animation<double> _fadeAnimation;
+  late AnimationController _alertController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     )..repeat(reverse: true);
 
-    _animation = Tween<double>(begin: 1.0, end: 1.1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    // NEW: init alert animation
+    _alertController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
     );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _alertController, curve: Curves.easeOut));
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _alertController, curve: Curves.easeIn));
+
+    // Khởi động animation sau khi màn hình load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _alertController.forward();
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _alertController.dispose();
     super.dispose();
   }
 
@@ -88,7 +110,18 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                     },
                     child: _cycleInformation(currentDay, cycleLength, daysUntilNext),
                   ),
-                )
+                ),
+                if (daysUntilNext <= 3)
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: _cycleAlertCard(context),
+                      ),
+                    ),
+                  ),
               ],
             ),
           );
@@ -141,6 +174,79 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
               _controller.repeat();
             },
             child: const Text("Đóng"),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _cycleAlertCard(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.pink.shade100.withAlpha(50),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.pink.shade100),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: const [
+              Icon(Icons.calendar_today, color: Colors.pink, size: 20),
+              SizedBox(width: 8),
+              Text(
+                "Sắp đến chu kỳ mới",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.pink),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            "Hãy xác nhận nếu bạn đã bắt đầu chu kỳ mới hoặc kết thúc kỳ kinh nguyệt hiện tại để theo dõi chính xác hơn.",
+            style: TextStyle(fontSize: 14, color: Colors.black87),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  icon: const Text("🌸", style: TextStyle(fontSize: 18)),
+                  label: const Text("Bắt đầu chu kỳ mới"),
+                  style: ElevatedButton.styleFrom(
+                    animationDuration: const Duration(milliseconds: 300),
+                    elevation: 4,
+                    shadowColor: Colors.pinkAccent.withAlpha(80),
+                    backgroundColor: Colors.pinkAccent,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () {
+                    // Dispatch sự kiện đến Bloc
+                    context.read<HomeBloc>().add(StartNewCycleEvent());
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: const Text("🧘‍♀️", style: TextStyle(fontSize: 18)),
+                  label: const Text("Kết thúc kỳ kinh"),
+                  style: ElevatedButton.styleFrom(
+                    animationDuration: const Duration(milliseconds: 300),
+                    elevation: 4,
+                    shadowColor: Colors.pinkAccent.withAlpha(80),
+                    foregroundColor: Colors.pink,
+                    side: BorderSide(color: Colors.pink.shade300),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () {
+                    context.read<HomeBloc>().add(EndMenstruationEvent());
+                  },
+                ),
+              ),
+            ],
           )
         ],
       ),
