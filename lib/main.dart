@@ -1,4 +1,3 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:women_diary/common/firebase/firebase_option.dart';
 import 'package:women_diary/common/firebase/firebase_user.dart';
 import 'package:women_diary/database/local_storage_service.dart';

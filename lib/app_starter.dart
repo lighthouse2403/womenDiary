@@ -17,13 +17,14 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
   final LocalAuthentication _auth = LocalAuthentication();
   bool _unlocked = false;
   bool _authInProgress = false;
+  bool _authFailed = false;
   Timer? _timeoutTimer;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _checkBiometricOnLaunch();
+    _startAuthenticationWithTimeout();
   }
 
   @override
@@ -33,77 +34,83 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  void _checkBiometricOnLaunch() async {
-    print('_checkBiometricOnLaunch ${widget.useBiometric}');
+  void _startAuthenticationWithTimeout() {
     if (!widget.useBiometric) {
       setState(() => _unlocked = true);
-    } else {
-      await _authenticate();
+      return;
+    }
+
+    _authFailed = false;
+    _unlocked = false;
+
+    // Bắt đầu timeout
+    _timeoutTimer?.cancel();
+    _timeoutTimer = Timer(const Duration(seconds: 5), () {
+      if (!_unlocked && mounted) {
+        setState(() => _authFailed = true); // Hiện nút xác thực lại
+      }
+    });
+
+    // Delay nhẹ tránh resume quá sớm
+    Future.delayed(const Duration(milliseconds: 300), _authenticate);
+  }
+
+  void _onAppResumed() {
+    if (widget.useBiometric && !_unlocked) {
+      _startAuthenticationWithTimeout();
     }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (widget.useBiometric && state == AppLifecycleState.resumed) {
-      _startTimeoutAndLock();
+    if (state == AppLifecycleState.resumed) {
+      _onAppResumed();
     }
-  }
-
-  void _startTimeoutAndLock() {
-    setState(() => _unlocked = false);
-
-    _timeoutTimer?.cancel();
-    _timeoutTimer = Timer(const Duration(seconds: 5), () {
-      if (!_unlocked) {
-        debugPrint("Đã hết timeout 5s. Cho phép xác thực lại.");
-      }
-    });
-
-    // Thêm delay nhỏ tránh resume quá nhanh
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (mounted && !_unlocked) {
-        _authenticate();
-      }
-    });
   }
 
   Future<void> _authenticate() async {
-    if (_authInProgress) {
-      debugPrint("Bỏ qua xác thực do đang trong quá trình trước đó.");
-      return;
-    }
+    if (_authInProgress) return;
 
     _authInProgress = true;
-    debugPrint("Bắt đầu xác thực sinh trắc...");
-
     try {
       final canCheck = await _auth.canCheckBiometrics;
-      final supported = await _auth.isDeviceSupported();
+      final isSupported = await _auth.isDeviceSupported();
 
-      if (!canCheck || !supported) {
-        setState(() => _unlocked = true);
-        _authInProgress = false;
+      if (!canCheck || !isSupported) {
+        setState(() {
+          _authFailed = true;
+          _unlocked = false;
+        });
         return;
       }
 
       final didAuth = await _auth.authenticate(
-        localizedReason: 'Xác thực bằng vân tay hoặc Face ID để tiếp tục',
+        localizedReason: 'Xác thực bằng Face ID hoặc Touch ID để tiếp tục',
         options: const AuthenticationOptions(
-          biometricOnly: true,
-          stickyAuth: false,
+          stickyAuth: true, // Cho phép hiển thị màn hình passcode máy
+          biometricOnly: false, // Cho phép fallback passcode
           useErrorDialogs: true,
         ),
       );
 
       if (didAuth) {
         _timeoutTimer?.cancel();
-        setState(() => _unlocked = true);
+        setState(() {
+          _unlocked = true;
+          _authFailed = false;
+        });
       } else {
-        setState(() => _unlocked = false);
+        setState(() {
+          _unlocked = false;
+          _authFailed = true;
+        });
       }
     } catch (e) {
-      debugPrint('Lỗi sinh trắc: $e');
-      setState(() => _unlocked = false);
+      debugPrint('Lỗi xác thực: $e');
+      setState(() {
+        _unlocked = false;
+        _authFailed = true;
+      });
     } finally {
       _authInProgress = false;
     }
@@ -118,20 +125,20 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.lock, size: 64, color: Colors.grey),
+                const Icon(Icons.lock_outline, size: 64, color: Colors.grey),
                 const SizedBox(height: 20),
-                const Text(
-                  'Ứng dụng đã bị khoá',
-                  style: TextStyle(fontSize: 18),
-                ),
+                const Text('Ứng dụng đã bị khoá', style: TextStyle(fontSize: 18)),
                 const SizedBox(height: 20),
-                _authInProgress
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton.icon(
-                  icon: const Icon(Icons.fingerprint),
-                  label: const Text('Xác thực lại'),
-                  onPressed: _authenticate,
-                ),
+                if (_authInProgress)
+                  const CircularProgressIndicator()
+                else if (_authFailed)
+                  ElevatedButton.icon(
+                    onPressed: _authenticate,
+                    icon: const Icon(Icons.fingerprint),
+                    label: const Text('Xác thực lại'),
+                  )
+                else
+                  const SizedBox(height: 20),
               ],
             ),
           ),
@@ -139,6 +146,7 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
       );
     }
 
+    // Nếu đã xác thực thành công thì hiển thị app chính
     return MaterialApp.router(
       themeMode: ThemeMode.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
