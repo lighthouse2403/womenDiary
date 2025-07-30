@@ -38,13 +38,13 @@ class LocalStorageService {
     return UserGoal.fromInt(goalValue);
   }
 
-  /// Goal
-  static Future<void> updatePIN(String pin) async {
-    await _prefs?.setString('PIN', pin);
+  /// Biometric
+  static Future<void> updateUsingBiometric(bool useBiometric) async {
+    await _prefs?.setBool('use_biometric', useBiometric);
   }
 
-  static String getPIN() {
-    return _prefs?.getString('PIN') ?? '';
+  static bool checkUsingBiometric() {
+    return _prefs?.getBool('use_biometric') ?? false;
   }
 
   /// ----------------------------- AVERAGE VALUES -----------------------------

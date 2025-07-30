@@ -9,15 +9,21 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import 'app_starter.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(name: 'WomenDiary',options: DefaultFirebaseOptions.currentPlatform);
-  await FirebaseUser.instance.addUser();
-  await LocalStorageService.init(); // <-- init SharedPreferences
-  final storage = FlutterSecureStorage();
-  String? pin = await storage.read(key: 'pin_code');
+  await Firebase.initializeApp(
+    name: 'WomenDiary',
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-  runApp(WomenDiary());
+  await FirebaseUser.instance.addUser();
+  await LocalStorageService.init();
+
+  final useBiometric = LocalStorageService.checkUsingBiometric();
+
+  runApp(AppStarter(useBiometric: useBiometric));
 }
 
 class WomenDiary extends StatelessWidget {

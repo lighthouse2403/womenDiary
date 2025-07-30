@@ -118,24 +118,14 @@ class _SettingViewState extends State<SettingView> {
 
   Widget _pin(BuildContext context) {
     return BlocBuilder<SettingBloc, SettingState>(
-      buildWhen: (previous, current) => current is UpdateUsingPINState,
+      buildWhen: (previous, current) => current is UpdateUsingBiometricState,
       builder: (context, state) {
-        final isEnabled = state is UpdateUsingPINState ? state.isUsingPIN : false;
+        final isEnabled = state is UpdateUsingBiometricState ? state.isUsingBiometric : false;
         return SwitchTile(
-          label: "Bật mã PIN khi mở app",
+          label: "Sử dụng Face ID",
           value: isEnabled,
-          onChanged: (val) async {
-            if (val) {
-              final result = await showDialog<String>(
-                context: context,
-                builder: (_) => const PinInputDialog(),
-              );
-
-              context.read<SettingBloc>().add(UpdatePINEvent(result ?? ''));
-
-            } else {
-              context.read<SettingBloc>().add(UpdatePINEvent(''));
-            }
+          onChanged: (value) async {
+            context.read<SettingBloc>().add(UpdateUsingBiometricEvent(value));
           },
         );
       },

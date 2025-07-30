@@ -31,9 +31,9 @@ class _PinInputDialogState extends State<PinInputDialog> {
       children: List.generate(
         6,
             (index) => Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8),
-          width: 16,
-          height: 16,
+          margin: const EdgeInsets.symmetric(horizontal: 10),
+          width: 20,
+          height: 20,
           decoration: BoxDecoration(
             color: index < _input.length ? Colors.black : Colors.transparent,
             border: Border.all(color: Colors.black, width: 1),
@@ -73,7 +73,7 @@ class _PinInputDialogState extends State<PinInputDialog> {
       mainAxisSize: MainAxisSize.min,
       children: rows.map((row) {
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
+          padding: const EdgeInsets.symmetric(vertical: 6),
           child: Row(
             children: row.map((label) {
               if (label == '←' || label == '⌫') {
@@ -97,9 +97,9 @@ class _PinInputDialogState extends State<PinInputDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             _buildPinDots(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             _buildKeyboard(),
           ],
         ),

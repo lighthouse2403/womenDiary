@@ -9,7 +9,7 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     on<UpdateCycleLengthEvent>(_onUpdateCycleLength);
     on<UpdateMenstruationLengthEvent>(_onUpdateMenstruationLength);
     on<ToggleAverageEvent>(_onToggleAverage);
-    on<UpdatePINEvent>(_onTogglePinEnabled);
+    on<UpdateUsingBiometricEvent>(_onToggleBiometricEnabled);
     on<UpdateUserGoal>(_onUpdateUserGoal);
   }
 
@@ -19,12 +19,12 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     int menstruationLength = LocalStorageService.getMenstruationLength();
 
     UserGoal goal = LocalStorageService.getGoal();
-    String pin = LocalStorageService.getPIN();
+    bool useBiometric = LocalStorageService.checkUsingBiometric();
 
     emit(UpdateCycleLengthState(cycleLength));
     emit(UpdateMenstruationLengthState(menstruationLength));
     emit(UpdateUsingAverageState(isUsingAverageValue));
-    emit(UpdateUsingPINState(pin.isNotEmpty));
+    emit(UpdateUsingBiometricState(useBiometric));
     emit(UpdateGoalState(goal));
   }
 
@@ -43,9 +43,9 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     emit(UpdateUsingAverageState(event.value));
   }
 
-  void _onTogglePinEnabled(UpdatePINEvent event, Emitter<SettingState> emit) {
-    LocalStorageService.updatePIN(event.value);
-    emit(UpdateUsingPINState(event.value.isNotEmpty));
+  void _onToggleBiometricEnabled(UpdateUsingBiometricEvent event, Emitter<SettingState> emit) {
+    LocalStorageService.updateUsingBiometric(event.value);
+    emit(UpdateUsingBiometricState(event.value));
   }
 
   void _onUpdateUserGoal(UpdateUserGoal event, Emitter<SettingState> emit) {

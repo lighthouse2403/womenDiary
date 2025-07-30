@@ -48,10 +48,10 @@ class UpdateOvulationDay extends SettingEvent {
   List<Object?> get props => [value];
 }
 
-class UpdatePINEvent extends SettingEvent {
-  final String value;
+class UpdateUsingBiometricEvent extends SettingEvent {
+  final bool value;
 
-  const UpdatePINEvent(this.value);
+  const UpdateUsingBiometricEvent(this.value);
 
   @override
   List<Object?> get props => [value];

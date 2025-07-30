@@ -42,11 +42,11 @@ class UpdateMenstruationLengthState extends SettingState {
   List<Object> get props => [value];
 }
 
-class UpdateUsingPINState extends SettingState {
-  const UpdateUsingPINState(this.isUsingPIN);
-  final bool isUsingPIN;
+class UpdateUsingBiometricState extends SettingState {
+  const UpdateUsingBiometricState(this.isUsingBiometric);
+  final bool isUsingBiometric;
   @override
-  List<Object> get props => [isUsingPIN];
+  List<Object> get props => [isUsingBiometric];
 }
 
 class UpdateGoalState extends SettingState {
