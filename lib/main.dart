@@ -24,25 +24,3 @@ void main() async {
 
   runApp(AppStarter(useBiometric: useBiometric));
 }
-
-class WomenDiary extends StatelessWidget {
-  WomenDiary({super.key});
-
-  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  static FirebaseAnalyticsObserver observer =
-  FirebaseAnalyticsObserver(analytics: analytics);
-  bool unlocked = false;
-
-  void saveUserLog() async {
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-        themeMode: ThemeMode.light,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        routerConfig: Routes.generateRouter(RoutesName.home)
-    );
-  }
-}

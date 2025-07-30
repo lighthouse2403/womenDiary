@@ -40,7 +40,6 @@ class Routes {
     return GoRouter(
       navigatorKey: navigatorKey,
       initialLocation: init,
-      observers: [WomenDiary.observer],
       routes: [
         ShellRoute(
           navigatorKey: _shellNavigatorKey,

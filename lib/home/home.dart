@@ -62,12 +62,16 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
           int daysUntilNext = state is LoadedCycleState ? state.daysUntilNext : 30;
           int ovulationDay = cycleLength - 14;
 
+          final screenWidth = MediaQuery.of(context).size.width;
+          final padding = 30.0;
+          final width = screenWidth - padding;
+
           return Center(
             child: Stack(
               alignment: Alignment.center,
               children: [
                 CustomPaint(
-                  size: const Size(320, 320),
+                  size: Size(width, width),
                   painter: PrettyCyclePainter(
                     currentDay: currentDay,
                     totalDays: cycleLength,
@@ -80,57 +84,65 @@ class _HomeViewState extends State<HomeView> with SingleTickerProviderStateMixin
                   child: GestureDetector(
                     onTap: () {
                       _controller.stop();
-                      showDialog(
-                        context: context,
-                        builder: (dialogCtx) => AlertDialog(
-                          title: const Text("Thông tin giai đoạn"),
-                          content: Text(
-                            "Hôm nay là ngày 12\n"
-                                "Giai đoạn hiện tại: 🌱\n"
-                                "Tiếp theo: 🌼 (trong 5 ngày)",
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(dialogCtx).pop();
-                                _controller.repeat();
-                              },
-                              child: const Text("Đóng"),
-                            )
-                          ],
-                        ),
-                      );
+                      _showCycleDialog();
                     },
-                    child: Container(
-                      width: 180,
-                      height: 180,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withAlpha(90),
-                        border: Border.all(color: Colors.white70, width: 1.5),
-                      ),
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text("Ngày hiện tại", style: TextStyle(fontSize: 14, color: Colors.black54)),
-                          Text("Ngày ${currentDay}", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87)),
-                          const SizedBox(height: 4),
-                          Text("Chu kỳ ${cycleLength} ngày", style: const TextStyle(fontSize: 12, color: Colors.black45)),
-                          const SizedBox(height: 6),
-                          Text("Giai đoạn: 🌼", style: const TextStyle(fontSize: 12, color: Colors.black87)),
-                          const SizedBox(height: 4),
-                          Text("Tiếp theo: 🌙", style: const TextStyle(fontSize: 12, color: Colors.deepOrange)),
-                          Text("Còn ${daysUntilNext} ngày", style: const TextStyle(fontSize: 12, color: Colors.orange)),
-                        ],
-                      ),
-                    ),
+                    child: _cycleInformation(currentDay, cycleLength, daysUntilNext),
                   ),
                 )
               ],
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _cycleInformation(int currentDay, int cycleLength, int daysUntilNext) {
+    return Container(
+      width: 180,
+      height: 180,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white.withAlpha(90),
+        border: Border.all(color: Colors.white70, width: 1.5),
+      ),
+      alignment: Alignment.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text("Ngày hiện tại", style: TextStyle(fontSize: 14, color: Colors.black54)),
+          Text("Ngày ${currentDay}", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87)),
+          const SizedBox(height: 4),
+          Text("Chu kỳ ${cycleLength} ngày", style: const TextStyle(fontSize: 12, color: Colors.black45)),
+          const SizedBox(height: 6),
+          Text("Giai đoạn: 🌼", style: const TextStyle(fontSize: 12, color: Colors.black87)),
+          const SizedBox(height: 4),
+          Text("Tiếp theo: 🌙", style: const TextStyle(fontSize: 12, color: Colors.deepOrange)),
+          Text("Còn ${daysUntilNext} ngày", style: const TextStyle(fontSize: 12, color: Colors.orange)),
+        ],
+      ),
+    );
+  }
+
+  void _showCycleDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: const Text("Thông tin giai đoạn"),
+        content: Text(
+          "Hôm nay là ngày 12\n"
+              "Giai đoạn hiện tại: 🌱\n"
+              "Tiếp theo: 🌼 (trong 5 ngày)",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogCtx).pop();
+              _controller.repeat();
+            },
+            child: const Text("Đóng"),
+          )
+        ],
       ),
     );
   }

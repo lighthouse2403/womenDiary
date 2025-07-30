@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
+import 'package:uuid/uuid.dart';
+import 'package:women_diary/database/local_storage_service.dart';
 
 class FirebaseUser {
   FirebaseUser._();
@@ -40,14 +42,18 @@ class FirebaseUser {
     String os = Platform.operatingSystem;
     String deviceName = '';
     String deviceVersion = '';
-    String identifier = '';
+    String identifier = LocalStorageService.getUuid();
     final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+
     try {
       if (Platform.isAndroid) {
         final build = await deviceInfoPlugin.androidInfo;
-        deviceName = build.model; // Tên thiết bị, ví dụ "Pixel 6"
-        deviceVersion = build.version.release; // Phiên bản Android, ví dụ "13"
-        identifier = build.id; // hoặc build.androidId nếu cần UUID ổn định
+        deviceName = build.model;
+        deviceVersion = build.version.release;
+        if (identifier.isEmpty) {
+          identifier = await Uuid().v6();
+          LocalStorageService.updateUuid(identifier);
+        }
       } else if (Platform.isIOS) {
         final data = await deviceInfoPlugin.iosInfo;
         deviceName = data.name; // Tên thiết bị, ví dụ "iPhone"

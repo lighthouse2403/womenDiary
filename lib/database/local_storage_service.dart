@@ -11,6 +11,15 @@ class LocalStorageService {
   }
 
   /// ----------------------------- FIXED VALUES -------------------------------
+  static Future<void> updateUuid(String uuid) async {
+    await _prefs?.setString('uuid', uuid);
+  }
+
+  static String getUuid() {
+    return _prefs?.getString('uuid') ?? '';
+  }
+
+  /// ----------------------------- FIXED VALUES -------------------------------
   static Future<void> updateCycleLength(int cycleLength) async {
     await _prefs?.setInt('cycleLength', cycleLength);
   }
