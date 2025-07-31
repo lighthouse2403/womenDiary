@@ -84,7 +84,6 @@ class LocalStorageService {
     return _prefs?.getInt('averageCycleLength') ?? 30;
   }
 
-
   static Future<void> clear() async {
     await _prefs?.clear();
   }

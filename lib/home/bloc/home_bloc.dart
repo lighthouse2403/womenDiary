@@ -56,12 +56,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     final List<PhaseModel> phases = [];
 
-    // 🩸 Giai đoạn kinh nguyệt
     phases.add(
       PhaseModel("🩸", menstruationLength, Colors.pink.shade200, 1),
     );
 
-    // 🌱 Giai đoạn an toàn đầu kỳ
     final int safeEarlyStart = menstruationLength + 1;
     final int safeEarlyLength = fertileStart - safeEarlyStart;
     if (safeEarlyLength > 0) {
@@ -87,5 +85,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     return phases;
   }
 
-
+  void handleMenstruationData() async {
+    List<MenstruationModel> menstruationList = await DatabaseHandler.getAllMenstruation();
+    int numberOfCycle = 0;
+    int allMenstruationDay = 0;
+    int averageMenstruationLength = 0;
+    int averageCycleLength = 0;
+    menstruationList.forEach((menstruation) {
+      numberOfCycle += 1;
+      int numberOfMenstruation = menstruation.endTime.difference(menstruation.startTime).inDays;
+      allMenstruationDay += numberOfMenstruation;
+    });
+    averageMenstruationLength = (allMenstruationDay/numberOfCycle).round();
+    averageCycleLength = (menstruationList.last.startTime.difference(menstruationList.first.startTime).inDays/(menstruationList.length - 1)).round();
+  }
 }

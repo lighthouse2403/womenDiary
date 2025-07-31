@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:women_diary/diary/diary_model.dart';
 import 'package:women_diary/menstruation/menstruation_model.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
@@ -51,7 +52,9 @@ class DatabaseHandler {
   static Future<List<MenstruationModel>> getAllMenstruation() async {
     final db = await DatabaseHandler.db(menstruationTable);
     final List<Map<String, dynamic>> list = await db.query(menstruationTable);
-    return list.map((e) => MenstruationModel.fromDatabase(e)).toList();
+    List<MenstruationModel> allMenstruation = list.map((e) => MenstruationModel.fromDatabase(e)).toList();
+    allMenstruation.sort((a, b) => a.startTime.compareTo(b.startTime));
+    return allMenstruation;
   }
 
   // Update an item by id
