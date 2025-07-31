@@ -184,16 +184,15 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   }
 
   Widget _cycleAlertCard(BuildContext context) {
+    final state = context.read<HomeBloc>().state;
+    final hasStarted = state is LoadedCycleState ? state.daysUntilNext < 3 : false;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.pink.shade100.withAlpha(50),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.pink.shade100),
-      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Row(
             children: const [
@@ -207,50 +206,42 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           ),
           const SizedBox(height: 8),
           const Text(
-            "Hãy xác nhận nếu bạn đã bắt đầu chu kỳ mới hoặc kết thúc kỳ kinh nguyệt hiện tại để theo dõi chính xác hơn.",
+            "Hãy xác nhận để theo dõi chu kỳ chính xác hơn.",
             style: TextStyle(fontSize: 14, color: Colors.black87),
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  icon: const Text("🌸", style: TextStyle(fontSize: 18)),
-                  label: const Text("Bắt đầu chu kỳ mới"),
-                  style: ElevatedButton.styleFrom(
-                    animationDuration: const Duration(milliseconds: 300),
-                    elevation: 4,
-                    shadowColor: Colors.pinkAccent.withAlpha(80),
-                    backgroundColor: Colors.pinkAccent,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  onPressed: () {
-                    // Dispatch sự kiện đến Bloc
-                    context.read<HomeBloc>().add(StartNewCycleEvent());
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Text("🧘‍♀️", style: TextStyle(fontSize: 18)),
-                  label: const Text("Kết thúc kỳ kinh"),
-                  style: ElevatedButton.styleFrom(
-                    animationDuration: const Duration(milliseconds: 300),
-                    elevation: 4,
-                    shadowColor: Colors.pinkAccent.withAlpha(80),
-                    foregroundColor: Colors.pink,
-                    side: BorderSide(color: Colors.pink.shade300),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  onPressed: () {
-                    context.read<HomeBloc>().add(EndMenstruationEvent());
-                  },
-                ),
-              ),
-            ],
+          hasStarted
+              ? ElevatedButton.icon(
+            icon: const Text("🧘‍♀️", style: TextStyle(fontSize: 18)),
+            label: const Text("Kết thúc kỳ kinh"),
+            style: ElevatedButton.styleFrom(
+              animationDuration: const Duration(milliseconds: 300),
+              elevation: 4,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.pink,
+              shadowColor: Colors.pinkAccent.withAlpha(80),
+              side: BorderSide(color: Colors.pink.shade300),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () {
+              context.read<HomeBloc>().add(EndMenstruationEvent());
+            },
           )
+              : ElevatedButton.icon(
+            icon: const Text("🌸", style: TextStyle(fontSize: 18)),
+            label: const Text("Bắt đầu chu kỳ mới"),
+            style: ElevatedButton.styleFrom(
+              animationDuration: const Duration(milliseconds: 300),
+              elevation: 4,
+              backgroundColor: Colors.pinkAccent,
+              foregroundColor: Colors.white,
+              shadowColor: Colors.pinkAccent.withAlpha(80),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () {
+              context.read<HomeBloc>().add(StartNewCycleEvent());
+            },
+          ),
         ],
       ),
     );
