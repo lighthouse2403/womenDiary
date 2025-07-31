@@ -49,7 +49,10 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 600),
     );
 
-    _slideAnimation = Tween<Offset>(
+    _animation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+      _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.2),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _alertController, curve: Curves.easeOut));
@@ -59,10 +62,10 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       end: 1.0,
     ).animate(CurvedAnimation(parent: _alertController, curve: Curves.easeIn));
 
-    // Khởi động animation sau khi màn hình load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _alertController.forward();
     });
+
   }
 
   @override
