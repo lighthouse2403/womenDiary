@@ -16,7 +16,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<LoadCycleEvent>((event, emit) {
       final phases = _buildPhases();
       int cycleLength = LocalStorageService.getCycleLength();
-      int currentDay = 10;
+      int currentDay = 0;
       final currentPhase = phases.firstWhere((p) => cycleLength >= p.startDay && currentDay < p.startDay + p.days);
       final nextPhase = phases.firstWhere(
             (p) => p.startDay > currentDay,
