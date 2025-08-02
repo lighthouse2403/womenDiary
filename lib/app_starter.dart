@@ -9,6 +9,7 @@ import 'package:women_diary/routes/routes.dart';
 
 class AppStarter extends StatefulWidget {
   final bool useBiometric;
+
   const AppStarter({super.key, required this.useBiometric});
 
   @override
@@ -36,27 +37,6 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  void _startAuthenticationWithTimeout() {
-    if (!widget.useBiometric) {
-      setState(() => _unlocked = true);
-      return;
-    }
-
-    _authFailed = false;
-    _unlocked = false;
-
-    // Bắt đầu timeout
-    _timeoutTimer?.cancel();
-    _timeoutTimer = Timer(const Duration(seconds: 5), () {
-      if (!_unlocked && mounted) {
-        setState(() => _authFailed = true); // Hiện nút xác thực lại
-      }
-    });
-
-    // Delay nhẹ tránh resume quá sớm
-    Future.delayed(const Duration(milliseconds: 300), _authenticate);
-  }
-
   void _onAppResumed() {
     if (widget.useBiometric && !_unlocked) {
       _startAuthenticationWithTimeout();
@@ -70,10 +50,29 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
     }
   }
 
+  void _startAuthenticationWithTimeout() {
+    if (!widget.useBiometric) {
+      setState(() => _unlocked = true);
+      return;
+    }
+
+    _authFailed = false;
+    _unlocked = false;
+
+    _timeoutTimer?.cancel();
+    _timeoutTimer = Timer(const Duration(seconds: 5), () {
+      if (!_unlocked && mounted) {
+        setState(() => _authFailed = true);
+      }
+    });
+
+    Future.delayed(const Duration(milliseconds: 300), _authenticate);
+  }
+
   Future<void> _authenticate() async {
     if (_authInProgress) return;
-
     _authInProgress = true;
+
     try {
       final canCheck = await _auth.canCheckBiometrics;
       final isSupported = await _auth.isDeviceSupported();
@@ -89,8 +88,8 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
       final didAuth = await _auth.authenticate(
         localizedReason: 'Xác thực bằng Face ID hoặc Touch ID để tiếp tục',
         options: const AuthenticationOptions(
-          stickyAuth: true, // Cho phép hiển thị màn hình passcode máy
-          biometricOnly: false, // Cho phép fallback passcode
+          stickyAuth: true,
+          biometricOnly: false,
           useErrorDialogs: true,
         ),
       );
@@ -118,45 +117,69 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
     }
   }
 
+  Future<String> _determineInitialRoute() async {
+    final cycleLength = await LocalStorageService.getCycleLength();
+    final menstruationLength = await LocalStorageService.getMenstruationLength();
+
+    final shouldStart = cycleLength == 0 || menstruationLength == 0;
+    return shouldStart ? RoutesName.firstCycleInformation : RoutesName.home;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!_unlocked) {
-      return MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.lock_outline, size: 64, color: Colors.grey),
-                const SizedBox(height: 20),
-                const Text('Ứng dụng đã bị khoá', style: TextStyle(fontSize: 18)),
-                const SizedBox(height: 20),
-                if (_authInProgress)
-                  const CircularProgressIndicator()
-                else if (_authFailed)
-                  ElevatedButton.icon(
-                    onPressed: _authenticate,
-                    icon: const Icon(Icons.fingerprint),
-                    label: const Text('Xác thực lại'),
-                  )
-                else
-                  const SizedBox(height: 20),
-              ],
-            ),
-          ),
-        ),
-      );
+      return _buildLockedUI();
     }
 
-    GoRouter initRouter = Routes.generateRouter(RoutesName.home);
-    if (LocalStorageService.getCycleLength() == 0 || LocalStorageService.getMenstruationLength() == 0) {
-      initRouter = Routes.generateRouter(RoutesName.firstCycleInformation);
-    }
-    return MaterialApp.router(
-      themeMode: ThemeMode.light,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      routerConfig: initRouter,
+    return FutureBuilder<String>(
+      future: _determineInitialRoute(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const MaterialApp(
+            home: Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
+
+        final initialRoute = snapshot.data!;
+        final router = Routes.generateRouter(initialRoute);
+
+        return MaterialApp.router(
+          themeMode: ThemeMode.light,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        );
+      },
+    );
+  }
+
+  Widget _buildLockedUI() {
+    return MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.lock_outline, size: 64, color: Colors.grey),
+              const SizedBox(height: 20),
+              const Text('Ứng dụng đã bị khoá', style: TextStyle(fontSize: 18)),
+              const SizedBox(height: 20),
+              if (_authInProgress)
+                const CircularProgressIndicator()
+              else if (_authFailed)
+                ElevatedButton.icon(
+                  onPressed: _authenticate,
+                  icon: const Icon(Icons.fingerprint),
+                  label: const Text('Xác thực lại'),
+                )
+              else
+                const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

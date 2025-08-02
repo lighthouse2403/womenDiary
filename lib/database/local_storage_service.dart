@@ -24,8 +24,8 @@ class LocalStorageService {
     await _prefs?.setInt('cycleLength', cycleLength);
   }
 
-  static Future<int> getCycleLength() async {
-    return await _prefs?.getInt('cycleLength') ?? 0;
+  static int getCycleLength() {
+    return _prefs?.getInt('cycleLength') ?? 0;
   }
 
   /// Menstrual length
@@ -33,8 +33,8 @@ class LocalStorageService {
     await _prefs?.setInt('updateMenstruationLength', menstrualLength);
   }
 
-  static Future<int> getMenstruationLength() async {
-    return await _prefs?.getInt('updateMenstruationLength') ?? 0;
+  static int getMenstruationLength() {
+    return _prefs?.getInt('updateMenstruationLength') ?? 0;
   }
 
   /// Goal
