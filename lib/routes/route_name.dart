@@ -2,6 +2,7 @@ class RoutesName {
   static const String tabBar = '/tabBar';
   static const String home = '/home';
   static const String setting = '/setting';
+  static const String firstCycleInformation = '/firstCycleInformation';
 
   ///Diaries
   static const String diaries = '/diaries';

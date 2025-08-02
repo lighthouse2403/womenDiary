@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/l10n/app_localizations.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
@@ -146,12 +148,15 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
       );
     }
 
-    // Nếu đã xác thực thành công thì hiển thị app chính
+    GoRouter initRouter = Routes.generateRouter(RoutesName.home);
+    if (LocalStorageService.getCycleLength() == 0 || LocalStorageService.getMenstruationLength() == 0) {
+      initRouter = Routes.generateRouter(RoutesName.firstCycleInformation);
+    }
     return MaterialApp.router(
       themeMode: ThemeMode.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      routerConfig: Routes.generateRouter(RoutesName.home),
+      routerConfig: initRouter,
     );
   }
 }

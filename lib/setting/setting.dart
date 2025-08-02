@@ -87,7 +87,7 @@ class _SettingViewState extends State<SettingView> {
           label: "Độ dài chu kỳ",
           value: length,
           min: 20,
-          max: 40,
+          max: 120,
           onChanged: (v) => context.read<SettingBloc>().add(UpdateCycleLengthEvent(v)),
         );
       },

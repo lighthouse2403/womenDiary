@@ -12,30 +12,31 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   HomeBloc() : super(const HomeState()) {
     on<LoadRedDateEvent>(_loadPeriods);
+    on<LoadCycleEvent>(_onLoadLocalData);
+  }
 
-    on<LoadCycleEvent>((event, emit) {
-      final phases = _buildPhases();
-      int cycleLength = LocalStorageService.getCycleLength();
-      int currentDay = 0;
-      final currentPhase = phases.firstWhere((p) => cycleLength >= p.startDay && currentDay < p.startDay + p.days);
-      final nextPhase = phases.firstWhere(
-            (p) => p.startDay > currentDay,
-        orElse: () => phases.first,
-      );
-      final daysUntilNext = nextPhase.startDay > currentDay
-          ? nextPhase.startDay - currentDay
-          : (cycleLength - currentDay + nextPhase.startDay);
+  void _onLoadLocalData(LoadCycleEvent event, Emitter<HomeState> emit) async {
+    final phases = await _buildPhases();
+    int cycleLength = await LocalStorageService.getCycleLength();
+    int currentDay = 10;
+    final currentPhase = phases.firstWhere((p) => cycleLength >= p.startDay && currentDay < p.startDay + p.days);
+    final nextPhase = phases.firstWhere(
+          (p) => p.startDay > currentDay,
+      orElse: () => phases.first,
+    );
+    final daysUntilNext = nextPhase.startDay > currentDay
+        ? nextPhase.startDay - currentDay
+        : (cycleLength - currentDay + nextPhase.startDay);
 
-      emit(LoadedCycleState(
-        currentDay: currentDay,
-        cycleLength: cycleLength,
-        phases: phases,
-        currentPhase: currentPhase,
-        nextPhase: nextPhase,
-        daysUntilNext: daysUntilNext,
-        periodList: [],
-      ));
-    });
+    emit(LoadedCycleState(
+      currentDay: currentDay,
+      cycleLength: cycleLength,
+      phases: phases,
+      currentPhase: currentPhase,
+      nextPhase: nextPhase,
+      daysUntilNext: daysUntilNext,
+      periodList: [],
+    ));
   }
 
   Future<void> _loadPeriods(LoadRedDateEvent event, Emitter<HomeState> emit) async {
@@ -45,9 +46,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
-  List<PhaseModel> _buildPhases() {
-    final int cycleLength = LocalStorageService.getCycleLength(); // VD: 28
-    final int menstruationLength = LocalStorageService.getMenstruationLength(); // VD: 5
+  Future<List<PhaseModel>> _buildPhases() async {
+    final int cycleLength = await LocalStorageService.getCycleLength(); // VD: 28
+    final int menstruationLength = await LocalStorageService.getMenstruationLength(); // VD: 5
 
     final int ovulationDay = cycleLength - 14; // VD: ngày 14
     final int fertileStart = ovulationDay - 5; // VD: ngày 9

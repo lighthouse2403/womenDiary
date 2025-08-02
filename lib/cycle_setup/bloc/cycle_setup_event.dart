@@ -20,3 +20,9 @@ class MenstruationLengthChangedEvent extends CycleSetupEvent {
   @override
   List<Object?> get props => [menstruationLength];
 }
+
+class SubmitCycleInformationEvent extends CycleSetupEvent {
+  const SubmitCycleInformationEvent();
+  @override
+  List<Object?> get props => [];
+}

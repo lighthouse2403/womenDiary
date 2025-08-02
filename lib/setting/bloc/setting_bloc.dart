@@ -13,10 +13,10 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     on<UpdateUserGoal>(_onUpdateUserGoal);
   }
 
-  void _onLoadLocalData(LoadLocalDataEvent event, Emitter<SettingState> emit) {
+  void _onLoadLocalData(LoadLocalDataEvent event, Emitter<SettingState> emit) async {
     bool isUsingAverageValue = LocalStorageService.isUsingAverageValue();
-    int cycleLength = LocalStorageService.getCycleLength();
-    int menstruationLength = LocalStorageService.getMenstruationLength();
+    int cycleLength = await LocalStorageService.getCycleLength();
+    int menstruationLength = await LocalStorageService.getMenstruationLength();
 
     UserGoal goal = LocalStorageService.getGoal();
     bool useBiometric = LocalStorageService.checkUsingBiometric();
