@@ -16,9 +16,28 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void _onLoadLocalData(LoadCycleEvent event, Emitter<HomeState> emit) async {
-    final phases = await _buildPhases();
     int cycleLength = await LocalStorageService.getCycleLength();
-    int currentDay = 10;
+    int menstruationLength = await LocalStorageService.getMenstruationLength();
+    bool isUsingAverageValue = await LocalStorageService.isUsingAverageValue();
+
+    List<MenstruationModel> menstruationList = await DatabaseHandler.getAllMenstruation();
+    MenstruationModel lastMenstruation = menstruationList.first;
+    int currentDay = DateTime.now().difference(lastMenstruation.startTime).inDays;
+
+    if (isUsingAverageValue && menstruationList.length > 1) {
+      int numberOfCycle = 0;
+      int allMenstruationDay = 0;
+      menstruationList.forEach((menstruation) {
+        numberOfCycle += 1;
+        int numberOfMenstruation = menstruation.endTime.difference(menstruation.startTime).inDays;
+        allMenstruationDay += numberOfMenstruation;
+      });
+      menstruationLength = (allMenstruationDay/numberOfCycle).round();
+      cycleLength = (menstruationList.last.startTime.difference(menstruationList.first.startTime).inDays/(menstruationList.length - 1)).round();
+    }
+
+    /// Show phase information
+    final phases = await _buildPhases();
     final currentPhase = phases.firstWhere((p) => cycleLength >= p.startDay && currentDay < p.startDay + p.days);
     final nextPhase = phases.firstWhere(
           (p) => p.startDay > currentDay,
@@ -47,8 +66,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   Future<List<PhaseModel>> _buildPhases() async {
-    final int cycleLength = await LocalStorageService.getCycleLength(); // VD: 28
-    final int menstruationLength = await LocalStorageService.getMenstruationLength(); // VD: 5
+    final int cycleLength = await LocalStorageService.getCycleLength();
+    final int menstruationLength = await LocalStorageService.getMenstruationLength();
 
     final int ovulationDay = cycleLength - 14; // VD: ngày 14
     final int fertileStart = ovulationDay - 5; // VD: ngày 9
@@ -79,7 +98,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final int safeLateLength = cycleLength - fertileEnd;
     if (safeLateLength > 0) {
       phases.add(
-        PhaseModel("🌙", safeLateLength, Colors.blue.shade200, afterFertileStart),
+        PhaseModel("🌙", safeLateLength, Colors.green.shade200, afterFertileStart),
       );
     }
 
@@ -87,17 +106,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void handleMenstruationData() async {
-    List<MenstruationModel> menstruationList = await DatabaseHandler.getAllMenstruation();
-    int numberOfCycle = 0;
-    int allMenstruationDay = 0;
-    int averageMenstruationLength = 0;
-    int averageCycleLength = 0;
-    menstruationList.forEach((menstruation) {
-      numberOfCycle += 1;
-      int numberOfMenstruation = menstruation.endTime.difference(menstruation.startTime).inDays;
-      allMenstruationDay += numberOfMenstruation;
-    });
-    averageMenstruationLength = (allMenstruationDay/numberOfCycle).round();
-    averageCycleLength = (menstruationList.last.startTime.difference(menstruationList.first.startTime).inDays/(menstruationList.length - 1)).round();
+
   }
 }

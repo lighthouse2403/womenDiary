@@ -21,6 +21,11 @@ class MenstruationLengthChangedEvent extends CycleSetupEvent {
   List<Object?> get props => [menstruationLength];
 }
 
+class LastPeriodDateChangedEvent extends CycleSetupEvent {
+  final DateTime date;
+  const LastPeriodDateChangedEvent(this.date);
+}
+
 class SubmitCycleInformationEvent extends CycleSetupEvent {
   const SubmitCycleInformationEvent();
   @override

@@ -22,6 +22,11 @@ class UpdatedMenstruationLengthState extends CycleSetupState {
   List<Object?> get props => [];
 }
 
+class UpdatedLastPeriodDateState extends CycleSetupState {
+  final DateTime date;
+  UpdatedLastPeriodDateState(this.date);
+}
+
 class UpdatedSubmitState extends CycleSetupState {
   UpdatedSubmitState(this.isEnable);
   final isEnable;
