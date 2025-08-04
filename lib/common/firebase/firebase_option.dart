@@ -16,21 +16,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDy_vl3OTNQZcq9RV1z04nhhNkQpsccqxs',
-    appId: '1:842547168180:android:ea902e16cdac74284ea8e1',
-    messagingSenderId: '842547168180',
-    projectId: 'baby-diary-8c5fb',
-    storageBucket: 'baby-diary-8c5fb.appspot.com',
-    androidClientId: '842547168180-gimnk7t793bpcpcmhck7uc5cmksu4lbo.apps.googleusercontent.com',
+    apiKey: 'AIzaSyC2OYIAsRLW13uf1HlyxDQHKR8-5gPsXcI',
+    appId: '1:623638512491:android:4e4bb26116eb37c8a0022e',
+    messagingSenderId: '623638512491',
+    projectId: 'women-diary-c2f09',
+    storageBucket: 'women-diary-c2f09.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDy_vl3OTNQZcq9RV1z04nhhNkQpsccqxs',
-    appId: '1:842547168180:ios:86b71c5caabae9a2',
-    messagingSenderId: '842547168180',
-    projectId: 'baby-diary-8c5fb',
-    storageBucket: 'baby-diary-8c5fb.appspot.com',
-    iosClientId: 'com.googleusercontent.apps.842547168180-gimnk7t793bpcpcmhck7uc5cmksu4lbo',
-    iosBundleId: 'baby.diary',
+    apiKey: 'AIzaSyCH8WMwhDv4Kkw1wUuhCVQqdxuh8i8L97I',
+    appId: '1:623638512491:ios:7a976b2f35060a8ea0022e',
+    messagingSenderId: '623638512491',
+    projectId: 'women-diary-c2f09',
+    storageBucket: 'women-diary-c2f09.firebasestorage.app',
+    iosBundleId: 'women.diary',
   );
 }
