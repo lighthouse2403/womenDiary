@@ -2,6 +2,48 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+enum ActionType {
+  medicine,
+  stomachache,
+  tired,
+  sweetCraving,
+  hotInside,
+}
+
+extension ActionTypeExtension on ActionType {
+  String get emoji {
+    switch (this) {
+      case ActionType.medicine:
+        return '💊';
+      case ActionType.stomachache:
+        return '🤕';
+      case ActionType.tired:
+        return '😴';
+      case ActionType.sweetCraving:
+        return '🍫';
+      case ActionType.hotInside:
+        return '🥵';
+    }
+  }
+
+  String get label {
+    switch (this) {
+      case ActionType.medicine:
+        return 'Uống thuốc';
+      case ActionType.stomachache:
+        return 'Đau bụng';
+      case ActionType.tired:
+        return 'Mệt mỏi';
+      case ActionType.sweetCraving:
+        return 'Thèm đồ ngọt';
+      case ActionType.hotInside:
+        return 'Nóng trong';
+    }
+  }
+
+  String get display => '$emoji $label';
+}
+
 class NewAction extends StatefulWidget {
   const NewAction({super.key});
 
@@ -11,16 +53,8 @@ class NewAction extends StatefulWidget {
 
 class _NewActionState extends State<NewAction> {
   DateTime selectedDate = DateTime.now();
-  String? selectedType;
+  ActionType? selectedType;
   final noteController = TextEditingController();
-
-  final List<String> actionTypes = [
-    "💊 Uống thuốc",
-    "🤕 Đau bụng",
-    "😴 Mệt mỏi",
-    "🍫 Thèm đồ ngọt",
-    "🥵 Nóng trong",
-  ];
 
   void _saveAction() {
     if (selectedType == null) return;
@@ -32,36 +66,38 @@ class _NewActionState extends State<NewAction> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(middle: Text("Hành động mới")),
+      navigationBar: const CupertinoNavigationBar(
+        middle: Text("Hành động mới"),
+      ),
       child: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            const Text("Ngày", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-            const SizedBox(height: 6),
+            _buildSectionTitle("Ngày"),
             CupertinoButton(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              onPressed: () => _pickDate(),
+              onPressed: _pickDate,
               child: Text(DateFormat('dd/MM/yyyy').format(selectedDate)),
             ),
             const SizedBox(height: 20),
-            const Text("Loại hành động", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            _buildSectionTitle("Loại hành động"),
             const SizedBox(height: 8),
             Wrap(
               spacing: 10,
               runSpacing: 10,
-              children: actionTypes.map((type) {
+              children: ActionType.values.map((type) {
                 final isSelected = selectedType == type;
                 return ChoiceChip(
-                  label: Text(type),
+                  label: Text(type.display),
                   selected: isSelected,
-                  onSelected: (_) => setState(() => selectedType = isSelected ? null : type),
+                  onSelected: (_) =>
+                      setState(() => selectedType = isSelected ? null : type),
                   selectedColor: CupertinoColors.systemPink.withAlpha(80),
                 );
               }).toList(),
             ),
             const SizedBox(height: 20),
-            const Text("Ghi chú", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            _buildSectionTitle("Ghi chú"),
             const SizedBox(height: 6),
             CupertinoTextField(
               controller: noteController,
@@ -72,12 +108,17 @@ class _NewActionState extends State<NewAction> {
             CupertinoButton.filled(
               child: const Text("Lưu"),
               onPressed: _saveAction,
-            )
+            ),
           ],
         ),
       ),
     );
   }
+
+  Widget _buildSectionTitle(String text) => Text(
+    text,
+    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+  );
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
