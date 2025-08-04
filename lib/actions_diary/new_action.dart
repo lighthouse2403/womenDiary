@@ -42,6 +42,19 @@ extension ActionTypeExtension on ActionType {
   }
 
   String get display => '$emoji $label';
+
+  int toInt() => index; // lưu dưới dạng int
+}
+
+// Factory từ int → enum
+extension ActionTypeFromInt on int {
+  ActionType toActionType() {
+    if (this >= 0 && this < ActionType.values.length) {
+      return ActionType.values[this];
+    } else {
+      throw ArgumentError('Invalid int value for ActionType: $this');
+    }
+  }
 }
 
 class NewAction extends StatefulWidget {
