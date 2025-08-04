@@ -1,8 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:women_diary/actions_diary/bloc/action_bloc.dart';
+import 'package:women_diary/actions_diary/bloc/action_event.dart';
+import 'package:women_diary/actions_diary/bloc/action_state.dart';
 import 'package:women_diary/actions_diary/new_action.dart';
 import 'package:women_diary/actions_diary/user_action_model.dart';
+import 'package:women_diary/common/constants/constants.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 
@@ -11,8 +17,25 @@ class ActionHistory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final groupedData = _mockGroupedActions();
+    return BlocProvider(
+      create: (_) => ActionHistoryBloc()..add(LoadActionsEvent()),
+      child: const _ActionHistoryView(),
+    );
+  }
+}
 
+class _ActionHistoryView extends StatefulWidget {
+  const _ActionHistoryView();
+
+  @override
+  State<_ActionHistoryView> createState() => _ActionHistoryViewState();
+}
+
+class _ActionHistoryViewState extends State<_ActionHistoryView> {
+  ActionType? _selectedFilter;
+
+  @override
+  Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
         middle: Text("📖 Lịch sử hành động"),
@@ -20,7 +43,12 @@ class ActionHistory extends StatelessWidget {
       child: SafeArea(
         child: Stack(
           children: [
-            _groupedList(groupedData),
+            Column(
+              children: [
+                _filterChips(),
+                Expanded(child: _buildList()),
+              ],
+            ),
             _addButton(context),
           ],
         ),
@@ -28,37 +56,69 @@ class ActionHistory extends StatelessWidget {
     );
   }
 
-  Widget _groupedList(Map<String, List<UserAction>> groupedData) {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      itemCount: groupedData.length,
-      itemBuilder: (context, index) {
-        final date = groupedData.keys.elementAt(index);
-        final actions = groupedData[date]!;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _sectionHeader(date),
-            ...actions.map((action) => _actionCard(action, context)),
-          ],
-        );
-      },
+  Widget _filterChips() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Wrap(
+        spacing: 8,
+        children: [
+          ChoiceChip(
+            label: const Text("Tất cả"),
+            selected: _selectedFilter == null,
+            onSelected: (_) {
+              setState(() => _selectedFilter = null);
+              context.read<ActionHistoryBloc>().add(FilterActions(filterType: null));
+            },
+          ),
+          ...ActionType.values.map(
+                (type) => ChoiceChip(
+              label: Text(type.display),
+              selected: _selectedFilter == type,
+              onSelected: (_) {
+                setState(() => _selectedFilter = type);
+                context.read<ActionHistoryBloc>().add(FilterActions(filterType: type));
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  /// Mock sample data
-  Map<String, List<UserAction>> _mockGroupedActions() {
-    final now = DateTime.now();
-    return {
-      "Hôm nay": [
-        UserAction("💊", "Uống thuốc", "Viên tránh thai", now.subtract(const Duration(hours: 1))),
-        UserAction("🤕", "Đau bụng", "Cảm giác nhói", now.subtract(const Duration(hours: 3))),
-      ],
-      "Hôm qua": [
-        UserAction("💧", "Ra dịch", "Không mùi", now.subtract(const Duration(days: 1, hours: 2))),
-      ]
-    };
+  Widget _buildList() {
+    return BlocBuilder<ActionHistoryBloc, ActionHistoryState>(
+      builder: (context, state) {
+        if (state is ActionHistoryLoading) {
+          return const Center(child: CupertinoActivityIndicator());
+        }
+
+        if (state is ActionHistoryLoaded) {
+          final groupedData = state.groupedActions;
+          if (groupedData.isEmpty) {
+            return const Center(child: Text("Không có dữ liệu"));
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            itemCount: groupedData.length,
+            itemBuilder: (context, index) {
+              final date = groupedData.keys.elementAt(index);
+              final actions = groupedData[date]!;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionHeader(date),
+                  ...actions.map((action) => _actionCard(action, context)),
+                ],
+              );
+            },
+          );
+        }
+
+        return const SizedBox.shrink(); // fallback
+      },
+    );
   }
 
   Widget _addButton(BuildContext context) {
@@ -69,14 +129,14 @@ class ActionHistory extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         borderRadius: BorderRadius.circular(30),
         onPressed: () {
-          Navigator.of(context).push(CupertinoPageRoute(builder: (_) => const NewAction()));
+          context.navigateTo(RoutesName.newAction);
         },
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(CupertinoIcons.add, size: 20, color: CupertinoColors.white),
-            SizedBox(width: 6),
-            Text("Thêm bản ghi", style: TextStyle(color: CupertinoColors.white)),
+            const Icon(CupertinoIcons.add, size: 20, color: CupertinoColors.white),
+            Constants.hSpacer6,
+            const Text("Thêm bản ghi").whiteColor(),
           ],
         ),
       ),
@@ -86,18 +146,12 @@ class ActionHistory extends StatelessWidget {
   Widget _sectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.only(top: 12, bottom: 8),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: CupertinoColors.systemPink,
-        ),
-      ),
+      child: Text(title).text16().w600().pinkColor(),
     );
   }
 
   Widget _actionCard(UserAction action, BuildContext context) {
+    String actionTime = DateFormat('HH:mm').format(action.time);
     return GestureDetector(
       onTap: () => context.navigateTo(RoutesName.actionDetail, arguments: action),
       child: Container(
@@ -117,29 +171,23 @@ class ActionHistory extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(action.emoji, style: const TextStyle(fontSize: 24)),
-            const SizedBox(width: 12),
+            Text(action.emoji).text20(),
+            Constants.hSpacer12,
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(action.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  Text(action.title).text16().w600(),
                   if (action.note.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0),
-                      child: Text(
-                        action.note,
-                        style: const TextStyle(fontSize: 14, color: CupertinoColors.systemGrey),
-                      ),
+                      child: Text(action.note).text14().customColor(CupertinoColors.systemGrey),
                     ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            Text(
-              DateFormat('HH:mm').format(action.time),
-              style: const TextStyle(fontSize: 12, color: CupertinoColors.systemGrey2),
-            ),
+            Constants.hSpacer10,
+            Text(actionTime).text12().customColor(CupertinoColors.systemGrey2),
           ],
         ),
       ),

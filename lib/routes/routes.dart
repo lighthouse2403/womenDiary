@@ -1,5 +1,6 @@
 import 'package:women_diary/actions_diary/action_detail.dart';
 import 'package:women_diary/actions_diary/action_history.dart';
+import 'package:women_diary/actions_diary/new_action.dart';
 import 'package:women_diary/actions_diary/user_action_model.dart';
 import 'package:women_diary/bottom_tab_bar/bottom_tab_bar.dart';
 import 'package:women_diary/chat/chat_detail.dart';
@@ -7,7 +8,6 @@ import 'package:women_diary/chat/chat_list.dart';
 import 'package:women_diary/chat/model/thread_model.dart';
 import 'package:women_diary/cycle_setup/cycle_setup.dart';
 import 'package:women_diary/home/home.dart';
-import 'package:women_diary/main.dart';
 import 'package:women_diary/menstruation/menstruation_calendar.dart';
 import 'package:women_diary/menstruation/menstruation_detail.dart';
 import 'package:women_diary/menstruation/menstruation_history.dart';
@@ -110,6 +110,12 @@ class Routes {
           pageBuilder: (context, state) {
             UserAction action = state.extra as UserAction;
             return _createPageFadeTransition(state: state, child: ActionDetail(action: action));
+          },
+        ),
+        GoRoute(
+          path: RoutesName.newAction,
+          pageBuilder: (context, state) {
+            return _createPageFadeTransition(state: state, child: NewAction());
           },
         ),
         GoRoute(

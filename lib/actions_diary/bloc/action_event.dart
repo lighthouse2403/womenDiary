@@ -1,13 +1,21 @@
-import 'package:flutter/material.dart';
-import 'package:women_diary/actions_diary/bloc/action_bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:women_diary/actions_diary/new_action.dart';
 
-abstract class ActionHistoryEvent {}
 
-class LoadActionHistoryEvent extends ActionHistoryEvent {}
+abstract class ActionHistoryEvent extends Equatable {
+  const ActionHistoryEvent();
 
-class FilterActionHistoryEvent extends ActionHistoryEvent {
-  final DateTimeRange? dateRange;
-  final List<HistoryActionType> types;
+  @override
+  List<Object?> get props => [];
+}
 
-  FilterActionHistoryEvent({this.dateRange, required this.types});
+class LoadActionsEvent extends ActionHistoryEvent {}
+
+class FilterActions extends ActionHistoryEvent {
+  final ActionType filterType;
+
+  const FilterActions(this.filterType);
+
+  @override
+  List<Object?> get props => [filterType];
 }

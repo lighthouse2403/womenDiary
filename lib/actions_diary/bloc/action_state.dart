@@ -1,31 +1,36 @@
-// history_state.dart
-import 'package:flutter/material.dart';
-import 'package:women_diary/actions_diary/bloc/action_bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:women_diary/actions_diary/new_action.dart';
+import 'package:women_diary/actions_diary/user_action_model.dart';
 
-class ActionHistoryState {
-  final List<CycleHistoryItem> allItems;
-  final List<CycleHistoryItem> filteredItems;
-  final DateTimeRange? selectedRange;
-  final List<HistoryActionType> selectedTypes;
+abstract class ActionHistoryState extends Equatable {
+  const ActionHistoryState();
 
-  ActionHistoryState({
-    required this.allItems,
-    required this.filteredItems,
-    this.selectedRange,
-    required this.selectedTypes,
+  @override
+  List<Object?> get props => [];
+}
+
+class ActionHistoryInitial extends ActionHistoryState {}
+
+class ActionHistoryLoading extends ActionHistoryState {}
+
+class ActionHistoryLoadedState extends ActionHistoryState {
+  final Map<String, List<UserAction>> groupedActions;
+  final ActionType currentFilter;
+
+  const ActionHistoryLoadedState({
+    required this.groupedActions,
+    required this.currentFilter,
   });
 
-  ActionHistoryState copyWith({
-    List<CycleHistoryItem>? allItems,
-    List<CycleHistoryItem>? filteredItems,
-    DateTimeRange? selectedRange,
-    List<HistoryActionType>? selectedTypes,
-  }) {
-    return ActionHistoryState(
-      allItems: allItems ?? this.allItems,
-      filteredItems: filteredItems ?? this.filteredItems,
-      selectedRange: selectedRange ?? this.selectedRange,
-      selectedTypes: selectedTypes ?? this.selectedTypes,
-    );
-  }
+  @override
+  List<Object?> get props => [groupedActions, currentFilter];
+}
+
+class ActionHistoryError extends ActionHistoryState {
+  final String message;
+
+  const ActionHistoryError(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }

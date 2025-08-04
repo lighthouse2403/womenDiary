@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:women_diary/actions_diary/bloc/action_bloc.dart';
+import 'package:women_diary/actions_diary/new_action.dart';
 
 class FilterSheet extends StatefulWidget {
   final DateTimeRange? initialRange;
-  final List<HistoryActionType> initialTypes;
+  final List<ActionType> initialTypes;
 
   const FilterSheet({this.initialRange, required this.initialTypes});
 
@@ -13,7 +14,7 @@ class FilterSheet extends StatefulWidget {
 
 class _FilterSheetState extends State<FilterSheet> {
   late DateTimeRange? _range;
-  late List<HistoryActionType> _types;
+  late List<ActionType> _types;
 
   @override
   void initState() {
@@ -41,7 +42,7 @@ class _FilterSheetState extends State<FilterSheet> {
             const SizedBox(height: 16),
             Wrap(
               spacing: 10,
-              children: HistoryActionType.values.map((type) {
+              children: ActionType.values.map((type) {
                 final selected = _types.contains(type);
                 return FilterChip(
                   label: Text(type.name),
