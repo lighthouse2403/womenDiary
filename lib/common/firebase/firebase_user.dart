@@ -15,10 +15,19 @@ class FirebaseUser {
     CollectionReference users = firestore.collection('user');
     List<String> deviceInfo = await getDeviceDetails();
     var docSnapshot = await users.doc(deviceInfo[3]).get();
+    var cycleLength = LocalStorageService.getCycleLength();
+    var averageCycleLength = LocalStorageService.getAverageCycleLength();
+    var menstruationLength = LocalStorageService.getMenstruationLength();
+    var averageMenstruationLength = LocalStorageService.getAverageMenstruationLength();
+
     if (!docSnapshot.exists) {
       users.doc(deviceInfo[3]).set({
         'os': deviceInfo.firstOrNull,
         'deviceName': deviceInfo[1],
+        'cycle': cycleLength,
+        'menstruation': menstruationLength,
+        'averageCycle': averageCycleLength,
+        'averageMenstruation': averageMenstruationLength,
         'deviceVersion': deviceInfo[2],
         'deviceId': deviceInfo[3],
         'firstTime': FieldValue.serverTimestamp()
@@ -56,7 +65,7 @@ class FirebaseUser {
         }
       } else if (Platform.isIOS) {
         final data = await deviceInfoPlugin.iosInfo;
-        deviceName = data.name; // Tên thiết bị, ví dụ "iPhone"
+        deviceName = data.modelName; // Tên thiết bị, ví dụ "iPhone"
         deviceVersion = data.systemVersion; // Phiên bản iOS, ví dụ "16.5"
         identifier = data.identifierForVendor ?? ''; // UUID ổn định
       }

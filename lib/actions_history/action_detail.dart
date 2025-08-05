@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:women_diary/actions_diary/user_action_model.dart';
+import 'package:women_diary/actions_history/user_action_model.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 

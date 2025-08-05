@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:women_diary/actions_diary/new_action.dart';
-import 'package:women_diary/actions_diary/user_action_model.dart';
+import 'package:women_diary/actions_history/new_action.dart';
+import 'package:women_diary/actions_history/user_action_model.dart';
 import 'package:women_diary/diary/diary_model.dart';
 import 'package:women_diary/menstruation/menstruation_model.dart';
 import 'package:women_diary/schedule/schedule_model.dart';

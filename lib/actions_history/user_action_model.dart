@@ -1,5 +1,5 @@
 class UserAction {
-   String id;
+   String id = '${DateTime.now().millisecondsSinceEpoch}';
    String emoji = '';
    String title = '';
    String note = '';
@@ -12,11 +12,11 @@ class UserAction {
   });
 
   UserAction.init(String title, DateTime time, String emoji, String note) {
+    this.id = '${DateTime.now().millisecondsSinceEpoch}';
     this.emoji  = emoji;
     this.title  = title;
     this.note   = note;
     this.time   = time;
-    this.id = '${DateTime.now().millisecondsSinceEpoch}';
   }
 
   UserAction.fromDatabase(Map<String, dynamic> json) {

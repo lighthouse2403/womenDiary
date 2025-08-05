@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:women_diary/actions_diary/bloc/action_bloc.dart';
-import 'package:women_diary/actions_diary/bloc/action_event.dart';
-import 'package:women_diary/actions_diary/bloc/action_state.dart';
-import 'package:women_diary/actions_diary/new_action.dart';
-import 'package:women_diary/actions_diary/user_action_model.dart';
+import 'package:women_diary/actions_history/bloc/action_bloc.dart';
+import 'package:women_diary/actions_history/bloc/action_event.dart';
+import 'package:women_diary/actions_history/bloc/action_state.dart';
+import 'package:women_diary/actions_history/new_action.dart';
+import 'package:women_diary/actions_history/user_action_model.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/routes/route_name.dart';
@@ -18,7 +18,7 @@ class ActionHistory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ActionHistoryBloc()..add(LoadActionsEvent()),
+      create: (_) => ActionHistoryBloc()..add(LoadUserActionEvent()),
       child: const _ActionHistoryView(),
     );
   }
@@ -32,7 +32,6 @@ class _ActionHistoryView extends StatefulWidget {
 }
 
 class _ActionHistoryViewState extends State<_ActionHistoryView> {
-  ActionType? _selectedFilter;
 
   @override
   Widget build(BuildContext context) {
@@ -57,63 +56,55 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
   }
 
   Widget _filterChips() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Wrap(
-        spacing: 8,
-        children: [
-          ChoiceChip(
-            label: const Text("Tất cả"),
-            selected: _selectedFilter == null,
-            onSelected: (_) {
-              setState(() => _selectedFilter = null);
-              context.read<ActionHistoryBloc>().add(FilterActions(filterType: null));
-            },
-          ),
-          ...ActionType.values.map(
-                (type) => ChoiceChip(
-              label: Text(type.display),
-              selected: _selectedFilter == type,
-              onSelected: (_) {
-                setState(() => _selectedFilter = type);
-                context.read<ActionHistoryBloc>().add(FilterActions(filterType: type));
-              },
+    return BlocBuilder<ActionHistoryBloc, UserActionState>(
+      buildWhen:  (pre, current) => current is ActionTypeUpdatedState,
+        builder: (context, state) {
+        ActionType? selectedType = state is ActionTypeUpdatedState ? state.type : null;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Wrap(
+              spacing: 8,
+              children: [
+                ChoiceChip(
+                  label: const Text("Tất cả"),
+                  selected: selectedType == null,
+                  onSelected: (_) {
+                    context.read<ActionHistoryBloc>().add(UpdateActionTypeEvent(null));
+                  },
+                ),
+                ...ActionType.values.map(
+                      (type) => ChoiceChip(
+                    label: Text(type.display),
+                    selected: selectedType == type,
+                    onSelected: (_) {
+                      context.read<ActionHistoryBloc>().add(UpdateActionTypeEvent(type));
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
+          );
+        }
     );
   }
 
   Widget _buildList() {
-    return BlocBuilder<ActionHistoryBloc, ActionHistoryState>(
-      buildWhen: (pre, current) => current is ActionHistoryLoadedState,
+    return BlocBuilder<ActionHistoryBloc, UserActionState>(
+      buildWhen: (pre, current) => current is UserActionLoadedState,
       builder: (context, state) {
-        if (state is ActionHistoryLoaded) {
-          final groupedData = state.groupedActions;
-          if (groupedData.isEmpty) {
-            return const Center(child: Text("Không có dữ liệu"));
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            itemCount: groupedData.length,
-            itemBuilder: (context, index) {
-              final date = groupedData.keys.elementAt(index);
-              final actions = groupedData[date]!;
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _sectionHeader(date),
-                  ...actions.map((action) => _actionCard(action, context)),
-                ],
-              );
-            },
-          );
-        }
-
-        return const SizedBox.shrink(); // fallback
+        List<UserAction> actionList = (state is UserActionLoadedState) ? state.actions : [];
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          itemCount: actionList.length,
+          itemBuilder: (context, index) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ...actionList.map((action) => _actionCard(action, context)),
+              ],
+            );
+          },
+        );
       },
     );
   }
