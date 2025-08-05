@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:women_diary/actions_diary/new_action.dart';
 import 'package:women_diary/actions_diary/user_action_model.dart';
 import 'package:women_diary/diary/diary_model.dart';
 import 'package:women_diary/menstruation/menstruation_model.dart';
@@ -242,10 +243,37 @@ class DatabaseHandler {
     return UserAction.fromDatabase(maps.first);
   }
 
-  static Future<UserAction> getActions(int startTime, int endTime) async {
+  static Future<List<UserAction>> getActions({int? startTime, int? endTime, ActionType? type}) async {
     final db = await DatabaseHandler.db(userActionTable);
-    final List<Map<String, dynamic>> maps = await db.query(userActionTable, where: 'startTime = ? AND endTime = ?', whereArgs: [startTime, endTime]);
-    return UserAction.fromDatabase(maps.first);
+
+    final whereClauses = <String>[];
+    final whereArgs = <dynamic>[];
+
+    if (startTime != null) {
+      whereClauses.add('time >= ?');
+      whereArgs.add(startTime);
+    }
+
+    if (endTime != null) {
+      whereClauses.add('time <= ?');
+      whereArgs.add(endTime);
+    }
+
+    if (type != null) {
+      whereClauses.add('type = ?');
+      whereArgs.add(type.index);
+    }
+
+    final whereString = whereClauses.isNotEmpty ? whereClauses.join(' AND ') : null;
+
+    final List<Map<String, dynamic>> list = await db.query(
+      userActionTable,
+      where: whereString,
+      whereArgs: whereArgs,
+      orderBy: 'time DESC',
+    );
+
+    return list.map((e) => UserAction.fromDatabase(e)).toList();
   }
 
   static Future<List<UserAction>> getAllAction() async {
