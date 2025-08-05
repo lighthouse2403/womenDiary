@@ -19,8 +19,13 @@ class ActionHistoryBloc extends Bloc<UserActionEvent, UserActionState> {
     on<LoadUserActionEvent>(_onLoadActions);
     on<UpdateActionTypeEvent>(_onUpdateActionType);
     on<UpdateDateRangeEvent>(_onUpdateDaterange);
-    on<UpdateActionDetailEvent>(_onLoadActionDetail);
 
+    /// Action detail
+    on<UpdateActionDetailEvent>(_onLoadActionDetail);
+    on<UpdateEmojiEvent>(_onUpdateEmoji);
+    on<UpdateTimeEvent>(_onUpdateTime);
+    on<UpdateTitleEvent>(_onUpdateTitle);
+    on<UpdateNoteEvent>(_onUpdateNote);
   }
 
   Future<void> _onLoadActions(LoadUserActionEvent event, Emitter<UserActionState> emit) async {
@@ -39,7 +44,7 @@ class ActionHistoryBloc extends Bloc<UserActionEvent, UserActionState> {
         endTime: endTime.millisecondsSinceEpoch,
         type: type
     );
-    emit(ActionTypeUpdatedState(type: type));
+    emit(ActionTypeUpdatedState(type: event.actionType));
     emit(UserActionLoadedState(actions: actions));
   }
 
@@ -59,5 +64,21 @@ class ActionHistoryBloc extends Bloc<UserActionEvent, UserActionState> {
   void _onLoadActionDetail(UpdateActionDetailEvent event, Emitter<UserActionState> emit) async {
     actionDetail = event.initialAction;
     emit(ActionDetailUpdatedState(actionDetail));
+  }
+
+  void _onUpdateEmoji(UpdateEmojiEvent event, Emitter<UserActionState> emit) async {
+    actionDetail.emoji = event.emoji;
+  }
+
+  void _onUpdateTime(UpdateTimeEvent event, Emitter<UserActionState> emit) async {
+    actionDetail.time = event.time;
+  }
+
+  void _onUpdateTitle(UpdateTitleEvent event, Emitter<UserActionState> emit) async {
+    actionDetail.title = event.title;
+  }
+
+  void _onUpdateNote(UpdateNoteEvent event, Emitter<UserActionState> emit) async {
+    actionDetail.note = event.note;
   }
 }

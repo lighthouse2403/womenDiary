@@ -49,3 +49,39 @@ class ActionDetailUpdatedState extends UserActionState {
   @override
   List<Object?> get props => [initialAction];
 }
+
+class EmojiUpdatedState extends UserActionState {
+  final String emoji;
+
+  const EmojiUpdatedState(this.emoji);
+
+  @override
+  List<Object?> get props => [emoji];
+}
+
+class TitleUpdatedState extends UserActionState {
+  final String title;
+
+  const TitleUpdatedState(this.title);
+
+  @override
+  List<Object?> get props => [title];
+}
+
+class TimeUpdatedState extends UserActionState {
+  final DateTime time;
+
+  const TimeUpdatedState(this.time);
+
+  @override
+  List<Object?> get props => [time];
+}
+
+class NoteUpdatedState extends UserActionState {
+  final String note;
+
+  const NoteUpdatedState(this.note);
+
+  @override
+  List<Object?> get props => [note];
+}

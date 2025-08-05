@@ -1,8 +1,11 @@
+import 'package:women_diary/actions_history/new_action.dart';
+
 class UserAction {
    String id = '${DateTime.now().millisecondsSinceEpoch}';
    String emoji = '';
    String title = '';
    String note = '';
+   ActionType type = ActionType.stomachache;
    DateTime time = DateTime.now();
 
   UserAction({
@@ -17,6 +20,7 @@ class UserAction {
     this.title  = title;
     this.note   = note;
     this.time   = time;
+    this.type   = ActionType.stomachache;
   }
 
   UserAction.fromDatabase(Map<String, dynamic> json) {
@@ -25,6 +29,7 @@ class UserAction {
     title = json['title'];
     note = json['note'];
     time = DateTime.fromMillisecondsSinceEpoch(json['time'] as int);
+    type = (json['time'] as int).toActionType();
   }
 
   Map<String, dynamic> toJson() {
@@ -34,6 +39,7 @@ class UserAction {
     data['title'] = title;
     data['note'] = note;
     data['time'] = time.millisecondsSinceEpoch;
+    data['type'] = type.index;
     return data;
   }
 }

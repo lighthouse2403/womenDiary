@@ -44,3 +44,40 @@ class UpdateActionDetailEvent extends UserActionEvent {
   @override
   List<Object?> get props => [initialAction];
 }
+
+class UpdateTimeEvent extends UserActionEvent {
+  final DateTime time;
+
+  const UpdateTimeEvent(this.time);
+
+  @override
+  List<Object?> get props => [time];
+}
+
+class UpdateEmojiEvent extends UserActionEvent {
+  final String emoji;
+
+  const UpdateEmojiEvent(this.emoji);
+
+  @override
+  List<Object?> get props => [emoji];
+}
+
+class UpdateTitleEvent extends UserActionEvent {
+  final String title;
+
+  const UpdateTitleEvent(this.title);
+
+  @override
+  List<Object?> get props => [title];
+}
+
+class UpdateNoteEvent extends UserActionEvent {
+  final String note;
+
+  const UpdateNoteEvent(this.note);
+
+  @override
+  List<Object?> get props => [note];
+}
+
