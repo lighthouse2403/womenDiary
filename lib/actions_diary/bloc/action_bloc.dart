@@ -18,15 +18,13 @@ class ActionHistoryBloc extends Bloc<ActionHistoryEvent, ActionHistoryState> {
     final now = DateTime.now();
     final grouped = {
       "Hôm nay": [
-        UserAction("💊", "Uống thuốc", "Viên tránh thai", now.subtract(const Duration(hours: 1))),
-        UserAction("🤕", "Đau bụng", "Cảm giác nhói", now.subtract(const Duration(hours: 3))),
+        UserAction.init("Uống thuốc", now.subtract(const Duration(hours: 1)), "💊", "Viên tránh thai"),
+        UserAction.init( "Đau bụng", now.subtract(const Duration(hours: 3)), "🤕", "Cảm giác nhói"),
       ],
       "Hôm qua": [
-        UserAction("💧", "Ra dịch", "Không mùi", now.subtract(const Duration(days: 1, hours: 2))),
+        UserAction.init("Ra dịch", now.subtract(const Duration(days: 1, hours: 2)), "💧", "Không mùi"),
       ]
     };
-
-    emit(ActionHistoryLoadedState(grouped));
   }
 
   void _onFilterActions(
@@ -36,7 +34,5 @@ class ActionHistoryBloc extends Bloc<ActionHistoryEvent, ActionHistoryState> {
     if (state is! ActionHistoryLoadedState) return;
 
     final current = (state as ActionHistoryLoadedState).groupedActions;
-    // TODO: Apply filter logic here (e.g., by type or date)
-    emit(ActionHistoryLoadedState(current)); // or new filtered map
   }
 }

@@ -4,13 +4,16 @@ class UserAction {
    String note = '';
    DateTime time = DateTime.now();
 
-  UserAction({this.emoji, this.title, this.time});
+  UserAction({
+    required this.emoji,
+    required this.time
+  });
 
-  UserAction.init(String title, DateTime time, String emoji) {
-    this.emoji = emoji;
-    title = title;
-    note = '';
-    time = DateTime.now();
+  UserAction.init(String title, DateTime time, String emoji, String note) {
+    this.emoji  = emoji;
+    this.title  = title;
+    this.note   = note;
+    this.time   = time;
   }
 
   UserAction.fromDatabase(Map<String, dynamic> json) {
