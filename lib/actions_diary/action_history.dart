@@ -87,11 +87,8 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
 
   Widget _buildList() {
     return BlocBuilder<ActionHistoryBloc, ActionHistoryState>(
+      buildWhen: (pre, current) => current is ActionHistoryLoadedState,
       builder: (context, state) {
-        if (state is ActionHistoryLoading) {
-          return const Center(child: CupertinoActivityIndicator());
-        }
-
         if (state is ActionHistoryLoaded) {
           final groupedData = state.groupedActions;
           if (groupedData.isEmpty) {

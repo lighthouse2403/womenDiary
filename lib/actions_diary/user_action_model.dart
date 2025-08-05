@@ -1,10 +1,12 @@
 class UserAction {
+   String id;
    String emoji = '';
    String title = '';
    String note = '';
    DateTime time = DateTime.now();
 
   UserAction({
+    required this.id,
     required this.emoji,
     required this.time
   });
@@ -14,9 +16,11 @@ class UserAction {
     this.title  = title;
     this.note   = note;
     this.time   = time;
+    this.id = '${DateTime.now().millisecondsSinceEpoch}';
   }
 
   UserAction.fromDatabase(Map<String, dynamic> json) {
+    id = json['id'];
     emoji = json['emoji'];
     title = json['title'];
     note = json['note'];
@@ -25,6 +29,7 @@ class UserAction {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
     data['emoji'] = emoji;
     data['title'] = title;
     data['note'] = note;

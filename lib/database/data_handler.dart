@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:women_diary/actions_diary/user_action_model.dart';
 import 'package:women_diary/diary/diary_model.dart';
 import 'package:women_diary/menstruation/menstruation_model.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
@@ -219,6 +220,64 @@ class DatabaseHandler {
     try {
       await db.delete(
           diaryTable
+      );
+    } catch (err) {
+      debugPrint("Something went wrong when deleting an item: $err");
+    }
+  }
+
+  ///---------------------------- USER ACTION ----------------------------------
+  static Future<void> insertNewAction(UserAction action) async {
+    final db = await DatabaseHandler.db(userActionTable);
+    await db.insert(
+      userActionTable,
+      action.toJson(),
+      conflictAlgorithm: sql.ConflictAlgorithm.replace,
+    );
+  }
+
+  static Future<UserAction> gedAction(String id) async {
+    final db = await DatabaseHandler.db(userActionTable);
+    final List<Map<String, dynamic>> maps = await db.query(userActionTable, where: 'id = ?', whereArgs: [id]);
+    return UserAction.fromDatabase(maps.first);
+  }
+
+  static Future<List<UserAction>> getAllAction() async {
+    final db = await DatabaseHandler.db(userActionTable);
+    final List<Map<String, dynamic>> list = await db.query(userActionTable);
+    return list.map((e) => UserAction.fromDatabase(e)).toList();
+  }
+
+  // Update an item by id
+  static Future<void> updateAction(UserAction action) async {
+    final db = await DatabaseHandler.db(userActionTable);
+
+    await db.update(
+      userActionTable,
+      action.toJson(),
+      where: 'id = ?',
+      whereArgs: [action.id],
+    );
+  }
+
+  // Delete
+  static Future<void> deleteAction(String id) async {
+    final db = await DatabaseHandler.db(userActionTable);
+    try {
+      await db.delete(
+          userActionTable,
+          where: "id = ?",
+          whereArgs: [id]);
+    } catch (err) {
+      debugPrint("Something went wrong when deleting an item: $err");
+    }
+  }
+
+  static Future<void> deleteAllAction() async {
+    final db = await DatabaseHandler.db(userActionTable);
+    try {
+      await db.delete(
+          userActionTable
       );
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
