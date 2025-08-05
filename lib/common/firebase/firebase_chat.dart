@@ -38,10 +38,9 @@ class FirebaseChat {
         'threadId': FieldValue.serverTimestamp().toString(),
         'title': title,
         'updateTime': FieldValue.serverTimestamp(),
-        'deviceId': deviceInfo[3],
+        'deviceId': deviceInfo[2],
         'deviceName': deviceInfo[1],
         'os': deviceInfo.firstOrNull,
-        'deviceVersion': deviceInfo[2],
         'commentsCount': 0,
     }).then((value) async {
       await editThreadId(value.id);
@@ -86,8 +85,7 @@ class FirebaseChat {
       'threadId': thread.threadId,
       'os': deviceInfo.firstOrNull,
       'deviceName': deviceInfo[1],
-      'deviceVersion': deviceInfo[2],
-      'deviceId': deviceInfo[3],
+      'deviceId': deviceInfo[2],
       'content': content,
       'updateTime': FieldValue.serverTimestamp(),
       'createTime': FieldValue.serverTimestamp()

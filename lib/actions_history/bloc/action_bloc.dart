@@ -6,15 +6,20 @@ import 'package:women_diary/actions_history/user_action_model.dart';
 import 'package:women_diary/database/data_handler.dart';
 
 class ActionHistoryBloc extends Bloc<UserActionEvent, UserActionState> {
+  /// Action list
   List<UserAction> actions = [];
   DateTime startTime = DateTime.now().subtract(Duration(days: 90));
   DateTime endTime = DateTime.now();
   ActionType? type;
 
+  /// Action detail
+  UserAction actionDetail = UserAction.init('', DateTime.now(), '', '');
+
   ActionHistoryBloc() : super(ActionHistoryLoading()) {
     on<LoadUserActionEvent>(_onLoadActions);
     on<UpdateActionTypeEvent>(_onUpdateActionType);
     on<UpdateDateRangeEvent>(_onUpdateDaterange);
+    on<UpdateActionDetailEvent>(_onLoadActionDetail);
 
   }
 
@@ -48,5 +53,11 @@ class ActionHistoryBloc extends Bloc<UserActionEvent, UserActionState> {
     );
 
     emit(UserActionLoadedState(actions: actions));
+  }
+
+  /// --------------------------- Action Detail --------------------------------
+  void _onLoadActionDetail(UpdateActionDetailEvent event, Emitter<UserActionState> emit) async {
+    actionDetail = event.initialAction;
+    emit(ActionDetailUpdatedState(actionDetail));
   }
 }

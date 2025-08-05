@@ -36,9 +36,6 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text("📖 Lịch sử hành động"),
-      ),
       child: SafeArea(
         child: Stack(
           children: [

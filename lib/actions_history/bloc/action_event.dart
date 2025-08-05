@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:women_diary/actions_history/new_action.dart';
+import 'package:women_diary/actions_history/user_action_model.dart';
 
 class UserActionEvent extends Equatable {
   const UserActionEvent();
@@ -32,4 +33,14 @@ class UpdateDateRangeEvent extends UserActionEvent {
 
   @override
   List<Object?> get props => [startTime, endTime];
+}
+
+/// Action detail
+class UpdateActionDetailEvent extends UserActionEvent {
+  final UserAction initialAction;
+
+  const UpdateActionDetailEvent(this.initialAction);
+
+  @override
+  List<Object?> get props => [initialAction];
 }

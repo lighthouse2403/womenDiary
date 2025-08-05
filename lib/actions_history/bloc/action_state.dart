@@ -39,3 +39,13 @@ class UserActionLoadedErrorState extends UserActionState {
   @override
   List<Object?> get props => [message];
 }
+
+/// Action detail
+class ActionDetailUpdatedState extends UserActionState {
+  final UserAction initialAction;
+
+  const ActionDetailUpdatedState(this.initialAction);
+
+  @override
+  List<Object?> get props => [initialAction];
+}
