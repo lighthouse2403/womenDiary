@@ -236,9 +236,15 @@ class DatabaseHandler {
     );
   }
 
-  static Future<UserAction> gedAction(String id) async {
+  static Future<UserAction> getAction(String id) async {
     final db = await DatabaseHandler.db(userActionTable);
     final List<Map<String, dynamic>> maps = await db.query(userActionTable, where: 'id = ?', whereArgs: [id]);
+    return UserAction.fromDatabase(maps.first);
+  }
+
+  static Future<UserAction> getActions(int startTime, int endTime) async {
+    final db = await DatabaseHandler.db(userActionTable);
+    final List<Map<String, dynamic>> maps = await db.query(userActionTable, where: 'startTime = ? AND endTime = ?', whereArgs: [startTime, endTime]);
     return UserAction.fromDatabase(maps.first);
   }
 
