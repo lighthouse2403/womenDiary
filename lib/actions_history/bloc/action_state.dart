@@ -51,6 +51,14 @@ class ActionDetailUpdatedState extends UserActionState {
   List<Object?> get props => [initialAction];
 }
 
+class SaveButtonState extends UserActionState {
+  const SaveButtonState(this.isEnable);
+
+  final bool isEnable;
+  @override
+  List<Object?> get props => [isEnable];
+}
+
 class EmojiUpdatedState extends UserActionState {
   final String emoji;
 

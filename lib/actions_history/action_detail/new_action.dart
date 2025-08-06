@@ -37,14 +37,11 @@ class _CreateActionView extends StatelessWidget {
             title: Row(
               children: [
                 const Icon(Icons.check_circle, color: Colors.pink),
-                const SizedBox(width: 8),
+                Constants.hSpacer8,
                 const Text("Thành công!").text18().pinkColor(),
               ],
             ),
-            content: const Text("Hành động của bạn đã được lưu.")
-                .text16()
-                .w500()
-                .greyColor(),
+            content: const Text("Hành động của bạn đã được lưu.").text16().w500().greyColor(),
             actions: [
               TextButton(
                 onPressed: () {
@@ -76,11 +73,13 @@ class _CreateActionView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _timePicker(),
-            Constants.vSpacer20,
+            Constants.vSpacer16,
             _emoji(),
-            Constants.vSpacer20,
+            Constants.vSpacer16,
             _actionType(),
-            Constants.vSpacer20,
+            Constants.vSpacer16,
+            _titleInput(context),
+            Constants.vSpacer16,
             _noteInput(context),
             Constants.vSpacer30,
             _saveButton(context),
@@ -184,6 +183,30 @@ class _CreateActionView extends StatelessWidget {
     );
   }
 
+  Widget _titleInput(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _section("Tiêu đề"),
+        Constants.vSpacer8,
+        TextField(
+          onChanged: (text) => context.read<UserActionBloc>().add(UpdateTitleEvent(text)),
+          decoration: InputDecoration(
+            hintText: "Nhập tiêu đề ngắn gọn...",
+            fillColor: AppColors.pinkBackgroundColor,
+            filled: true,
+            contentPadding: const EdgeInsets.all(14),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
   Widget _noteInput(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,20 +265,24 @@ class _CreateActionView extends StatelessWidget {
   }
 
   Widget _saveButton(BuildContext context) {
-    return Center(
-      child: ElevatedButton(
-        onPressed: () {
-          context.read<UserActionBloc>().add(CreateActionDetailEvent());
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.pink,
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+    return BlocBuilder<UserActionBloc, UserActionState>(
+      buildWhen: (pre, current) => current is SaveButtonState,
+      builder: (context, state) {
+        final isEnabled = state is SaveButtonState ? state.isEnable : false;
+
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: isEnabled
+                ? () {
+              context.read<UserActionBloc>().add(CreateActionDetailEvent());
+            }
+                : null,
+            child: const Text("Save"),
           ),
-        ),
-        child: const Text("Lưu").text16().whiteColor(),
-      ),
+        );
+      },
     );
   }
+
 }

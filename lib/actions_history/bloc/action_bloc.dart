@@ -91,6 +91,7 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
 
   void _onUpdateTitle(UpdateTitleEvent event, Emitter<UserActionState> emit) async {
     actionDetail.title = event.title;
+    emit(SaveButtonState(actionDetail.title.isNotEmpty));
   }
 
   void _onUpdateNote(UpdateNoteEvent event, Emitter<UserActionState> emit) async {
