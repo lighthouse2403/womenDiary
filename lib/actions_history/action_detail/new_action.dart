@@ -114,7 +114,7 @@ class _CreateActionView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _section("Biểu tượng cảm xúc"),
+        _section("Cảm xúc"),
         BlocBuilder<UserActionBloc, UserActionState>(
           buildWhen: (pre,current) => current is EmojiUpdatedState,
           builder: (context, state) {
@@ -137,7 +137,7 @@ class _CreateActionView extends StatelessWidget {
                         width: 2,
                       ),
                     ),
-                    child: Text(emoji, style: const TextStyle(fontSize: 24)),
+                    child: Text(emoji).text30(),
                   ),
                 );
               }).toList(),
@@ -153,7 +153,7 @@ class _CreateActionView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _section("Ghi chú"),
-        const SizedBox(height: 8),
+        Constants.vSpacer8,
         TextField(
           maxLines: 3,
           onChanged: (text) => context.read<UserActionBloc>().add(UpdateNoteEvent(text)),
@@ -177,7 +177,7 @@ class _CreateActionView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _section("Loại hành động"),
-        const SizedBox(height: 10),
+        Constants.vSpacer10,
         BlocBuilder<UserActionBloc, UserActionState>(
           buildWhen: (pre,current) => current is ActionTypeUpdatedState,
           builder: (context, state) {
@@ -217,7 +217,7 @@ class _CreateActionView extends StatelessWidget {
             borderRadius: BorderRadius.circular(30),
           ),
         ),
-        child: const Text("Lưu", style: TextStyle(color: Colors.white, fontSize: 16)),
+        child: const Text("Lưu").text16().whiteColor(),
       ),
     );
   }
