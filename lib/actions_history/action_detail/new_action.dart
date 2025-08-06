@@ -45,8 +45,8 @@ class _CreateActionView extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Close dialog
-                  Navigator.pop(context); // Go back screen
+                  Navigator.pop(context);
+                  Navigator.pop(context);
                 },
                 child: const Text("OK").text16().pinkColor(),
               ),
@@ -62,7 +62,7 @@ class _CreateActionView extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Tạo hành động mới").pinkColor(),
+        title: const Text("Tạo hành động mới").text20().pinkColor().w600(),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.pink),
@@ -73,15 +73,15 @@ class _CreateActionView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _timePicker(),
-            Constants.vSpacer16,
+            Constants.vSpacer24,
             _emoji(),
-            Constants.vSpacer16,
+            Constants.vSpacer24,
             _actionType(),
-            Constants.vSpacer16,
+            Constants.vSpacer24,
             _titleInput(context),
-            Constants.vSpacer16,
+            Constants.vSpacer24,
             _noteInput(context),
-            Constants.vSpacer30,
+            Constants.vSpacer40,
             _saveButton(context),
           ],
         ),
@@ -89,7 +89,10 @@ class _CreateActionView extends StatelessWidget {
     );
   }
 
-  Widget _section(String title) => Text(title).text18().w600().pinkColor();
+  Widget _section(String title) => Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Text(title).text18().w600().pinkColor(),
+  );
 
   Widget _timePicker() {
     return Column(
@@ -102,13 +105,15 @@ class _CreateActionView extends StatelessWidget {
             DateTime time = state is TimeUpdatedState ? state.time : DateTime.now();
             return InkWell(
               onTap: () => _pickDateTime(context, time),
+              borderRadius: BorderRadius.circular(12),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 decoration: BoxDecoration(
                   color: AppColors.pinkBackgroundColor,
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.pink.shade100),
                 ),
-                child: Text(DateFormat('dd/MM/yyyy – HH:mm').format(time)).text16(),
+                child: Text(DateFormat('dd/MM/yyyy – HH:mm').format(time)).text16().w500(),
               ),
             );
           },
@@ -155,15 +160,15 @@ class _CreateActionView extends StatelessWidget {
           builder: (context, state) {
             String selectedEmoji = state is EmojiUpdatedState ? state.emoji : '';
             return Wrap(
-              spacing: 12,
-              runSpacing: 12,
+              spacing: 16,
+              runSpacing: 16,
               children: emojis.map((emoji) {
                 final isSelected = selectedEmoji == emoji;
                 return GestureDetector(
                   onTap: () => context.read<UserActionBloc>().add(UpdateEmojiEvent(emoji)),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.all(14),
+                    duration: const Duration(milliseconds: 250),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: isSelected ? Colors.pink.shade100 : AppColors.pinkBackgroundColor,
                       shape: BoxShape.circle,
@@ -188,16 +193,15 @@ class _CreateActionView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _section("Tiêu đề"),
-        Constants.vSpacer8,
         TextField(
           onChanged: (text) => context.read<UserActionBloc>().add(UpdateTitleEvent(text)),
           decoration: InputDecoration(
             hintText: "Nhập tiêu đề ngắn gọn...",
             fillColor: AppColors.pinkBackgroundColor,
             filled: true,
-            contentPadding: const EdgeInsets.all(14),
+            contentPadding: const EdgeInsets.all(16),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
           ),
@@ -206,13 +210,11 @@ class _CreateActionView extends StatelessWidget {
     );
   }
 
-
   Widget _noteInput(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _section("Ghi chú"),
-        Constants.vSpacer8,
         TextField(
           maxLines: 3,
           onChanged: (text) => context.read<UserActionBloc>().add(UpdateNoteEvent(text)),
@@ -220,9 +222,9 @@ class _CreateActionView extends StatelessWidget {
             hintText: "Nhập ghi chú nhẹ nhàng...",
             fillColor: AppColors.pinkBackgroundColor,
             filled: true,
-            contentPadding: const EdgeInsets.all(14),
+            contentPadding: const EdgeInsets.all(16),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
           ),
@@ -236,7 +238,6 @@ class _CreateActionView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _section("Loại hành động"),
-        Constants.vSpacer10,
         BlocBuilder<UserActionBloc, UserActionState>(
           buildWhen: (pre, current) => current is ActionTypeUpdatedState,
           builder: (context, state) {
@@ -244,8 +245,8 @@ class _CreateActionView extends StatelessWidget {
                 ? state.type
                 : ActionType.stomachache;
             return Wrap(
-              spacing: 10,
-              runSpacing: 10,
+              spacing: 12,
+              runSpacing: 12,
               children: ActionType.values.map((type) {
                 final isSelected = selectedType == type;
                 return ChoiceChip(
@@ -255,6 +256,10 @@ class _CreateActionView extends StatelessWidget {
                       UpdateActionTypeEvent(isSelected ? null : type)),
                   selectedColor: Colors.pink.shade100,
                   backgroundColor: AppColors.pinkBackgroundColor,
+                  labelStyle: TextStyle(
+                    color: isSelected ? Colors.pink.shade700 : Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
                 );
               }).toList(),
             );
@@ -278,11 +283,17 @@ class _CreateActionView extends StatelessWidget {
               context.read<UserActionBloc>().add(CreateActionDetailEvent());
             }
                 : null,
-            child: const Text("Save"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isEnabled ? Colors.pink : Colors.pink.shade100,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+            child: const Text("Lưu lại").text16().w600().whiteColor(),
           ),
         );
       },
     );
   }
-
 }

@@ -16,7 +16,9 @@ class Constants {
   static Widget vSpacer12 = const SizedBox(height: 12);
   static Widget vSpacer16 = const SizedBox(height: 16);
   static Widget vSpacer20 = const SizedBox(height: 20);
+  static Widget vSpacer24 = const SizedBox(height: 24);
   static Widget vSpacer30 = const SizedBox(height: 30);
+  static Widget vSpacer40 = const SizedBox(height: 40);
   static Widget vSpacer90 = const SizedBox(height: 90);
 
   static Widget hSpacer2 = const SizedBox(width: 2);
