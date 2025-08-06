@@ -91,6 +91,15 @@ extension FontSizeExtension on TextStyle? {
     );
   }
 
+  TextStyle text24() {
+    return TextStyle(
+      fontWeight: this?.fontWeight,
+      fontSize: 24,
+      color:  this?.color,
+      overflow: this?.overflow,
+    );
+  }
+
   TextStyle text30() {
     return TextStyle(
       fontWeight: this?.fontWeight,

@@ -168,16 +168,16 @@ class _CreateActionView extends StatelessWidget {
                   onTap: () => context.read<UserActionBloc>().add(UpdateEmojiEvent(emoji)),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: isSelected ? Colors.pink.shade100 : AppColors.pinkBackgroundColor,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isSelected ? Colors.pink : Colors.transparent,
-                        width: 2,
+                        width: 1,
                       ),
                     ),
-                    child: Text(emoji).text30(),
+                    child: Text(emoji).text24(),
                   ),
                 );
               }).toList(),
@@ -254,6 +254,7 @@ class _CreateActionView extends StatelessWidget {
                   selected: isSelected,
                   onSelected: (_) => context.read<UserActionBloc>().add(
                       UpdateActionTypeEvent(isSelected ? null : type)),
+                  checkmarkColor: Colors.pinkAccent,
                   selectedColor: Colors.pink.shade100,
                   backgroundColor: AppColors.pinkBackgroundColor,
                   labelStyle: TextStyle(

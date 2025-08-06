@@ -105,6 +105,10 @@ extension TextExtension on Text? {
     return Text(this?.data ?? '', style: this?.style.text20(), textAlign: this?.textAlign, overflow: this?.overflow, maxLines: this?.maxLines);
   }
 
+  Text text24() {
+    return Text(this?.data ?? '', style: this?.style.text24(), textAlign: this?.textAlign, overflow: this?.overflow, maxLines: this?.maxLines);
+  }
+
   Text text30() {
     return Text(this?.data ?? '', style: this?.style.text30(), textAlign: this?.textAlign, overflow: this?.overflow, maxLines: this?.maxLines);
   }
