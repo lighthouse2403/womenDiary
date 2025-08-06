@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
-import 'package:women_diary/actions_history/new_action.dart';
 import 'package:women_diary/actions_history/user_action_model.dart';
 import 'package:women_diary/database/data_handler.dart';
 
-class ActionHistoryBloc extends Bloc<UserActionEvent, UserActionState> {
+class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   /// Action list
   List<UserAction> actions = [];
   DateTime startTime = DateTime.now().subtract(Duration(days: 90));
@@ -15,17 +15,20 @@ class ActionHistoryBloc extends Bloc<UserActionEvent, UserActionState> {
   /// Action detail
   UserAction actionDetail = UserAction.init('', DateTime.now(), '', '');
 
-  ActionHistoryBloc() : super(ActionHistoryLoading()) {
+  UserActionBloc() : super(ActionHistoryLoading()) {
     on<LoadUserActionEvent>(_onLoadActions);
     on<UpdateActionTypeEvent>(_onUpdateActionType);
-    on<UpdateDateRangeEvent>(_onUpdateDaterange);
+    on<UpdateDateRangeEvent>(_onUpdateDateRange);
 
     /// Action detail
-    on<UpdateActionDetailEvent>(_onLoadActionDetail);
+    on<InitActionDetailEvent>(_onLoadActionDetail);
     on<UpdateEmojiEvent>(_onUpdateEmoji);
     on<UpdateTimeEvent>(_onUpdateTime);
     on<UpdateTitleEvent>(_onUpdateTitle);
     on<UpdateNoteEvent>(_onUpdateNote);
+    on<UpdateActionDetailEvent>(_onUpdateActionDetail);
+    on<CreateActionDetailEvent>(_onCreateActionDetail);
+
   }
 
   Future<void> _onLoadActions(LoadUserActionEvent event, Emitter<UserActionState> emit) async {
@@ -48,7 +51,7 @@ class ActionHistoryBloc extends Bloc<UserActionEvent, UserActionState> {
     emit(UserActionLoadedState(actions: actions));
   }
 
-  void _onUpdateDaterange(UpdateDateRangeEvent event, Emitter<UserActionState> emit) async {
+  void _onUpdateDateRange(UpdateDateRangeEvent event, Emitter<UserActionState> emit) async {
     startTime = event.startTime;
     endTime = event.endTime;
     actions = await DatabaseHandler.getActions(
@@ -61,9 +64,19 @@ class ActionHistoryBloc extends Bloc<UserActionEvent, UserActionState> {
   }
 
   /// --------------------------- Action Detail --------------------------------
-  void _onLoadActionDetail(UpdateActionDetailEvent event, Emitter<UserActionState> emit) async {
+  void _onLoadActionDetail(InitActionDetailEvent event, Emitter<UserActionState> emit) async {
     actionDetail = event.initialAction;
     emit(ActionDetailUpdatedState(actionDetail));
+  }
+
+  void _onUpdateActionDetail(UpdateActionDetailEvent event, Emitter<UserActionState> emit) async {
+    await DatabaseHandler.updateAction(actionDetail);
+    emit(ActionSavedSuccessfullyState());
+  }
+
+  void _onCreateActionDetail(CreateActionDetailEvent event, Emitter<UserActionState> emit) async {
+    await DatabaseHandler.insertNewAction(actionDetail);
+    emit(ActionSavedSuccessfullyState());
   }
 
   void _onUpdateEmoji(UpdateEmojiEvent event, Emitter<UserActionState> emit) async {

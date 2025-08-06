@@ -2,10 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/bloc/action_bloc.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
-import 'package:women_diary/actions_history/new_action.dart';
+import 'package:women_diary/actions_history/action_detail/new_action.dart';
 import 'package:women_diary/actions_history/user_action_model.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
@@ -18,7 +19,7 @@ class ActionHistory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ActionHistoryBloc()..add(LoadUserActionEvent()),
+      create: (_) => UserActionBloc()..add(LoadUserActionEvent()),
       child: const _ActionHistoryView(),
     );
   }
@@ -53,7 +54,7 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
   }
 
   Widget _filterChips() {
-    return BlocBuilder<ActionHistoryBloc, UserActionState>(
+    return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen:  (pre, current) => current is ActionTypeUpdatedState,
         builder: (context, state) {
         ActionType? selectedType = state is ActionTypeUpdatedState ? state.type : null;
@@ -66,7 +67,7 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
                   label: const Text("Tất cả"),
                   selected: selectedType == null,
                   onSelected: (_) {
-                    context.read<ActionHistoryBloc>().add(UpdateActionTypeEvent(null));
+                    context.read<UserActionBloc>().add(UpdateActionTypeEvent(null));
                   },
                 ),
                 ...ActionType.values.map(
@@ -74,7 +75,7 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
                     label: Text(type.display),
                     selected: selectedType == type,
                     onSelected: (_) {
-                      context.read<ActionHistoryBloc>().add(UpdateActionTypeEvent(type));
+                      context.read<UserActionBloc>().add(UpdateActionTypeEvent(type));
                     },
                   ),
                 ),
@@ -86,7 +87,7 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
   }
 
   Widget _buildList() {
-    return BlocBuilder<ActionHistoryBloc, UserActionState>(
+    return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (pre, current) => current is UserActionLoadedState,
       builder: (context, state) {
         List<UserAction> actionList = (state is UserActionLoadedState) ? state.actions : [];

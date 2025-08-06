@@ -1,4 +1,4 @@
-import 'package:women_diary/actions_history/new_action.dart';
+import 'package:women_diary/actions_history/action_type.dart';
 
 class UserAction {
    String id = '${DateTime.now().millisecondsSinceEpoch}';

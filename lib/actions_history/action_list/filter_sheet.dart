@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:women_diary/actions_history/new_action.dart';
+import 'package:women_diary/actions_history/action_detail/new_action.dart';
+import 'package:women_diary/actions_history/action_type.dart';
 
 class FilterSheet extends StatefulWidget {
   final DateTimeRange? initialRange;
