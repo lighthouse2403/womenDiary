@@ -5,6 +5,7 @@ import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/bloc/action_bloc.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 
@@ -56,8 +57,6 @@ class _CreateActionView extends StatelessWidget {
   Widget _section(String title) => Text(title).text18().w600().pinkColor();
 
   Widget _timePicker() {
-    final pastelPink = const Color(0xFFFFE6E6);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -71,13 +70,10 @@ class _CreateActionView extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: pastelPink,
+                  color: AppColors.pinkBackgroundColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(
-                  DateFormat('dd/MM/yyyy – HH:mm').format(time),
-                  style: const TextStyle(fontSize: 16),
-                ),
+                child: Text(DateFormat('dd/MM/yyyy – HH:mm').format(time)).text16(),
               ),
             );
           },
@@ -90,7 +86,7 @@ class _CreateActionView extends StatelessWidget {
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: initial,
-      firstDate: DateTime.now().subtract(const Duration(days: 90)),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now(),
     );
     if (pickedDate == null) return;
@@ -114,7 +110,6 @@ class _CreateActionView extends StatelessWidget {
 
   Widget _emoji() {
     final emojis = ['😊', '😢', '🤒', '🥰', '😡', '😴', '🌸', '🍫'];
-    final pastelPink = const Color(0xFFFFE6E6);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,7 +130,7 @@ class _CreateActionView extends StatelessWidget {
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.pink.shade100 : pastelPink,
+                      color: isSelected ? Colors.pink.shade100 : AppColors.pinkBackgroundColor,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isSelected ? Colors.pink : Colors.transparent,
@@ -154,8 +149,6 @@ class _CreateActionView extends StatelessWidget {
   }
 
   Widget _noteInput(BuildContext context) {
-    final pastelPink = const Color(0xFFFFE6E6);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -166,7 +159,7 @@ class _CreateActionView extends StatelessWidget {
           onChanged: (text) => context.read<UserActionBloc>().add(UpdateNoteEvent(text)),
           decoration: InputDecoration(
             hintText: "Nhập ghi chú nhẹ nhàng...",
-            fillColor: pastelPink,
+            fillColor: AppColors.pinkBackgroundColor,
             filled: true,
             contentPadding: const EdgeInsets.all(14),
             border: OutlineInputBorder(
@@ -180,8 +173,6 @@ class _CreateActionView extends StatelessWidget {
   }
 
   Widget _actionType() {
-    final pastelPink = const Color(0xFFFFE6E6);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -202,7 +193,7 @@ class _CreateActionView extends StatelessWidget {
                   onSelected: (_) => context.read<UserActionBloc>().add(
                       UpdateActionTypeEvent(isSelected ? null : type)),
                   selectedColor: Colors.pink.shade100,
-                  backgroundColor: pastelPink,
+                  backgroundColor: AppColors.pinkBackgroundColor,
                 );
               }).toList(),
             );
