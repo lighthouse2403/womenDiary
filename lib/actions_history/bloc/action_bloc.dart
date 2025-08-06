@@ -81,10 +81,12 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
 
   void _onUpdateEmoji(UpdateEmojiEvent event, Emitter<UserActionState> emit) async {
     actionDetail.emoji = event.emoji;
+    emit(EmojiUpdatedState(event.emoji));
   }
 
   void _onUpdateTime(UpdateTimeEvent event, Emitter<UserActionState> emit) async {
     actionDetail.time = event.time;
+    emit(TimeUpdatedState(event.time));
   }
 
   void _onUpdateTitle(UpdateTitleEvent event, Emitter<UserActionState> emit) async {
