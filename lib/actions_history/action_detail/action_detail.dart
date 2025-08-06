@@ -19,13 +19,36 @@ class ActionDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => UserActionBloc()..add(InitActionDetailEvent(action)),
-      child: const _CreateActionView(),
+      child: _ActionDetailView(action: action,),
     );
   }
 }
 
-class _CreateActionView extends StatelessWidget {
-  const _CreateActionView();
+class _ActionDetailView extends StatefulWidget {
+  const _ActionDetailView({required this.action});
+  final UserAction action;
+
+  @override
+  State<_ActionDetailView> createState() => _ActionDetailViewState();
+}
+
+class _ActionDetailViewState extends State<_ActionDetailView> {
+  late final TextEditingController titleController;
+  late final TextEditingController noteController;
+
+  @override
+  void initState() {
+    super.initState();
+    titleController = TextEditingController(text: widget.action.title ?? '');
+    noteController = TextEditingController(text: widget.action.note ?? '');
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    noteController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -197,6 +220,7 @@ class _CreateActionView extends StatelessWidget {
       children: [
         _section("Tiêu đề"),
         TextField(
+          controller: titleController,
           onChanged: (text) => context.read<UserActionBloc>().add(UpdateTitleEvent(text)),
           decoration: InputDecoration(
             hintText: "Nhập tiêu đề ngắn gọn...",
@@ -219,6 +243,7 @@ class _CreateActionView extends StatelessWidget {
       children: [
         _section("Ghi chú"),
         TextField(
+          controller: noteController,
           maxLines: 3,
           onChanged: (text) => context.read<UserActionBloc>().add(UpdateNoteEvent(text)),
           decoration: InputDecoration(

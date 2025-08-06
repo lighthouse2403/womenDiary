@@ -66,7 +66,8 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
   /// --------------------------- Action Detail --------------------------------
   void _onLoadActionDetail(InitActionDetailEvent event, Emitter<UserActionState> emit) async {
     actionDetail = event.initialAction;
-    emit(ActionDetailUpdatedState(actionDetail));
+    emit(EmojiUpdatedState(actionDetail.emoji));
+    emit(TimeUpdatedState(actionDetail.time));
   }
 
   void _onUpdateActionDetail(UpdateActionDetailEvent event, Emitter<UserActionState> emit) async {
