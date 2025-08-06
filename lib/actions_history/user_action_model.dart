@@ -29,7 +29,7 @@ class UserAction {
     title = json['title'];
     note = json['note'];
     time = DateTime.fromMillisecondsSinceEpoch(json['time'] as int);
-    type = (json['time'] as int).toActionType();
+    type = (json['type'] as int).toActionType();
   }
 
   Map<String, dynamic> toJson() {

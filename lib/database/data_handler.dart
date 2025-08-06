@@ -265,6 +265,7 @@ class DatabaseHandler {
       whereArgs.add(type.index);
     }
 
+
     final whereString = whereClauses.isNotEmpty ? whereClauses.join(' AND ') : null;
 
     final List<Map<String, dynamic>> list = await db.query(
@@ -273,6 +274,7 @@ class DatabaseHandler {
       whereArgs: whereArgs,
       orderBy: 'time DESC',
     );
+    print('list ${list}');
 
     return list.map((e) => UserAction.fromDatabase(e)).toList();
   }

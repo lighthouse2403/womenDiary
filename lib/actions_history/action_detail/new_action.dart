@@ -26,6 +26,42 @@ class _CreateActionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return BlocListener<UserActionBloc, UserActionState>(
+      listenWhen: (prev, curr) => curr is ActionSavedSuccessfullyState,
+      listener: (context, state) async {
+        await showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            backgroundColor: Colors.pink.shade50,
+            title: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.pink),
+                const SizedBox(width: 8),
+                const Text("Thành công!").text18().pinkColor(),
+              ],
+            ),
+            content: const Text("Hành động của bạn đã được lưu.")
+                .text16()
+                .w500()
+                .greyColor(),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close dialog
+                  Navigator.pop(context); // Go back screen
+                },
+                child: const Text("OK").text16().pinkColor(),
+              ),
+            ],
+          ),
+        );
+      },
+      child: _mainScaffold(context),
+    );
+  }
+
+  Widget _mainScaffold(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -116,14 +152,14 @@ class _CreateActionView extends StatelessWidget {
       children: [
         _section("Cảm xúc"),
         BlocBuilder<UserActionBloc, UserActionState>(
-          buildWhen: (pre,current) => current is EmojiUpdatedState,
+          buildWhen: (pre, current) => current is EmojiUpdatedState,
           builder: (context, state) {
-            String selecetdEmoji = state is EmojiUpdatedState ? state.emoji : '';
+            String selectedEmoji = state is EmojiUpdatedState ? state.emoji : '';
             return Wrap(
               spacing: 12,
               runSpacing: 12,
               children: emojis.map((emoji) {
-                final isSelected = selecetdEmoji == emoji;
+                final isSelected = selectedEmoji == emoji;
                 return GestureDetector(
                   onTap: () => context.read<UserActionBloc>().add(UpdateEmojiEvent(emoji)),
                   child: AnimatedContainer(
@@ -179,9 +215,11 @@ class _CreateActionView extends StatelessWidget {
         _section("Loại hành động"),
         Constants.vSpacer10,
         BlocBuilder<UserActionBloc, UserActionState>(
-          buildWhen: (pre,current) => current is ActionTypeUpdatedState,
+          buildWhen: (pre, current) => current is ActionTypeUpdatedState,
           builder: (context, state) {
-            ActionType? selectedType = state is ActionTypeUpdatedState ? state.type : ActionType.stomachache;
+            ActionType? selectedType = state is ActionTypeUpdatedState
+                ? state.type
+                : ActionType.stomachache;
             return Wrap(
               spacing: 10,
               runSpacing: 10,
@@ -208,7 +246,6 @@ class _CreateActionView extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {
           context.read<UserActionBloc>().add(CreateActionDetailEvent());
-          Navigator.pop(context);
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.pink,
