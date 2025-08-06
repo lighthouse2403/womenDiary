@@ -280,9 +280,7 @@ class _CreateActionView extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: isEnabled
-                ? () {
-              context.read<UserActionBloc>().add(CreateActionDetailEvent());
-            }
+                ? () { context.read<UserActionBloc>().add(CreateActionDetailEvent()); }
                 : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: isEnabled ? Colors.pink : Colors.pink.shade100,
