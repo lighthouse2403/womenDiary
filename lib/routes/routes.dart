@@ -15,6 +15,10 @@ import 'package:women_diary/menstruation/menstruation_model.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:women_diary/schedule/new_schedule.dart';
+import 'package:women_diary/schedule/schedule_detail.dart';
+import 'package:women_diary/schedule/schedule_list.dart';
+import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:women_diary/setting/setting.dart';
 
 class Routes {
@@ -122,6 +126,25 @@ class Routes {
           path: RoutesName.firstCycleInformation,
           pageBuilder: (context, state) {
             return _createPageFadeTransition(state: state, child: FirstCycleSetupView());
+          },
+        ),
+        GoRoute(
+          path: RoutesName.schedules,
+          pageBuilder: (context, state) {
+            return _createPageFadeTransition(state: state, child: Schedule());
+          },
+        ),
+        GoRoute(
+          path: RoutesName.scheduleDetail,
+          pageBuilder: (context, state) {
+            ScheduleModel schedule = state.extra as ScheduleModel;
+            return _createPageFadeTransition(state: state, child: ScheduleDetail(schedule: schedule));
+          },
+        ),
+        GoRoute(
+          path: RoutesName.newSchedule,
+          pageBuilder: (context, state) {
+            return _createPageFadeTransition(state: state, child: NewSchedule());
           },
         )
       ],

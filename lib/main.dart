@@ -9,7 +9,7 @@ import 'app_starter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService().init(); // <-- thêm dòng này
+  await NotificationService().init();
   await Firebase.initializeApp(
     name: 'WomenDiary',
     options: DefaultFirebaseOptions.currentPlatform,
