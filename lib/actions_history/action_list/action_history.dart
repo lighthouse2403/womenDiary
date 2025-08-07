@@ -220,7 +220,9 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
   Widget _actionCard(UserAction action, BuildContext context) {
     String actionTime = DateFormat('HH:mm').format(action.time);
     return GestureDetector(
-      onTap: () => context.navigateTo(RoutesName.actionDetail, arguments: action),
+      onTap: () => context.navigateTo(RoutesName.actionDetail, arguments: action).then((value) {
+        context.read<UserActionBloc>().add(const LoadUserActionEvent());
+      }),
       child: Container(
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(

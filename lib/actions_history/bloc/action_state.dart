@@ -1,9 +1,8 @@
 import 'package:equatable/equatable.dart';
-import 'package:women_diary/actions_history/action_detail/new_action.dart';
 import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/user_action_model.dart';
 
-abstract class UserActionState extends Equatable {
+class UserActionState extends Equatable {
   const UserActionState();
 
   @override

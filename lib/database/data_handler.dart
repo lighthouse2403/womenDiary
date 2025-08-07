@@ -118,19 +118,35 @@ class DatabaseHandler {
     return list.map((e) => ScheduleModel.fromDatabase(e)).toList();
   }
 
-  static Future<List<ScheduleModel>> getScheduleOnDate(DateTime day) async {
-    final db = await DatabaseHandler.db(scheduleTable);
+  static Future<UserAction> getAction(String id) async {
+    final db = await DatabaseHandler.db(userActionTable);
+    final List<Map<String, dynamic>> maps = await db.query(userActionTable, where: 'id = ?', whereArgs: [id]);
+    return UserAction.fromDatabase(maps.first);
+  }
 
-    final startOfDay = DateTime(day.year, day.month, day.day).millisecondsSinceEpoch;
-    final endOfDay = DateTime(day.year, day.month, day.day, 23, 59, 59, 999).millisecondsSinceEpoch;
+  static Future<List<ScheduleModel>> getSchedule({int? startTime, int? endTime}) async {
+    final db = await DatabaseHandler.db(userActionTable);
+
+    final whereClauses = <String>[];
+    final whereArgs = <dynamic>[];
+
+    if (startTime != null) {
+      whereClauses.add('time >= ?');
+      whereArgs.add(startTime);
+    }
+
+    if (endTime != null) {
+      whereClauses.add('time <= ?');
+      whereArgs.add(endTime);
+    }
+
+    final whereString = whereClauses.isNotEmpty ? whereClauses.join(' AND ') : null;
 
     final List<Map<String, dynamic>> list = await db.query(
-      scheduleTable,
-      where: '''
-      startTime <= ? AND 
-      (stopTime IS NULL OR stopTime >= ?)
-    ''',
-      whereArgs: [endOfDay, startOfDay],
+      userActionTable,
+      where: whereString,
+      whereArgs: whereArgs,
+      orderBy: 'time DESC',
     );
 
     return list.map((e) => ScheduleModel.fromDatabase(e)).toList();
