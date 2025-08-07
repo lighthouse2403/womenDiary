@@ -88,10 +88,16 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Tạo hành động mới").text20().pinkColor().w600(),
+        title: const Text("Chi tiết hành động").text20().pinkColor().w600(),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.pink),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.pink),
+            onPressed: () => _confirmDelete(context),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -323,4 +329,38 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
       },
     );
   }
+
+  void _confirmDelete(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.pink.shade50,
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.pink),
+            Constants.hSpacer8,
+            const Text("Xoá bản ghi?").text18().pinkColor(),
+          ],
+        ),
+        content: const Text("Bạn có chắc chắn muốn xoá hành động này không?")
+            .text16().w500().greyColor(),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text("Huỷ").text16().pinkColor(),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<UserActionBloc>().add(DeleteActionDetailEvent(widget.action.id));
+              Navigator.of(context).pop(); // thoát khỏi màn detail
+            },
+            child: const Text("Xoá").text16().w600().pinkColor(),
+          ),
+        ],
+      ),
+    );
+  }
+
 }

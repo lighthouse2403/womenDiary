@@ -60,6 +60,22 @@ class CreateActionDetailEvent extends UserActionEvent {
   List<Object?> get props => [];
 }
 
+class DeleteActionFromListEvent extends UserActionEvent {
+  const DeleteActionFromListEvent(this.id);
+  final String id;
+
+  @override
+  List<Object?> get props => [id];
+}
+
+class DeleteActionDetailEvent extends UserActionEvent {
+  const DeleteActionDetailEvent(this.id);
+  final String id;
+
+  @override
+  List<Object?> get props => [id];
+}
+
 class UpdateTimeEvent extends UserActionEvent {
   final DateTime time;
 

@@ -6,7 +6,6 @@ import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/bloc/action_bloc.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
-import 'package:women_diary/actions_history/action_detail/new_action.dart';
 import 'package:women_diary/actions_history/user_action_model.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
@@ -33,7 +32,6 @@ class _ActionHistoryView extends StatefulWidget {
 }
 
 class _ActionHistoryViewState extends State<_ActionHistoryView> {
-
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -55,34 +53,66 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
 
   Widget _filterChips() {
     return BlocBuilder<UserActionBloc, UserActionState>(
-      buildWhen:  (pre, current) => current is ActionTypeUpdatedState,
-        builder: (context, state) {
+      buildWhen: (pre, current) => current is ActionTypeUpdatedState,
+      builder: (context, state) {
         ActionType? selectedType = state is ActionTypeUpdatedState ? state.type : null;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Wrap(
-              spacing: 8,
-              children: [
-                ChoiceChip(
-                  label: const Text("Tất cả"),
-                  selected: selectedType == null,
-                  onSelected: (_) {
-                    context.read<UserActionBloc>().add(UpdateActionTypeEvent(null));
-                  },
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Wrap(
+            spacing: 8,
+            children: [
+              ChoiceChip(
+                label: const Text(
+                  "Tất cả",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
-                ...ActionType.values.map(
-                      (type) => ChoiceChip(
-                    label: Text(type.display),
-                    selected: selectedType == type,
-                    onSelected: (_) {
-                      context.read<UserActionBloc>().add(UpdateActionTypeEvent(type));
-                    },
+                selected: selectedType == null,
+                selectedColor: Colors.pink.shade100,
+                backgroundColor: Colors.grey.shade100,
+                labelStyle: TextStyle(
+                  color: selectedType == null ? Colors.pink.shade700 : Colors.black87,
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: BorderSide(
+                    color: selectedType == null ? Colors.pink.shade200 : Colors.grey.shade300,
                   ),
                 ),
-              ],
-            ),
-          );
-        }
+                visualDensity: VisualDensity.compact,
+                onSelected: (_) {
+                  context.read<UserActionBloc>().add(UpdateActionTypeEvent(null));
+                },
+              ),
+              ...ActionType.values.map(
+                    (type) => ChoiceChip(
+                  label: Text(
+                    type.display,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                  selected: selectedType == type,
+                  selectedColor: Colors.pink.shade100,
+                  backgroundColor: Colors.grey.shade100,
+                  labelStyle: TextStyle(
+                    color: selectedType == type ? Colors.pink.shade700 : Colors.black87,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color: selectedType == type ? Colors.pink.shade200 : Colors.grey.shade300,
+                    ),
+                  ),
+                  visualDensity: VisualDensity.compact,
+                  onSelected: (_) {
+                    context.read<UserActionBloc>().add(UpdateActionTypeEvent(type));
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -90,49 +120,100 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
     return BlocBuilder<UserActionBloc, UserActionState>(
       buildWhen: (pre, current) => current is UserActionLoadedState,
       builder: (context, state) {
-        List<UserAction> actionList = (state is UserActionLoadedState) ? state.actions : [];
-        return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          itemCount: actionList.length,
-          itemBuilder: (context, index) {
+        final List<UserAction> actionList =
+        (state is UserActionLoadedState) ? state.actions : [];
+
+        if (actionList.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(CupertinoIcons.book, size: 80, color: Colors.pinkAccent),
+                const SizedBox(height: 16),
+                Text("Chưa có bản ghi nào")
+                    .text18()
+                    .w600()
+                    .customColor(Colors.pink.shade600),
+                const SizedBox(height: 8),
+                Text("Nhấn nút bên dưới để thêm bản ghi đầu tiên của bạn ❤️")
+                    .text14()
+                    .customColor(Colors.grey),
+              ],
+            ),
+          );
+        }
+
+        final Map<String, List<UserAction>> groupedByDate = {};
+        for (var action in actionList) {
+          final date = DateFormat('dd/MM/yyyy').format(action.time);
+          groupedByDate.putIfAbsent(date, () => []).add(action);
+        }
+
+        return ListView(
+          padding: const EdgeInsets.all(16),
+          children: groupedByDate.entries.map((entry) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ...actionList.map((action) => _actionCard(action, context)),
+                _sectionHeader(entry.key),
+                ...entry.value.map((action) => _dismissibleCard(action, context)),
+                const SizedBox(height: 20),
               ],
             );
-          },
+          }).toList(),
         );
       },
     );
   }
 
-  Widget _addButton(BuildContext context) {
-    return Positioned(
-      bottom: 24,
-      right: 24,
-      child: CupertinoButton.filled(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        borderRadius: BorderRadius.circular(30),
-        onPressed: () {
-          context.navigateTo(RoutesName.newAction);
-        },
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(CupertinoIcons.add, size: 20, color: CupertinoColors.white),
-            Constants.hSpacer6,
-            const Text("Thêm bản ghi").whiteColor(),
-          ],
-        ),
-      ),
+  Widget _sectionHeader(String date) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Text("📅 $date")
+          .text16()
+          .w600()
+          .customColor(Colors.pink.shade600),
     );
   }
 
-  Widget _sectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12, bottom: 8),
-      child: Text(title).text16().w600().pinkColor(),
+  Widget _dismissibleCard(UserAction action, BuildContext context) {
+    return Dismissible(
+      key: ValueKey(action.id),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        decoration: BoxDecoration(
+          color: Colors.redAccent.shade100,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Icon(CupertinoIcons.delete, color: Colors.white),
+      ),
+      confirmDismiss: (_) async {
+        return await showCupertinoDialog<bool>(
+          context: context,
+          builder: (ctx) => CupertinoAlertDialog(
+            title: const Text('Xoá bản ghi'),
+            content: const Text('Bạn có chắc muốn xoá bản ghi này không?'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('Huỷ'),
+                onPressed: () => Navigator.of(ctx).pop(false),
+              ),
+              CupertinoDialogAction(
+                child: const Text('Xoá'),
+                isDestructiveAction: true,
+                onPressed: () => Navigator.of(ctx).pop(true),
+              ),
+            ],
+          ),
+        ) ??
+            false;
+      },
+      onDismissed: (_) {
+        context.read<UserActionBloc>().add(DeleteActionFromListEvent(action.id));
+      },
+      child: _actionCard(action, context),
     );
   }
 
@@ -141,39 +222,76 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
     return GestureDetector(
       onTap: () => context.navigateTo(RoutesName.actionDetail, arguments: action),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: CupertinoColors.systemGrey6,
+          color: Colors.pink.shade50,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Colors.black12,
-              blurRadius: 8,
-              offset: Offset(0, 2),
+              color: Colors.pink.shade100.withOpacity(0.2),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(action.emoji).text20(),
+            Text(action.emoji).text24(),
             Constants.hSpacer12,
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(action.title).text16().w600(),
+                  Text(action.title)
+                      .text16()
+                      .w600()
+                      .customColor(Colors.black87),
                   if (action.note.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0),
-                      child: Text(action.note).text14().customColor(CupertinoColors.systemGrey),
+                      child: Text(action.note)
+                          .text13()
+                          .customColor(Colors.grey.shade600),
                     ),
                 ],
               ),
             ),
             Constants.hSpacer10,
-            Text(actionTime).text12().customColor(CupertinoColors.systemGrey2),
+            Row(
+              children: [
+                const Icon(CupertinoIcons.time, size: 14, color: CupertinoColors.systemGrey),
+                const SizedBox(width: 4),
+                Text(actionTime)
+                    .text12()
+                    .customColor(Colors.grey.shade500),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _addButton(BuildContext context) {
+    return Positioned(
+      bottom: 24,
+      right: 24,
+      child: CupertinoButton(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        color: Colors.pinkAccent.shade100,
+        borderRadius: BorderRadius.circular(30),
+        onPressed: () => context.navigateTo(RoutesName.newAction),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(CupertinoIcons.add, size: 20, color: Colors.white),
+            Constants.hSpacer6,
+            const Text("Thêm bản ghi")
+                .text16()
+                .w600()
+                .customColor(Colors.white),
           ],
         ),
       ),

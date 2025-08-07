@@ -28,7 +28,8 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     on<UpdateNoteEvent>(_onUpdateNote);
     on<UpdateActionDetailEvent>(_onUpdateActionDetail);
     on<CreateActionDetailEvent>(_onCreateActionDetail);
-
+    on<DeleteActionFromListEvent>(_onDeleteActionFromList);
+    on<DeleteActionDetailEvent>(_onDeleteActionDetail);
   }
 
   Future<void> _onLoadActions(LoadUserActionEvent event, Emitter<UserActionState> emit) async {
@@ -63,6 +64,12 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
     emit(UserActionLoadedState(actions: actions));
   }
 
+  void _onDeleteActionFromList(DeleteActionFromListEvent event, Emitter<UserActionState> emit) async {
+    await DatabaseHandler.deleteAction(event.id);
+    actions.removeWhere((action) => action.id == event.id);
+    emit(UserActionLoadedState(actions: actions));
+  }
+  
   /// --------------------------- Action Detail --------------------------------
   void _onLoadActionDetail(InitActionDetailEvent event, Emitter<UserActionState> emit) async {
     actionDetail = event.initialAction;
@@ -77,6 +84,12 @@ class UserActionBloc extends Bloc<UserActionEvent, UserActionState> {
 
   void _onCreateActionDetail(CreateActionDetailEvent event, Emitter<UserActionState> emit) async {
     await DatabaseHandler.insertNewAction(actionDetail);
+    emit(ActionSavedSuccessfullyState());
+  }
+
+  void _onDeleteActionDetail(DeleteActionDetailEvent event, Emitter<UserActionState> emit) async {
+    await DatabaseHandler.deleteAction(event.id);
+    actionDetail = UserAction.init('', DateTime.now(), '', '');
     emit(ActionSavedSuccessfullyState());
   }
 
