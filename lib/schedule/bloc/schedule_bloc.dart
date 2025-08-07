@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:women_diary/common/notification_service.dart';
 import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/schedule/bloc/schedule_event.dart';
 import 'package:women_diary/schedule/bloc/schedule_state.dart';
@@ -67,8 +68,23 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
   void _onCreateScheduleDetail(CreateScheduleDetailEvent event, Emitter<ScheduleState> emit) async {
     await DatabaseHandler.insertSchedule(scheduleDetail);
+
+    final notificationId = int.parse(scheduleDetail.id) ;
+
+    if (scheduleDetail.isReminderOn) {
+      await NotificationService().scheduleNotification(
+        id: notificationId,
+        title: "Nhắc nhở lịch trình",
+        body: scheduleDetail.title,
+        scheduledTime: scheduleDetail.time,
+      );
+    } else {
+      await NotificationService().cancelNotification(notificationId);
+    }
+
     emit(ScheduleSavedSuccessfullyState());
   }
+
 
   void _onDeleteScheduleDetail(DeleteScheduleDetailEvent event, Emitter<ScheduleState> emit) async {
     await DatabaseHandler.deleteSchedule(event.id);
