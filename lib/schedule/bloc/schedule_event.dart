@@ -94,3 +94,10 @@ class UpdateNoteEvent extends ScheduleEvent {
   List<Object?> get props => [note];
 }
 
+class UpdateReminderEvent extends ScheduleEvent {
+  final bool isReminderOn;
+  const UpdateReminderEvent(this.isReminderOn);
+
+  @override
+  List<Object?> get props => [isReminderOn];
+}

@@ -61,6 +61,14 @@ class NoteUpdatedState extends ScheduleState {
   List<Object?> get props => [note];
 }
 
+class ReminderUpdatedState extends ScheduleState {
+  final bool isReminderOn ;
+  const ReminderUpdatedState(this.isReminderOn);
+
+  @override
+  List<Object?> get props => [isReminderOn];
+}
+
 class ScheduleSavedSuccessfullyState extends ScheduleState {
   const ScheduleSavedSuccessfullyState();
 

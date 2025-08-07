@@ -4,6 +4,7 @@ class ScheduleModel {
   String note = '';
   DateTime time = DateTime.now();
   String title = '';
+  bool isReminderOn = false;
   DateTime createdTime = DateTime.now();
   DateTime updatedTime = DateTime.now();
 
@@ -13,6 +14,7 @@ class ScheduleModel {
     required this.note,
     required this.time,
     required this.title,
+    required this.isReminderOn,
     required this.createdTime,
     required this.updatedTime,
   });
@@ -22,6 +24,7 @@ class ScheduleModel {
     note = '';
     time = DateTime.now();
     title = '';
+    isReminderOn = false;
     createdTime = DateTime.now();
     updatedTime = DateTime.now();
   }
@@ -31,6 +34,7 @@ class ScheduleModel {
     note = json['note'];
     title = json['title'];
     time = DateTime.fromMillisecondsSinceEpoch(json['time'] as int);
+    isReminderOn = (json['isReminderOn'] as int) == 1;
     createdTime = DateTime.fromMillisecondsSinceEpoch(json['createdTime'] as int);
     updatedTime = DateTime.fromMillisecondsSinceEpoch(json['updatedTime'] as int);
   }
@@ -41,6 +45,7 @@ class ScheduleModel {
     data['note'] = note;
     data['title'] = title;
     data['time'] = time.millisecondsSinceEpoch;
+    data['isReminderOn'] = isReminderOn ? 1 : 0;
     data['createdTime'] = createdTime.millisecondsSinceEpoch;
     data['updatedTime'] = updatedTime.millisecondsSinceEpoch;
     return data;

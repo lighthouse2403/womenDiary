@@ -21,6 +21,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     on<InitScheduleDetailEvent>(_onLoadScheduleDetail);
     on<UpdateTimeEvent>(_onUpdateTime);
     on<UpdateTitleEvent>(_onUpdateTitle);
+    on<UpdateReminderEvent>(_onUpdateReminder);
     on<UpdateNoteEvent>(_onUpdateNote);
     on<UpdateScheduleDetailEvent>(_onUpdateScheduleDetail);
     on<CreateScheduleDetailEvent>(_onCreateScheduleDetail);
@@ -29,7 +30,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   }
 
   Future<void> _onLoadSchedules(LoadScheduleEvent event, Emitter<ScheduleState> emit) async {
-    scheduleList = await DatabaseHandler.getSchedule(
+    scheduleList = await DatabaseHandler.getSchedules(
         startTime: startTime.millisecondsSinceEpoch,
         endTime: endTime.millisecondsSinceEpoch,
     );
@@ -39,7 +40,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   void _onUpdateDateRange(UpdateDateRangeEvent event, Emitter<ScheduleState> emit) async {
     startTime = event.startTime;
     endTime = event.endTime;
-    scheduleList = await DatabaseHandler.getSchedule(
+    scheduleList = await DatabaseHandler.getSchedules(
         startTime: startTime.millisecondsSinceEpoch,
         endTime: endTime.millisecondsSinceEpoch,
     );
@@ -87,5 +88,10 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
   void _onUpdateNote(UpdateNoteEvent event, Emitter<ScheduleState> emit) async {
     scheduleDetail.note = event.note;
+  }
+
+  void _onUpdateReminder(UpdateReminderEvent event, Emitter<ScheduleState> emit) async {
+    scheduleDetail.isReminderOn = event.isReminderOn;
+    emit(ReminderUpdatedState(event.isReminderOn));
   }
 }

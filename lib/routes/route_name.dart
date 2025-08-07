@@ -27,9 +27,14 @@ class RoutesName {
   static const String knowledge = '/knowledge';
   static const String knowledgeDetail = '/knowledge/knowledgeDetail';
 
-  /// History
+  /// Actions
   static const String actionHistory = '/actionHistory';
   static const String actionDetail = '/actionHistory/actionDetail';
   static const String newAction = '/actionHistory/newAction';
+
+  /// Schedule
+  static const String schedules = '/schedules';
+  static const String scheduleDetail = '/schedules/scheduleDetail';
+  static const String newSchedule = '/schedules/newSchedule';
 
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:women_diary/actions_history/action_detail/new_action.dart';
 import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/user_action_model.dart';
 import 'package:women_diary/diary/diary_model.dart';
@@ -27,7 +26,7 @@ class DatabaseHandler {
 
   static Future<void> createTables(sql.Database database) async {
     await database.execute("CREATE TABLE $menstruationTable(startTime INTEGER, endTime INTEGER, note TEXT, createdTime INTEGER, updatedTime INTEGER)");
-    await database.execute("CREATE TABLE $scheduleTable(id TEXT PRIMARY KEY, time INTEGER, content TEXT, createdTime INTEGER, updatedTime INTEGER, alarm INTEGER)");
+    await database.execute("CREATE TABLE $scheduleTable(id TEXT PRIMARY KEY, time INTEGER, title TEXT, note TEXT, createdTime INTEGER, updatedTime INTEGER, isReminderOn INTEGER)");
     await database.execute("CREATE TABLE $diaryTable(id TEXT PRIMARY KEY, time INTEGER, content TEXT, createdTime INTEGER, updatedTime INTEGER, url TEXT)");
     await database.execute("CREATE TABLE $userActionTable(id TEXT PRIMARY KEY, type INTEGER, time INTEGER, emoji TEXT, note TEXT, title TEXT, createdTime INTEGER, updatedTime INTEGER)");
   }
@@ -118,14 +117,8 @@ class DatabaseHandler {
     return list.map((e) => ScheduleModel.fromDatabase(e)).toList();
   }
 
-  static Future<UserAction> getAction(String id) async {
-    final db = await DatabaseHandler.db(userActionTable);
-    final List<Map<String, dynamic>> maps = await db.query(userActionTable, where: 'id = ?', whereArgs: [id]);
-    return UserAction.fromDatabase(maps.first);
-  }
-
-  static Future<List<ScheduleModel>> getSchedule({int? startTime, int? endTime}) async {
-    final db = await DatabaseHandler.db(userActionTable);
+  static Future<List<ScheduleModel>> getSchedules({int? startTime, int? endTime}) async {
+    final db = await DatabaseHandler.db(scheduleTable);
 
     final whereClauses = <String>[];
     final whereArgs = <dynamic>[];
@@ -143,7 +136,7 @@ class DatabaseHandler {
     final whereString = whereClauses.isNotEmpty ? whereClauses.join(' AND ') : null;
 
     final List<Map<String, dynamic>> list = await db.query(
-      userActionTable,
+      scheduleTable,
       where: whereString,
       whereArgs: whereArgs,
       orderBy: 'time DESC',

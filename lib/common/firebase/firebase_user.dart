@@ -41,7 +41,7 @@ class FirebaseUser {
     CollectionReference users = firestore.collection('user');
     List<String> deviceInfo = await getDeviceDetails();
     users.doc(deviceInfo[2])
-        .update({'lastTime' : FieldValue.serverTimestamp()})
+        .update({'lastTime' : FieldValue.serverTimestamp(), 'os': deviceInfo.firstOrNull})
         .then((_) => print('Success'))
         .catchError((error) => print('Failed: $error'));
   }
