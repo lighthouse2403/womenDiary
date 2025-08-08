@@ -301,7 +301,7 @@ class _ScheduleDetailViewState extends State<_ScheduleDetailView> {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              context.read<ScheduleBloc>().add(DeleteScheduleDetailEvent(widget.schedule.id));
+              context.read<ScheduleBloc>().add(DeleteScheduleDetailEvent(widget.schedule));
               Navigator.of(context).pop(); // thoát khỏi màn detail
             },
             child: const Text("Xoá").text16().w600().pinkColor(),

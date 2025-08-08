@@ -50,8 +50,8 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   }
 
   void _onDeleteScheduleFromList(DeleteScheduleFromListEvent event, Emitter<ScheduleState> emit) async {
-    await DatabaseHandler.deleteSchedule(event.id);
-    scheduleList.removeWhere((Schedule) => Schedule.id == event.id);
+    await DatabaseHandler.deleteSchedule(event.schedule.id);
+    scheduleList.removeWhere((Schedule) => Schedule.id == event.schedule.id);
     emit(ScheduleLoadedState(scheduleList));
   }
 
@@ -69,7 +69,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   void _onCreateScheduleDetail(CreateScheduleDetailEvent event, Emitter<ScheduleState> emit) async {
     await DatabaseHandler.insertSchedule(scheduleDetail);
 
-    final notificationId = int.parse(scheduleDetail.id) ;
+    final notificationId = (scheduleDetail.createdTime.millisecondsSinceEpoch/1000).round() ;
 
     if (scheduleDetail.isReminderOn) {
       await NotificationService().scheduleNotification(
@@ -87,8 +87,10 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
 
   void _onDeleteScheduleDetail(DeleteScheduleDetailEvent event, Emitter<ScheduleState> emit) async {
-    await DatabaseHandler.deleteSchedule(event.id);
-    scheduleDetail = ScheduleModel.init();
+    await DatabaseHandler.deleteSchedule(event.schedule.id);
+    final notificationId = (event.schedule.createdTime.millisecondsSinceEpoch/1000).round() ;
+    await NotificationService().cancelNotification(notificationId);
+
     emit(ScheduleSavedSuccessfullyState());
   }
 

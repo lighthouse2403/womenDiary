@@ -144,7 +144,7 @@ class _ScheduleViewState extends State<_ScheduleView> {
             false;
       },
       onDismissed: (_) {
-        context.read<ScheduleBloc>().add(DeleteScheduleFromListEvent(shedule.id));
+        context.read<ScheduleBloc>().add(DeleteScheduleFromListEvent(shedule));
       },
       child: _scheduleCard(shedule, context),
     );

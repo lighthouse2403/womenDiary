@@ -52,19 +52,19 @@ class CreateScheduleDetailEvent extends ScheduleEvent {
 }
 
 class DeleteScheduleFromListEvent extends ScheduleEvent {
-  const DeleteScheduleFromListEvent(this.id);
-  final String id;
+  const DeleteScheduleFromListEvent(this.schedule);
+  final ScheduleModel schedule;
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [schedule];
 }
 
 class DeleteScheduleDetailEvent extends ScheduleEvent {
-  const DeleteScheduleDetailEvent(this.id);
-  final String id;
+  const DeleteScheduleDetailEvent(this.schedule);
+  final ScheduleModel schedule;
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [schedule];
 }
 
 class UpdateTimeEvent extends ScheduleEvent {
