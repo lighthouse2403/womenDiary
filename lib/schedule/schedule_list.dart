@@ -77,9 +77,9 @@ class _ScheduleViewState extends State<_ScheduleView> {
         }
 
         final Map<String, List<ScheduleModel>> groupedByDate = {};
-        for (var action in scheduleList) {
-          final date = DateFormat('dd/MM/yyyy').format(action.time);
-          groupedByDate.putIfAbsent(date, () => []).add(action);
+        for (var schedule in scheduleList) {
+          final date = DateFormat('dd/MM/yyyy').format(schedule.time);
+          groupedByDate.putIfAbsent(date, () => []).add(schedule);
         }
 
         return ListView(
@@ -146,14 +146,14 @@ class _ScheduleViewState extends State<_ScheduleView> {
       onDismissed: (_) {
         context.read<ScheduleBloc>().add(DeleteScheduleFromListEvent(shedule.id));
       },
-      child: _actionCard(shedule, context),
+      child: _scheduleCard(shedule, context),
     );
   }
 
-  Widget _actionCard(ScheduleModel shedule, BuildContext context) {
-    String actionTime = DateFormat('HH:mm').format(shedule.time);
+  Widget _scheduleCard(ScheduleModel shedule, BuildContext context) {
+    String scheduleTime = DateFormat('HH:mm').format(shedule.time);
     return GestureDetector(
-      onTap: () => context.navigateTo(RoutesName.actionDetail, arguments: shedule).then((value) {
+      onTap: () => context.navigateTo(RoutesName.scheduleDetail, arguments: shedule).then((value) {
         context.read<ScheduleBloc>().add(const LoadScheduleEvent());
       }),
       child: Container(
@@ -196,7 +196,7 @@ class _ScheduleViewState extends State<_ScheduleView> {
               children: [
                 const Icon(CupertinoIcons.time, size: 14, color: CupertinoColors.systemGrey),
                 const SizedBox(width: 4),
-                Text(actionTime)
+                Text(scheduleTime)
                     .text12()
                     .customColor(Colors.grey.shade500),
               ],
@@ -215,7 +215,7 @@ class _ScheduleViewState extends State<_ScheduleView> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         color: Colors.pinkAccent.shade100,
         borderRadius: BorderRadius.circular(30),
-        onPressed: () => context.navigateTo(RoutesName.newAction),
+        onPressed: () => context.navigateTo(RoutesName.newSchedule),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -9,7 +9,14 @@ class NotificationService {
     tz.initializeTimeZones();
 
     const AndroidInitializationSettings android = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const InitializationSettings settings = InitializationSettings(android: android);
+    const DarwinInitializationSettings ios = DarwinInitializationSettings();
+
+    const InitializationSettings settings = InitializationSettings(
+      android: android,
+      iOS: ios,
+    );
+
+    await _notifications.initialize(settings);
     await _notifications.initialize(settings);
   }
 
