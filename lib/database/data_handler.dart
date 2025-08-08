@@ -24,7 +24,7 @@ class DatabaseHandler {
   }
 
   static Future<void> createTables(sql.Database database) async {
-    await database.execute("CREATE TABLE $menstruationTable(startTime INTEGER, endTime INTEGER, note TEXT, createdTime INTEGER, updatedTime INTEGER)");
+    await database.execute("CREATE TABLE $menstruationTable(id TEXT PRIMARY KEY, startTime INTEGER, endTime INTEGER, note TEXT, createdTime INTEGER, updatedTime INTEGER)");
     await database.execute("CREATE TABLE $scheduleTable(id TEXT PRIMARY KEY, time INTEGER, title TEXT, note TEXT, createdTime INTEGER, updatedTime INTEGER, isReminderOn INTEGER)");
     await database.execute("CREATE TABLE $userActionTable(id TEXT PRIMARY KEY, type INTEGER, time INTEGER, emoji TEXT, note TEXT, title TEXT, createdTime INTEGER, updatedTime INTEGER)");
   }

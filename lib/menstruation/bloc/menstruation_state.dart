@@ -16,4 +16,9 @@ class LoadedAllMenstruationState extends MenstruationState {
   List<Object?> get props => [menstruationList.length];
 }
 
+class MenstruationSavedSuccessfullyState extends MenstruationState {
+  const MenstruationSavedSuccessfullyState();
 
+  @override
+  List<Object?> get props => [];
+}

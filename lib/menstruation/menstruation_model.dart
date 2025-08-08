@@ -1,5 +1,6 @@
 
 class MenstruationModel {
+  String id = '${DateTime.now().millisecondsSinceEpoch}';
   String note = '';
   DateTime startTime = DateTime.now();
   DateTime endTime = DateTime.now();
@@ -13,6 +14,7 @@ class MenstruationModel {
   });
 
   MenstruationModel.init(DateTime startTime, DateTime endTime) {
+    id = '${DateTime.now().millisecondsSinceEpoch}';
     note = '';
     this.startTime = startTime;
     this.endTime = endTime;
@@ -21,6 +23,7 @@ class MenstruationModel {
   }
 
   MenstruationModel.fromDatabase(Map<String, dynamic> json) {
+    id = json['id'];
     note = json['note'];
     startTime = DateTime.fromMillisecondsSinceEpoch(json['startTime'] as int);
     endTime = DateTime.fromMillisecondsSinceEpoch(json['endTime'] as int);
@@ -31,6 +34,7 @@ class MenstruationModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['note'] = note;
+    data['id'] = id;
     data['endTime'] = endTime.millisecondsSinceEpoch;
     data['startTime'] = startTime.millisecondsSinceEpoch;
     data['createdTime'] = createdTime.millisecondsSinceEpoch;
