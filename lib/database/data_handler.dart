@@ -140,6 +140,7 @@ class DatabaseHandler {
       orderBy: 'time DESC',
     );
 
+    print(list);
     return list.map((e) => ScheduleModel.fromDatabase(e)).toList();
   }
 

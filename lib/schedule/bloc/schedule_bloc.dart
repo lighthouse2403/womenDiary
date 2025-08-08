@@ -8,8 +8,8 @@ import 'package:women_diary/schedule/schedule_model.dart';
 class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   /// Schedule list
   List<ScheduleModel> scheduleList = [];
-  DateTime startTime = DateTime.now().subtract(Duration(days: 90));
-  DateTime endTime = DateTime.now();
+  DateTime startTime = DateTime.now().subtract(Duration(days: 365));
+  DateTime endTime = DateTime.now().add(Duration(days: 60));
 
   /// Schedule detail
   ScheduleModel scheduleDetail = ScheduleModel.init();
@@ -31,6 +31,9 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   }
 
   Future<void> _onLoadSchedules(LoadScheduleEvent event, Emitter<ScheduleState> emit) async {
+    print('startTime: ${startTime}');
+    print('endTime: ${endTime}');
+
     scheduleList = await DatabaseHandler.getSchedules(
         startTime: startTime.millisecondsSinceEpoch,
         endTime: endTime.millisecondsSinceEpoch,
@@ -59,6 +62,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   void _onLoadScheduleDetail(InitScheduleDetailEvent event, Emitter<ScheduleState> emit) async {
     scheduleDetail = event.initialSchedule;
     emit(TimeUpdatedState(scheduleDetail.time));
+    emit(ReminderUpdatedState(scheduleDetail.isReminderOn));
   }
 
   void _onUpdateScheduleDetail(UpdateScheduleDetailEvent event, Emitter<ScheduleState> emit) async {

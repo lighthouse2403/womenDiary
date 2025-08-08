@@ -37,59 +37,32 @@ class _ScheduleViewState extends State<_ScheduleView> {
       child: SafeArea(
         child: Stack(
           children: [
-            Column(
-              children: [
-                Expanded(child: _buildList()),
-              ],
-            ),
-            _addButton(context),
+            _buildScheduleList(),
+            _buildAddButton(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildList() {
+  Widget _buildScheduleList() {
     return BlocBuilder<ScheduleBloc, ScheduleState>(
-      buildWhen: (pre, current) => current is ScheduleLoadedState,
+      buildWhen: (prev, current) => current is ScheduleLoadedState,
       builder: (context, state) {
-        final List<ScheduleModel> scheduleList =
-        (state is ScheduleLoadedState) ? state.scheduleList : [];
+        List<ScheduleModel> scheduleList = (state is ScheduleLoadedState) ? state.scheduleList : [];
 
-        if (scheduleList.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(CupertinoIcons.book, size: 80, color: Colors.pinkAccent),
-                const SizedBox(height: 16),
-                Text("Chưa có bản ghi nào")
-                    .text18()
-                    .w600()
-                    .customColor(Colors.pink.shade600),
-                const SizedBox(height: 8),
-                Text("Nhấn nút bên dưới để thêm bản ghi đầu tiên của bạn ❤️")
-                    .text14()
-                    .customColor(Colors.grey),
-              ],
-            ),
-          );
-        }
+        if (scheduleList.isEmpty) return _buildEmptyView();
 
-        final Map<String, List<ScheduleModel>> groupedByDate = {};
-        for (var schedule in scheduleList) {
-          final date = DateFormat('dd/MM/yyyy').format(schedule.time);
-          groupedByDate.putIfAbsent(date, () => []).add(schedule);
-        }
+        final groupedSchedules = _groupSchedulesByDate(scheduleList);
 
         return ListView(
           padding: const EdgeInsets.all(16),
-          children: groupedByDate.entries.map((entry) {
+          children: groupedSchedules.entries.map((entry) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _sectionHeader(entry.key),
-                ...entry.value.map((shedule) => _dismissibleCard(shedule, context)),
+                _buildSectionHeader(entry.key),
+                ...entry.value.map((schedule) => _buildDismissibleCard(schedule)),
                 const SizedBox(height: 20),
               ],
             );
@@ -99,7 +72,16 @@ class _ScheduleViewState extends State<_ScheduleView> {
     );
   }
 
-  Widget _sectionHeader(String date) {
+  Map<String, List<ScheduleModel>> _groupSchedulesByDate(List<ScheduleModel> schedules) {
+    final Map<String, List<ScheduleModel>> grouped = {};
+    for (var schedule in schedules) {
+      final date = DateFormat('dd/MM/yyyy').format(schedule.time);
+      grouped.putIfAbsent(date, () => []).add(schedule);
+    }
+    return grouped;
+  }
+
+  Widget _buildSectionHeader(String date) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Text("📅 $date")
@@ -109,55 +91,63 @@ class _ScheduleViewState extends State<_ScheduleView> {
     );
   }
 
-  Widget _dismissibleCard(ScheduleModel shedule, BuildContext context) {
+  Widget _buildDismissibleCard(ScheduleModel schedule) {
     return Dismissible(
-      key: ValueKey(shedule.id),
+      key: ValueKey(schedule.id),
       direction: DismissDirection.endToStart,
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
-        decoration: BoxDecoration(
-          color: Colors.redAccent.shade100,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: const Icon(CupertinoIcons.delete, color: Colors.white),
-      ),
-      confirmDismiss: (_) async {
-        return await showCupertinoDialog<bool>(
-          context: context,
-          builder: (ctx) => CupertinoAlertDialog(
-            title: const Text('Xoá bản ghi'),
-            content: const Text('Bạn có chắc muốn xoá bản ghi này không?'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('Huỷ'),
-                onPressed: () => Navigator.of(ctx).pop(false),
-              ),
-              CupertinoDialogAction(
-                child: const Text('Xoá'),
-                isDestructiveAction: true,
-                onPressed: () => Navigator.of(ctx).pop(true),
-              ),
-            ],
-          ),
-        ) ??
-            false;
-      },
+      background: _buildDeleteBackground(),
+      confirmDismiss: (_) => _confirmDeleteDialog(),
       onDismissed: (_) {
-        context.read<ScheduleBloc>().add(DeleteScheduleFromListEvent(shedule));
+        context.read<ScheduleBloc>().add(DeleteScheduleFromListEvent(schedule));
       },
-      child: _scheduleCard(shedule, context),
+      child: _buildScheduleCard(schedule),
     );
   }
 
-  Widget _scheduleCard(ScheduleModel shedule, BuildContext context) {
-    String scheduleTime = DateFormat('HH:mm').format(shedule.time);
+  Widget _buildDeleteBackground() {
+    return Container(
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.only(right: 20),
+      decoration: BoxDecoration(
+        color: Colors.redAccent.shade100,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Icon(CupertinoIcons.delete, color: Colors.white),
+    );
+  }
+
+  Future<bool> _confirmDeleteDialog() async {
+    return await showCupertinoDialog<bool>(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Xoá bản ghi'),
+        content: const Text('Bạn có chắc muốn xoá bản ghi này không?'),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('Huỷ'),
+            onPressed: () => Navigator.of(ctx).pop(false),
+          ),
+          CupertinoDialogAction(
+            child: const Text('Xoá'),
+            isDestructiveAction: true,
+            onPressed: () => Navigator.of(ctx).pop(true),
+          ),
+        ],
+      ),
+    ) ??
+        false;
+  }
+
+  Widget _buildScheduleCard(ScheduleModel schedule) {
+    final scheduleTime = DateFormat('HH:mm').format(schedule.time);
+
     return GestureDetector(
-      onTap: () => context.navigateTo(RoutesName.scheduleDetail, arguments: shedule).then((value) {
-        context.read<ScheduleBloc>().add(const LoadScheduleEvent());
-      }),
+      onTap: () => context
+          .navigateTo(RoutesName.scheduleDetail, arguments: schedule)
+          .then((_) => context.read<ScheduleBloc>().add(const LoadScheduleEvent())),
       child: Container(
         margin: const EdgeInsets.only(bottom: 20),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: Colors.pink.shade50,
           borderRadius: BorderRadius.circular(16),
@@ -169,45 +159,52 @@ class _ScheduleViewState extends State<_ScheduleView> {
             ),
           ],
         ),
-        padding: const EdgeInsets.all(14),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(shedule.title)
-                      .text16()
-                      .w600()
-                      .customColor(Colors.black87),
-                  if (shedule.note.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4.0),
-                      child: Text(shedule.note)
-                          .text13()
-                          .customColor(Colors.grey.shade600),
-                    ),
-                ],
-              ),
+              child: _buildScheduleContent(schedule),
             ),
             Constants.hSpacer10,
-            Row(
-              children: [
-                const Icon(CupertinoIcons.time, size: 14, color: CupertinoColors.systemGrey),
-                const SizedBox(width: 4),
-                Text(scheduleTime)
-                    .text12()
-                    .customColor(Colors.grey.shade500),
-              ],
-            )
+            _buildTime(scheduleTime),
           ],
         ),
       ),
     );
   }
 
-  Widget _addButton(BuildContext context) {
+  Widget _buildScheduleContent(ScheduleModel schedule) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(schedule.title)
+            .text16()
+            .w600()
+            .customColor(Colors.black87),
+        if (schedule.note.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(schedule.note)
+                .text13()
+                .customColor(Colors.grey.shade600),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildTime(String scheduleTime) {
+    return Row(
+      children: [
+        const Icon(CupertinoIcons.time, size: 14, color: CupertinoColors.systemGrey),
+        const SizedBox(width: 4),
+        Text(scheduleTime)
+            .text12()
+            .customColor(Colors.grey.shade500),
+      ],
+    );
+  }
+
+  Widget _buildAddButton(BuildContext context) {
     return Positioned(
       bottom: 24,
       right: 24,
@@ -215,7 +212,9 @@ class _ScheduleViewState extends State<_ScheduleView> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         color: Colors.pinkAccent.shade100,
         borderRadius: BorderRadius.circular(30),
-        onPressed: () => context.navigateTo(RoutesName.newSchedule),
+        onPressed: () => context.navigateTo(RoutesName.newSchedule).then((_) {
+            return context.read<ScheduleBloc>().add(const LoadScheduleEvent());
+        }),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -227,6 +226,26 @@ class _ScheduleViewState extends State<_ScheduleView> {
                 .customColor(Colors.white),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyView() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(CupertinoIcons.book, size: 80, color: Colors.pinkAccent),
+          const SizedBox(height: 16),
+          Text("Chưa có bản ghi nào")
+              .text18()
+              .w600()
+              .customColor(Colors.pink.shade600),
+          const SizedBox(height: 8),
+          Text("Nhấn nút bên dưới để thêm bản ghi đầu tiên của bạn ❤️")
+              .text14()
+              .customColor(Colors.grey),
+        ],
       ),
     );
   }
