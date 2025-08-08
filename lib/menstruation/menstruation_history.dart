@@ -24,7 +24,7 @@ class MenstruationHistory extends StatelessWidget {
 }
 
 class _MenstruationHistoryView extends StatefulWidget {
-  const _MenstruationHistoryView({super.key});
+  const _MenstruationHistoryView();
 
   @override
   State<_MenstruationHistoryView> createState() => _MenstruationHistoryViewState();

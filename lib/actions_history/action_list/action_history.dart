@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/bloc/action_bloc.dart';
@@ -177,42 +178,41 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
   }
 
   Widget _dismissibleCard(UserAction action, BuildContext context) {
-    return Dismissible(
+    return Slidable(
       key: ValueKey(action.id),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
-        decoration: BoxDecoration(
-          color: Colors.redAccent.shade100,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: const Icon(CupertinoIcons.delete, color: Colors.white),
-      ),
-      confirmDismiss: (_) async {
-        return await showCupertinoDialog<bool>(
-          context: context,
-          builder: (ctx) => CupertinoAlertDialog(
-            title: const Text('Xoá bản ghi'),
-            content: const Text('Bạn có chắc muốn xoá bản ghi này không?'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('Huỷ'),
-                onPressed: () => Navigator.of(ctx).pop(false),
-              ),
-              CupertinoDialogAction(
-                child: const Text('Xoá'),
-                isDestructiveAction: true,
-                onPressed: () => Navigator.of(ctx).pop(true),
-              ),
-            ],
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        extentRatio: 0.25,
+        children: [
+          SlidableAction(
+            onPressed: (_) {
+              showCupertinoDialog<bool>(
+                context: context,
+                builder: (ctx) => CupertinoAlertDialog(
+                  title: const Text('Xoá bản ghi'),
+                  content: const Text('Bạn có chắc muốn xoá bản ghi này không?'),
+                  actions: [
+                    CupertinoDialogAction(
+                      child: const Text('Huỷ'),
+                      onPressed: () => Navigator.of(ctx).pop(false),
+                    ),
+                    CupertinoDialogAction(
+                      child: const Text('Xoá'),
+                      isDestructiveAction: true,
+                      onPressed: () => Navigator.of(ctx).pop(true),
+                    ),
+                  ],
+                ),
+              );
+            },
+            backgroundColor: Colors.redAccent,
+            foregroundColor: Colors.white,
+            icon: Icons.delete_outline,
+            label: 'Xoá',
+            borderRadius: BorderRadius.circular(12),
           ),
-        ) ??
-            false;
-      },
-      onDismissed: (_) {
-        context.read<UserActionBloc>().add(DeleteActionFromListEvent(action.id));
-      },
+        ],
+      ),
       child: _actionCard(action, context),
     );
   }
@@ -230,7 +230,7 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.pink.shade100.withOpacity(0.2),
+              color: Colors.pink.shade100.withAlpha(50),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
