@@ -4,11 +4,6 @@ class RoutesName {
   static const String setting = '/setting';
   static const String firstCycleInformation = '/firstCycleInformation';
 
-  ///Diaries
-  static const String diaries = '/diaries';
-  static const String diaryDetail = '/diaries/diaryDetail';
-  static const String newDiary = '/diaries/newDiary';
-
   /// Period
   static const String menstruationHistory = '/menstruationHistory';
   static const String menstruationDetail = '/menstruationDetail';

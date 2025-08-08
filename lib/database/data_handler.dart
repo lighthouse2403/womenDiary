@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/user_action_model.dart';
-import 'package:women_diary/diary/diary_model.dart';
 import 'package:women_diary/menstruation/menstruation_model.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:flutter/foundation.dart';
@@ -27,7 +26,6 @@ class DatabaseHandler {
   static Future<void> createTables(sql.Database database) async {
     await database.execute("CREATE TABLE $menstruationTable(startTime INTEGER, endTime INTEGER, note TEXT, createdTime INTEGER, updatedTime INTEGER)");
     await database.execute("CREATE TABLE $scheduleTable(id TEXT PRIMARY KEY, time INTEGER, title TEXT, note TEXT, createdTime INTEGER, updatedTime INTEGER, isReminderOn INTEGER)");
-    await database.execute("CREATE TABLE $diaryTable(id TEXT PRIMARY KEY, time INTEGER, content TEXT, createdTime INTEGER, updatedTime INTEGER, url TEXT)");
     await database.execute("CREATE TABLE $userActionTable(id TEXT PRIMARY KEY, type INTEGER, time INTEGER, emoji TEXT, note TEXT, title TEXT, createdTime INTEGER, updatedTime INTEGER)");
   }
 
@@ -173,64 +171,6 @@ class DatabaseHandler {
     try {
       await db.delete(
           scheduleTable
-      );
-    } catch (err) {
-      debugPrint("Something went wrong when deleting an item: $err");
-    }
-  }
-
-  ///----------------------- DIARIES -------------------------------------------
-  static Future<void> insertDiary(DiaryModel diary) async {
-    final db = await DatabaseHandler.db(diaryTable);
-    await db.insert(
-      diaryTable,
-      diary.toJson(),
-      conflictAlgorithm: sql.ConflictAlgorithm.replace,
-    );
-  }
-
-  static Future<DiaryModel> gedDiary(String id) async {
-    final db = await DatabaseHandler.db(diaryTable);
-    final List<Map<String, dynamic>> maps = await db.query(diaryTable, where: 'id = ?', whereArgs: [id]);
-    return DiaryModel.fromDatabase(maps.first);
-  }
-
-  static Future<List<DiaryModel>> getAllDiary() async {
-    final db = await DatabaseHandler.db(diaryTable);
-    final List<Map<String, dynamic>> list = await db.query(diaryTable);
-    return list.map((e) => DiaryModel.fromDatabase(e)).toList();
-  }
-
-  // Update an item by id
-  static Future<void> updateDiary(DiaryModel diary) async {
-    final db = await DatabaseHandler.db(diaryTable);
-
-    await db.update(
-      diaryTable,
-      diary.toJson(),
-      where: 'id = ?',
-      whereArgs: [diary.id],
-    );
-  }
-
-  // Delete
-  static Future<void> deleteDiary(String id) async {
-    final db = await DatabaseHandler.db(diaryTable);
-    try {
-      await db.delete(
-          diaryTable,
-          where: "id = ?",
-          whereArgs: [id]);
-    } catch (err) {
-      debugPrint("Something went wrong when deleting an item: $err");
-    }
-  }
-
-  static Future<void> deleteAllDiary() async {
-    final db = await DatabaseHandler.db(diaryTable);
-    try {
-      await db.delete(
-          diaryTable
       );
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");

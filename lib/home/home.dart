@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:women_diary/common/constants/constants.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/home/bloc/home_bloc.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
@@ -146,13 +148,13 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text("Ngày hiện tại", style: TextStyle(fontSize: 14, color: Colors.black54)),
+          const Text("Ngày hiện tại").text14().customColor(Colors.black54),
           Text("Ngày ${currentDay}", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87)),
-          const SizedBox(height: 4),
+          Constants.vSpacer4,
           Text("Chu kỳ ${cycleLength} ngày", style: const TextStyle(fontSize: 12, color: Colors.black45)),
-          const SizedBox(height: 6),
+          Constants.vSpacer6,
           Text("Giai đoạn: 🌼", style: const TextStyle(fontSize: 12, color: Colors.black87)),
-          const SizedBox(height: 4),
+          Constants.vSpacer4,
           Text("Tiếp theo: 🌙", style: const TextStyle(fontSize: 12, color: Colors.deepOrange)),
           Text("Còn ${daysUntilNext} ngày", style: const TextStyle(fontSize: 12, color: Colors.orange)),
         ],

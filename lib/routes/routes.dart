@@ -68,9 +68,9 @@ class Routes {
             ),
             GoRoute(
               parentNavigatorKey: _shellNavigatorKey,
-              path: RoutesName.chat,
+              path: RoutesName.schedules,
               pageBuilder: (context, state) {
-                return _createPageFadeTransition(state: state, child: const Chat());
+                return _createPageFadeTransition(state: state, child: const Schedule());
               },
             ),
             GoRoute(
@@ -90,10 +90,10 @@ class Routes {
           ],
         ),
         GoRoute(
-          path: RoutesName.diaryDetail,
+          path: RoutesName.scheduleDetail,
           pageBuilder: (context, state) {
-            ThreadModel thread = state.extra as ThreadModel;
-            return _createPageFadeTransition(state: state, child: ChatDetail(thread: thread));
+            ScheduleModel schedule = state.extra as ScheduleModel;
+            return _createPageFadeTransition(state: state, child: ScheduleDetail(schedule: schedule));
           },
         ),
         GoRoute(
