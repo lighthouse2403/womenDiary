@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/common/widgets/date_picker/multi_range_calendar.dart';
 import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/menstruation/menstruation_model.dart';
@@ -34,12 +35,12 @@ class _MenstruationCalendarState extends State<MenstruationCalendar> {
         initialRanges: initialRange,
         onAddRange: (range) {
           print(range.start);
-          MenstruationModel menstruation = MenstruationModel.init(range.start, range.end);
+          MenstruationModel menstruation = MenstruationModel.init(range.start.startOfDay(), range.end.startOfDay());
           DatabaseHandler.insertMenstruation(menstruation);
         },
         onDeleteRange: (ranges) {
           ranges.forEach((range) {
-            DatabaseHandler.deleteMenstruation(range.start.millisecondsSinceEpoch, range.end.millisecondsSinceEpoch);
+            DatabaseHandler.deleteMenstruation(range.start.startOfDay().millisecondsSinceEpoch, range.end.startOfDay().millisecondsSinceEpoch);
           });
         },
       ),
