@@ -25,7 +25,6 @@ class MenstruationBloc extends Bloc<MenstruationEvent, MenstruationState> {
     try {
       await DatabaseHandler.deleteMenstruation(event.startTime.millisecondsSinceEpoch, event.endTime.millisecondsSinceEpoch);
       menstruationList = await DatabaseHandler.getAllMenstruation();
-      print('menstruationList length: ${menstruationList.length}');
       emit(LoadedAllMenstruationState(menstruationList));
     } catch (error) {
     }
