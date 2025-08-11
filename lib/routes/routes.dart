@@ -10,7 +10,7 @@ import 'package:women_diary/cycle_setup/cycle_setup.dart';
 import 'package:women_diary/home/home.dart';
 import 'package:women_diary/menstruation/menstruation_calendar.dart';
 import 'package:women_diary/menstruation/menstruation_detail.dart';
-import 'package:women_diary/menstruation/menstruation_history.dart';
+import 'package:women_diary/menstruation/list/menstruation_history.dart';
 import 'package:women_diary/menstruation/menstruation_model.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:flutter/material.dart';

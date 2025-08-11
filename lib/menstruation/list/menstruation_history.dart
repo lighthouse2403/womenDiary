@@ -4,10 +4,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:women_diary/_gen/assets.gen.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/widgets/empty_view.dart';
 import 'package:women_diary/menstruation/bloc/menstruation_bloc.dart';
 import 'package:women_diary/menstruation/bloc/menstruation_event.dart';
 import 'package:women_diary/menstruation/bloc/menstruation_state.dart';
-import 'package:women_diary/menstruation/menstruation_row.dart';
+import 'package:women_diary/menstruation/list/menstruation_row.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 
@@ -58,7 +59,10 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
             final list = state.menstruationList;
 
             if (list.isEmpty) {
-              return _buildEmptyView();
+              return EmptyView(
+                  title: 'Chưa có kỳ kinh nào',
+                  content: 'Hãy bắt đầu ghi lại để theo dõi chu kỳ của bạn.'
+              );
             }
 
             return ListView.separated(
@@ -103,7 +107,7 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       elevation: 2,
-                      shadowColor: AppColors.mainColor.withOpacity(0.15),
+                      shadowColor: AppColors.mainColor.withAlpha(40),
                       child: Padding(
                         padding: const EdgeInsets.all(12),
                         child: MenstruationRow(menstruation: menstruation),
@@ -115,37 +119,11 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
             );
           }
 
-          return _buildEmptyView();
+          return EmptyView(
+              title: 'Chưa có kỳ kinh nào',
+              content: 'Hãy bắt đầu ghi lại để theo dõi chu kỳ của bạn.'
+          );
         },
-      ),
-    );
-  }
-
-  Widget _buildEmptyView() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Assets.icons.calendar.svg(width: 80, height: 80, colorFilter: ColorFilter.mode(Colors.grey.shade400, BlendMode.srcIn)),
-          const SizedBox(height: 16),
-          Text(
-            'Chưa có kỳ kinh nào',
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Hãy bắt đầu ghi lại để theo dõi chu kỳ của bạn.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey.shade500,
-              fontSize: 14,
-            ),
-          ),
-        ],
       ),
     );
   }
