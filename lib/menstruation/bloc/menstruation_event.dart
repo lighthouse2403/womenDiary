@@ -58,8 +58,8 @@ class UpdateNoteEvent extends MenstruationEvent {
 class DeleteMenstruationEvent extends MenstruationEvent {
   const DeleteMenstruationEvent({ required this.startTime, required this.endTime });
 
-  final int startTime;
-  final int endTime;
+  final DateTime startTime;
+  final DateTime endTime;
 
   @override
   List<Object?> get props => [startTime, endTime];

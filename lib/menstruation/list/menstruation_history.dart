@@ -4,6 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:women_diary/_gen/assets.gen.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/common/widgets/empty_view.dart';
 import 'package:women_diary/menstruation/bloc/menstruation_bloc.dart';
 import 'package:women_diary/menstruation/bloc/menstruation_event.dart';
@@ -92,8 +93,8 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
                 onPressed: (_) {
                   context.read<MenstruationBloc>().add(
                     DeleteMenstruationEvent(
-                      startTime: menstruation.startTime.millisecondsSinceEpoch,
-                      endTime: menstruation.endTime.millisecondsSinceEpoch,
+                      startTime: menstruation.startTime.startOfDay(),
+                      endTime: menstruation.endTime.startOfDay(),
                     ),
                   );
                 },

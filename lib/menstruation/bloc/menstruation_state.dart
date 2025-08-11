@@ -1,6 +1,4 @@
-import 'package:women_diary/home/phase_model.dart';
 import 'package:women_diary/menstruation/menstruation_model.dart';
-import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:equatable/equatable.dart';
 
 class MenstruationState extends Equatable {
@@ -10,7 +8,7 @@ class MenstruationState extends Equatable {
 }
 
 class LoadedAllMenstruationState extends MenstruationState {
-  const LoadedAllMenstruationState({ required this.menstruationList });
+  const LoadedAllMenstruationState(this.menstruationList);
 
   final List<MenstruationModel> menstruationList;
   @override

@@ -16,16 +16,17 @@ class MenstruationBloc extends Bloc<MenstruationEvent, MenstruationState> {
   Future<void> _loadAllMenstruation(LoadAllMenstruationEvent event, Emitter<MenstruationState> emit) async {
     try {
       menstruationList = await DatabaseHandler.getAllMenstruation();
-      emit(LoadedAllMenstruationState(menstruationList: menstruationList));
+      emit(LoadedAllMenstruationState(menstruationList));
     } catch (error) {
     }
   }
 
   Future<void> _deleteMenstruation(DeleteMenstruationEvent event, Emitter<MenstruationState> emit) async {
     try {
-      await DatabaseHandler.deleteMenstruation(event.startTime, event.endTime);
-      menstruationList.removeWhere((e) => e.startTime.millisecondsSinceEpoch == event.startTime && e.endTime.millisecondsSinceEpoch == event.endTime);
-      emit(LoadedAllMenstruationState(menstruationList: menstruationList));
+      await DatabaseHandler.deleteMenstruation(event.startTime.millisecondsSinceEpoch, event.endTime.millisecondsSinceEpoch);
+      menstruationList.removeWhere((e) => e.startTime.millisecondsSinceEpoch == event.startTime.millisecondsSinceEpoch && e.endTime.millisecondsSinceEpoch == event.endTime.millisecondsSinceEpoch);
+      print('menstruationList length: ${menstruationList.length}');
+      emit(LoadedAllMenstruationState(menstruationList));
     } catch (error) {
     }
   }
