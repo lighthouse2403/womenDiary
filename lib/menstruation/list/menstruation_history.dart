@@ -9,6 +9,7 @@ import 'package:women_diary/menstruation/bloc/menstruation_bloc.dart';
 import 'package:women_diary/menstruation/bloc/menstruation_event.dart';
 import 'package:women_diary/menstruation/bloc/menstruation_state.dart';
 import 'package:women_diary/menstruation/list/menstruation_row.dart';
+import 'package:women_diary/menstruation/menstruation_model.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 
@@ -53,78 +54,77 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
           ),
         ],
       ),
-      body: BlocBuilder<MenstruationBloc, MenstruationState>(
-        builder: (context, state) {
-          if (state is LoadedAllMenstruationState) {
-            final list = state.menstruationList;
+      body: _menstruationList()
+    );
+  }
 
-            if (list.isEmpty) {
-              return EmptyView(
-                  title: 'Chưa có kỳ kinh nào',
-                  content: 'Hãy bắt đầu ghi lại để theo dõi chu kỳ của bạn.'
+  Widget _menstruationList() {
+    return BlocBuilder(
+      buildWhen: (pre, current) => current is LoadedAllMenstruationState,
+      builder: (context, state) {
+        List<MenstruationModel> list = state is LoadedAllMenstruationState ? state.menstruationList : [];
+        return list.isNotEmpty
+            ? _list(list)
+            : EmptyView(
+                title: 'Chưa có kỳ kinh nào',
+                content: 'Hãy bắt đầu ghi lại để theo dõi chu kỳ của bạn.'
               );
-            }
-
-            return ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              itemCount: list.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final menstruation = list[index];
-
-                return Slidable(
-                  key: ValueKey(menstruation.startTime.millisecondsSinceEpoch),
-                  endActionPane: ActionPane(
-                    motion: const ScrollMotion(),
-                    extentRatio: 0.25,
-                    children: [
-                      SlidableAction(
-                        onPressed: (_) {
-                          context.read<MenstruationBloc>().add(
-                            DeleteMenstruationEvent(
-                              startTime: menstruation.startTime.millisecondsSinceEpoch,
-                              endTime: menstruation.endTime.millisecondsSinceEpoch,
-                            ),
-                          );
-                        },
-                        backgroundColor: Colors.redAccent,
-                        foregroundColor: Colors.white,
-                        icon: Icons.delete_outline,
-                        label: 'Xoá',
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ],
-                  ),
-                  child: GestureDetector(
-                    onTap: () {
-                      context.navigateTo(
-                        RoutesName.menstruationDetail,
-                        arguments: menstruation,
-                      );
-                    },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 2,
-                      shadowColor: AppColors.mainColor.withAlpha(40),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: MenstruationRow(menstruation: menstruation),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          }
-
-          return EmptyView(
-              title: 'Chưa có kỳ kinh nào',
-              content: 'Hãy bắt đầu ghi lại để theo dõi chu kỳ của bạn.'
-          );
         },
-      ),
+    );
+  }
+
+  Widget _list(List<MenstruationModel> list) {
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      itemCount: list.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      itemBuilder: (context, index) {
+        final menstruation = list[index];
+
+        return Slidable(
+          key: ValueKey(menstruation.startTime.millisecondsSinceEpoch),
+          endActionPane: ActionPane(
+            motion: const ScrollMotion(),
+            extentRatio: 0.25,
+            children: [
+              SlidableAction(
+                onPressed: (_) {
+                  context.read<MenstruationBloc>().add(
+                    DeleteMenstruationEvent(
+                      startTime: menstruation.startTime.millisecondsSinceEpoch,
+                      endTime: menstruation.endTime.millisecondsSinceEpoch,
+                    ),
+                  );
+                },
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+                icon: Icons.delete_outline,
+                label: 'Xoá',
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ],
+          ),
+          child: GestureDetector(
+            onTap: () {
+              context.navigateTo(
+                RoutesName.menstruationDetail,
+                arguments: menstruation,
+              );
+            },
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 2,
+              shadowColor: AppColors.mainColor.withAlpha(40),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: MenstruationRow(menstruation: menstruation),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
