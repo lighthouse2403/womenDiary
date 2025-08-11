@@ -24,7 +24,7 @@ class MenstruationBloc extends Bloc<MenstruationEvent, MenstruationState> {
   Future<void> _deleteMenstruation(DeleteMenstruationEvent event, Emitter<MenstruationState> emit) async {
     try {
       await DatabaseHandler.deleteMenstruation(event.startTime.millisecondsSinceEpoch, event.endTime.millisecondsSinceEpoch);
-      menstruationList.removeWhere((e) => e.startTime.millisecondsSinceEpoch == event.startTime.millisecondsSinceEpoch && e.endTime.millisecondsSinceEpoch == event.endTime.millisecondsSinceEpoch);
+      menstruationList = await DatabaseHandler.getAllMenstruation();
       print('menstruationList length: ${menstruationList.length}');
       emit(LoadedAllMenstruationState(menstruationList));
     } catch (error) {
