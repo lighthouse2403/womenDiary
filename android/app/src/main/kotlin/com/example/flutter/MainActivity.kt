@@ -1,4 +1,4 @@
-package com.baby.diary.flutter
+package women.diary
 
 import io.flutter.embedding.android.FlutterActivity
 
