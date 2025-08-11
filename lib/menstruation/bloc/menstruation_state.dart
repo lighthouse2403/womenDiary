@@ -10,8 +10,9 @@ class MenstruationState extends Equatable {
 }
 
 class LoadedAllMenstruationState extends MenstruationState {
-  final List<MenstruationModel> menstruationList;
   const LoadedAllMenstruationState({ required this.menstruationList });
+
+  final List<MenstruationModel> menstruationList;
   @override
   List<Object?> get props => [menstruationList.length];
 }

@@ -42,7 +42,7 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
         actions: [
           IconButton(
             onPressed: () {
-              context.navigateTo(RoutesName.menstruationCalendar).then((_) {
+              context.navigateTo(RoutesName.menstruationCalendar, arguments:  context.read<MenstruationBloc>().menstruationList).then((_) {
                 context.read<MenstruationBloc>().add(const LoadAllMenstruationEvent());
               });
             },
@@ -59,10 +59,11 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
   }
 
   Widget _menstruationList() {
-    return BlocBuilder(
+    return BlocBuilder<MenstruationBloc, MenstruationState>(
       buildWhen: (pre, current) => current is LoadedAllMenstruationState,
       builder: (context, state) {
         List<MenstruationModel> list = state is LoadedAllMenstruationState ? state.menstruationList : [];
+        print('_menstruationList ${list.length}');
         return list.isNotEmpty
             ? _list(list)
             : EmptyView(

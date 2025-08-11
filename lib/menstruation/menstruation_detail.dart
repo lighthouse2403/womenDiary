@@ -30,7 +30,7 @@ class _MenstruationDetailState extends State<MenstruationDetail> {
           children: [
             Text('Start time: ${widget.menstruation.startTime.globalDateFormat()}'),
             Constants.vSpacer10,
-            Text('End time: ${widget.menstruation.startTime.globalDateFormat()}'),
+            Text('End time: ${widget.menstruation.endTime.globalDateFormat()}'),
             Text('Note: ${widget.menstruation.note}'),
           ],
         ),

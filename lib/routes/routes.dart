@@ -99,7 +99,8 @@ class Routes {
         GoRoute(
           path: RoutesName.menstruationCalendar,
           pageBuilder: (context, state) {
-            return _createPageFadeTransition(state: state, child: MenstruationCalendar());
+            List<MenstruationModel> menstruationList = state.extra as List<MenstruationModel>;
+            return _createPageFadeTransition(state: state, child: MenstruationCalendar(menstruation: menstruationList));
           },
         ),
         GoRoute(

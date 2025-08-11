@@ -5,29 +5,23 @@ import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/menstruation/menstruation_model.dart';
 
 class MenstruationCalendar extends StatefulWidget {
-  const MenstruationCalendar({super.key});
+  MenstruationCalendar({super.key, required this.menstruation});
+  final List<MenstruationModel> menstruation;
 
   @override
   State<MenstruationCalendar> createState() => _MenstruationCalendarState();
 }
 
 class _MenstruationCalendarState extends State<MenstruationCalendar> {
-  List<MenstruationModel> menstruation = [];
 
   @override
   initState() {
-    loadInitialData();
     super.initState();
-  }
-
-  loadInitialData() async {
-    menstruation = await DatabaseHandler.getAllMenstruation();
-    print(menstruation.length);
   }
 
   @override
   Widget build(BuildContext context) {
-    List<DateTimeRange> initialRange = menstruation.map((e) {
+    List<DateTimeRange> initialRange = widget.menstruation.map((e) {
       return DateTimeRange(start: e.startTime, end: e.endTime);
     }).toList();
     return Scaffold(
