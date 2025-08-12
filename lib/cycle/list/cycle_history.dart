@@ -4,7 +4,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:women_diary/_gen/assets.gen.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
-import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/common/widgets/empty_view.dart';
 import 'package:women_diary/cycle/bloc/cycle_bloc.dart';
 import 'package:women_diary/cycle/bloc/cycle_event.dart';
@@ -92,7 +91,7 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
               SlidableAction(
                 onPressed: (_) {
                   context.read<CycleBloc>().add(
-                    DeleteCycleFromListEvent(cycle.id),
+                    DeleteCycleEvent(cycle.id),
                   );
                 },
                 backgroundColor: Colors.redAccent,

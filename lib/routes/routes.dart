@@ -97,7 +97,7 @@ class Routes {
           path: RoutesName.cycleCalendar,
           pageBuilder: (context, state) {
             List<CycleModel> cycleList = state.extra as List<CycleModel>;
-            return _createPageFadeTransition(state: state, child: CycleCalendar(cycle: cycleList));
+            return _createPageFadeTransition(state: state, child: CycleCalendar());
           },
         ),
         GoRoute(

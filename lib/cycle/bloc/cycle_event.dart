@@ -1,5 +1,7 @@
 
 import 'package:equatable/equatable.dart';
+import 'package:women_diary/common/widgets/date_picker/multi_range_calendar.dart';
+import 'package:women_diary/cycle/cycle_model.dart';
 
 class CycleEvent extends Equatable {
   const CycleEvent();
@@ -14,35 +16,55 @@ class LoadAllCycleEvent extends CycleEvent {
   List<Object?> get props => [];
 }
 
-class DeleteCycleFromListEvent extends CycleEvent {
-  const DeleteCycleFromListEvent(this.id);
+/// Update cycle
+class CreateCycleEvent extends CycleEvent {
+  const CreateCycleEvent(this.newCycle);
+  final CycleModel newCycle;
+
+  @override
+  List<Object?> get props => [newCycle.id];
+}
+
+class UpdateCycleEvent extends CycleEvent {
+  const UpdateCycleEvent(this.newCycle);
+  final CycleModel newCycle;
+
+  @override
+  List<Object?> get props => [newCycle.id];
+}
+
+/// Delete cycle
+class DeleteCycleEvent extends CycleEvent {
+  const DeleteCycleEvent(this.id);
   final String id;
 
   @override
   List<Object?> get props => [id];
 }
 
-class DeleteCycleDetailEvent extends CycleEvent {
-  const DeleteCycleDetailEvent(this.id);
-  final String id;
-
-  @override
-  List<Object?> get props => [id];
-}
-
-class UpdateStartTimeEvent extends CycleEvent {
+/// Update cycle information
+class UpdateCycleStartTimeEvent extends CycleEvent {
   final DateTime startTime;
 
-  const UpdateStartTimeEvent(this.startTime);
+  const UpdateCycleStartTimeEvent(this.startTime);
 
   @override
   List<Object?> get props => [startTime];
 }
 
-class UpdateNoteEvent extends CycleEvent {
+class UpdateCycleEndTimeEvent extends CycleEvent {
+  final DateTime startTime;
+
+  const UpdateCycleEndTimeEvent(this.startTime);
+
+  @override
+  List<Object?> get props => [startTime];
+}
+
+class UpdateCycleNoteEvent extends CycleEvent {
   final String note;
 
-  const UpdateNoteEvent(this.note);
+  const UpdateCycleNoteEvent(this.note);
 
   @override
   List<Object?> get props => [note];

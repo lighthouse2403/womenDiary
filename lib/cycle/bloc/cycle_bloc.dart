@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/cycle/bloc/cycle_event.dart';
 import 'package:women_diary/cycle/bloc/cycle_state.dart';
@@ -10,7 +9,8 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
 
   CycleBloc() : super(const CycleState()) {
     on<LoadAllCycleEvent>(_loadAllCycle);
-    on<DeleteCycleFromListEvent>(_deleteCycleFromList);
+    on<DeleteCycleEvent>(_deleteCycle);
+    on<CreateCycleEvent>(_createCycle);
 
   }
 
@@ -22,7 +22,16 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
     }
   }
 
-  Future<void> _deleteCycleFromList(DeleteCycleFromListEvent event, Emitter<CycleState> emit) async {
+  Future<void> _createCycle(CreateCycleEvent event, Emitter<CycleState> emit) async {
+    try {
+      await DatabaseHandler.insertCycle(event.newCycle);
+      cycleList.add(event.newCycle);
+      emit(LoadedAllCycleState(cycleList));
+    } catch (error) {
+    }
+  }
+
+  Future<void> _deleteCycle(DeleteCycleEvent event, Emitter<CycleState> emit) async {
     try {
       await DatabaseHandler.deleteCycleById(event.id);
       cycleList.removeWhere((e) => e.id == event.id);

@@ -33,11 +33,11 @@ class DatabaseHandler {
   }
 
   ///----------------------- Menstruation PERIOD -------------------------------
-  static Future<void> insertCycle(CycleModel menstruation) async {
+  static Future<void> insertCycle(CycleModel cycle) async {
     final db = await DatabaseHandler.db(cycleTable);
     await db.insert(
       cycleTable,
-      menstruation.toJson(),
+      cycle.toJson(),
       conflictAlgorithm: sql.ConflictAlgorithm.replace,
     );
   }

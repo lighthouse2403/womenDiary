@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/cycle/cycle_model.dart';
 
 class MultiRangeCalendar extends StatefulWidget {
-  final List<DateTimeRange> initialRanges;
-  final void Function(DateTimeRange) onAddRange;
-  final void Function(List<DateTimeRange>) onDeleteRange;
+  final List<CycleModel> initialRanges;
+  final void Function(CycleModel) onAddRange;
+  final void Function(String) onDeleteRange; // xóa theo id
 
   const MultiRangeCalendar({
     super.key,
@@ -19,7 +20,7 @@ class MultiRangeCalendar extends StatefulWidget {
 }
 
 class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
-  late List<DateTimeRange> _ranges;
+  late List<CycleModel> _ranges;
   DateTime? _pendingStart;
 
   @override
@@ -85,23 +86,26 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
   bool _isSameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
 
-  bool _isInRange(DateTime day, DateTimeRange range) =>
-      !day.isBefore(range.start) && !day.isAfter(range.end);
+  bool _isInRange(DateTime day, CycleModel range) =>
+      !day.isBefore(range.cycleStartTime) && !day.isAfter(range.menstruationEndTime);
 
-  int _findRangeIndex(DateTime day) {
-    return _ranges.indexWhere((r) => _isInRange(day, r));
+  String? _findRangeId(DateTime day) {
+    final match = _ranges.firstWhere(
+          (r) => _isInRange(day, r),
+      orElse: () => CycleModel.init(DateTime(0), DateTime(0)),
+    );
+    return match.id.isEmpty ? null : match.id;
   }
 
   void _onDayTapped(DateTime date) {
     setState(() {
-      final index = _findRangeIndex(date);
+      final rangeId = _findRangeId(date);
 
-      if (index != -1) {
+      if (rangeId != null) {
         // Xóa range đã chọn
         _pendingStart = null;
-        widget.onDeleteRange([_ranges[index]]);
-        _ranges.removeAt(index);
-
+        widget.onDeleteRange(rangeId);
+        _ranges.removeWhere((r) => r.id == rangeId);
         return;
       }
 
@@ -111,9 +115,13 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
       } else {
         // Có ngày bắt đầu rồi, tạo range mới
         final start = _pendingStart!;
-        final newRange = DateTimeRange(
-          start: start.isBefore(date) ? start : date,
-          end: start.isAfter(date) ? start : date,
+        DateTime cycleStartTime = start.isBefore(date) ? start : date;
+        DateTime cycleEndTime = cycleStartTime.add(Duration(days: 30));
+        DateTime menstruationEndTime = start.isAfter(date) ? start : date;
+        final newRange = CycleModel.startCycle(
+            cycleStartTime,
+            cycleEndTime,
+            menstruationEndTime
         );
         _ranges.add(newRange);
         _pendingStart = null;
@@ -124,7 +132,9 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
 
   void _resetRanges() {
     setState(() {
-      widget.onDeleteRange(_ranges);
+      for (var r in _ranges) {
+        widget.onDeleteRange(r.id);
+      }
       _ranges.clear();
       _pendingStart = null;
     });
@@ -143,15 +153,14 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
     for (final r in _ranges) {
       if (_isInRange(day, r)) {
         isInRange = true;
-        if (_isSameDay(day, r.start)) isStart = true;
-        if (_isSameDay(day, r.end)) isEnd = true;
+        if (_isSameDay(day, r.cycleStartTime)) isStart = true;
+        if (_isSameDay(day, r.menstruationEndTime)) isEnd = true;
         break;
       }
     }
 
     final isToday = _isSameDay(day, DateTime.now());
-    final isPending = _pendingStart != null &&
-        _isSameDay(_pendingStart!, day);
+    final isPending = _pendingStart != null && _isSameDay(_pendingStart!, day);
 
     Color dateColor = (isStart || isEnd || isInRange || isPending)
         ? Colors.white
