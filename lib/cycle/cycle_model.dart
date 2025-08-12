@@ -1,4 +1,6 @@
 
+import 'package:women_diary/database/local_storage_service.dart';
+
 class CycleModel {
   String id = '${DateTime.now().millisecondsSinceEpoch}';
   String note = '';
@@ -13,11 +15,21 @@ class CycleModel {
     this.cycleStartTime,
   );
 
-  CycleModel.init(DateTime cycleStartTime, DateTime cycleEndTime) {
+  CycleModel.init(DateTime cycleStartTime, DateTime cycleEndTime ) {
     id = '${DateTime.now().millisecondsSinceEpoch}';
     note = '';
     this.cycleStartTime = cycleStartTime;
     this.cycleEndTime = cycleEndTime;
+    createdTime = DateTime.now();
+    updatedTime = DateTime.now();
+  }
+
+  CycleModel.startCycle(DateTime cycleStartTime, DateTime cycleEndTime, DateTime menstruationEndTime) {
+    id = '${DateTime.now().millisecondsSinceEpoch}';
+    note = '';
+    this.cycleStartTime = cycleStartTime;
+    this.cycleEndTime = cycleEndTime;
+    this.menstruationEndTime = menstruationEndTime;
     createdTime = DateTime.now();
     updatedTime = DateTime.now();
   }

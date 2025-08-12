@@ -5,9 +5,9 @@ class RoutesName {
   static const String firstCycleInformation = '/firstCycleInformation';
 
   /// Period
-  static const String menstruationHistory = '/menstruationHistory';
-  static const String menstruationDetail = '/menstruationDetail';
-  static const String menstruationCalendar = '/menstruationCalendar';
+  static const String cycleList = '/cycleList';
+  static const String cycleDetail = '/cycleDetail';
+  static const String cycleCalendar = '/cycleCalendar';
 
   /// Chat
   static const String chat = '/chat';

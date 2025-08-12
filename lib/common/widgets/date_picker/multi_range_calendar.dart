@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 
 class MultiRangeCalendar extends StatefulWidget {
   final List<DateTimeRange> initialRanges;
@@ -20,10 +21,65 @@ class MultiRangeCalendar extends StatefulWidget {
 class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
   late List<DateTimeRange> _ranges;
   DateTime? _pendingStart;
+
   @override
   void initState() {
     super.initState();
     _ranges = List.from(widget.initialRanges);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final months = _generateMonths(DateTime(now.year, now.month - 6), 13);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Cycle history"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _resetRanges,
+          )
+        ],
+      ),
+      body: ListView.builder(
+        itemCount: months.length,
+        itemBuilder: (context, index) {
+          final month = months[index];
+          return _rowInMonth(month);
+        },
+      ),
+    );
+  }
+
+  Widget _rowInMonth(DateTime month) {
+    final daysInMonth =
+    DateUtils.getDaysInMonth(month.year, month.month);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+          child: Text(DateFormat('MMMM yyyy').format(month)).text18().w700(),
+        ),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 7,
+            mainAxisSpacing: 4,
+            crossAxisSpacing: 4,
+          ),
+          itemCount: daysInMonth,
+          itemBuilder: (context, dayIndex) {
+            return _gridCell(dayIndex, month);
+          },
+        )
+      ],
+    );
   }
 
   bool _isSameDay(DateTime a, DateTime b) =>
@@ -78,101 +134,46 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
     return List.generate(count, (i) => DateTime(from.year, from.month + i, 1));
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final months = _generateMonths(DateTime(now.year, now.month - 6), 13);
+  Widget _gridCell(int dayIndex, DateTime month) {
+    final day = DateTime(month.year, month.month, dayIndex + 1);
+    bool isInRange = false;
+    bool isStart = false;
+    bool isEnd = false;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Multi Range Calendar"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _resetRanges,
-          )
-        ],
-      ),
-      body: ListView.builder(
-        itemCount: months.length,
-        itemBuilder: (context, index) {
-          final month = months[index];
-          final daysInMonth =
-          DateUtils.getDaysInMonth(month.year, month.month);
+    for (final r in _ranges) {
+      if (_isInRange(day, r)) {
+        isInRange = true;
+        if (_isSameDay(day, r.start)) isStart = true;
+        if (_isSameDay(day, r.end)) isEnd = true;
+        break;
+      }
+    }
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-                child: Text(
-                  DateFormat('MMMM yyyy').format(month),
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 7,
-                  mainAxisSpacing: 4,
-                  crossAxisSpacing: 4,
-                ),
-                itemCount: daysInMonth,
-                itemBuilder: (context, dayIndex) {
-                  final day = DateTime(month.year, month.month, dayIndex + 1);
-                  bool isInRange = false;
-                  bool isStart = false;
-                  bool isEnd = false;
+    final isToday = _isSameDay(day, DateTime.now());
+    final isPending = _pendingStart != null &&
+        _isSameDay(_pendingStart!, day);
 
-                  for (final r in _ranges) {
-                    if (_isInRange(day, r)) {
-                      isInRange = true;
-                      if (_isSameDay(day, r.start)) isStart = true;
-                      if (_isSameDay(day, r.end)) isEnd = true;
-                      break;
-                    }
-                  }
-
-                  final isToday = _isSameDay(day, DateTime.now());
-                  final isPending = _pendingStart != null &&
-                      _isSameDay(_pendingStart!, day);
-
-                  return GestureDetector(
-                    onTap: () => _onDayTapped(day),
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: isStart || isEnd
-                            ? Colors.blue
-                            : isInRange
-                            ? Colors.blue.withAlpha(70)
-                            : isPending
-                            ? Colors.orange.withAlpha(70)
-                            : null,
-                        border: isToday
-                            ? Border.all(color: Colors.red, width: 1.5)
-                            : Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        '${day.day}',
-                        style: TextStyle(
-                          color: (isStart || isEnd || isInRange || isPending)
-                              ? Colors.white
-                              : Colors.black87,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              )
-            ],
-          );
-        },
+    Color dateColor = (isStart || isEnd || isInRange || isPending)
+        ? Colors.white
+        : Colors.black87;
+    return GestureDetector(
+      onTap: () => _onDayTapped(day),
+      child: Container(
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isStart || isEnd
+              ? Colors.blue
+              : isInRange
+              ? Colors.blue.withAlpha(70)
+              : isPending
+              ? Colors.orange.withAlpha(70)
+              : null,
+          border: isToday
+              ? Border.all(color: Colors.red, width: 1.5)
+              : Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Text('${day.day}').customColor(dateColor),
       ),
     );
   }

@@ -14,23 +14,16 @@ class LoadAllCycleEvent extends CycleEvent {
   List<Object?> get props => [];
 }
 
-class CreateActionDetailEvent extends CycleEvent {
-  const CreateActionDetailEvent();
-
-  @override
-  List<Object?> get props => [];
-}
-
-class DeleteActionFromListEvent extends CycleEvent {
-  const DeleteActionFromListEvent(this.id);
+class DeleteCycleFromListEvent extends CycleEvent {
+  const DeleteCycleFromListEvent(this.id);
   final String id;
 
   @override
   List<Object?> get props => [id];
 }
 
-class DeleteActionDetailEvent extends CycleEvent {
-  const DeleteActionDetailEvent(this.id);
+class DeleteCycleDetailEvent extends CycleEvent {
+  const DeleteCycleDetailEvent(this.id);
   final String id;
 
   @override
@@ -53,14 +46,4 @@ class UpdateNoteEvent extends CycleEvent {
 
   @override
   List<Object?> get props => [note];
-}
-
-class DeleteCycleEvent extends CycleEvent {
-  const DeleteCycleEvent({ required this.startTime, required this.endTime });
-
-  final DateTime startTime;
-  final DateTime endTime;
-
-  @override
-  List<Object?> get props => [startTime, endTime];
 }

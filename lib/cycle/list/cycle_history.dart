@@ -43,7 +43,7 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
         actions: [
           IconButton(
             onPressed: () {
-              context.navigateTo(RoutesName.menstruationCalendar, arguments:  context.read<CycleBloc>().cycleList).then((_) {
+              context.navigateTo(RoutesName.cycleCalendar, arguments:  context.read<CycleBloc>().cycleList).then((_) {
                 context.read<CycleBloc>().add(const LoadAllCycleEvent());
               });
             },
@@ -92,10 +92,7 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
               SlidableAction(
                 onPressed: (_) {
                   context.read<CycleBloc>().add(
-                    DeleteCycleEvent(
-                      startTime: cycle.cycleStartTime.startOfDay(),
-                      endTime: cycle.cycleEndTime.startOfDay(),
-                    ),
+                    DeleteCycleFromListEvent(cycle.id),
                   );
                 },
                 backgroundColor: Colors.redAccent,
@@ -109,7 +106,7 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
           child: GestureDetector(
             onTap: () {
               context.navigateTo(
-                RoutesName.menstruationDetail,
+                RoutesName.cycleDetail,
                 arguments: cycle,
               );
             },

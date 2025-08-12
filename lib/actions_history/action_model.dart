@@ -1,6 +1,6 @@
 import 'package:women_diary/actions_history/action_type.dart';
 
-class UserAction {
+class ActionModel {
    String id = '${DateTime.now().millisecondsSinceEpoch}';
    String emoji = '';
    String title = '';
@@ -8,13 +8,13 @@ class UserAction {
    ActionType type = ActionType.stomachache;
    DateTime time = DateTime.now();
 
-  UserAction({
+  ActionModel({
     required this.id,
     required this.emoji,
     required this.time
   });
 
-  UserAction.init(String title, DateTime time, String emoji, String note) {
+  ActionModel.init(String title, DateTime time, String emoji, String note) {
     this.id = '${DateTime.now().millisecondsSinceEpoch}';
     this.emoji  = emoji;
     this.title  = title;
@@ -23,7 +23,7 @@ class UserAction {
     this.type   = ActionType.stomachache;
   }
 
-  UserAction.fromDatabase(Map<String, dynamic> json) {
+  ActionModel.fromDatabase(Map<String, dynamic> json) {
     id = json['id'];
     emoji = json['emoji'];
     title = json['title'];

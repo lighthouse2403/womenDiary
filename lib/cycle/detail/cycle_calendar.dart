@@ -24,20 +24,18 @@ class _CycleCalendarState extends State<CycleCalendar> {
     List<DateTimeRange> initialRange = widget.cycle.map((e) {
       return DateTimeRange(start: e.cycleStartTime, end: e.cycleEndTime);
     }).toList();
-    return Scaffold(
-      body: MultiRangeCalendar(
-        initialRanges: initialRange,
-        onAddRange: (range) {
-          print(range.start);
-          CycleModel cycle = CycleModel.init(range.start.startOfDay(), range.end.startOfDay());
-          DatabaseHandler.insertCycle(cycle);
-        },
-        onDeleteRange: (ranges) {
-          ranges.forEach((range) {
-            DatabaseHandler.deleteCycle(range.start.startOfDay().millisecondsSinceEpoch);
-          });
-        },
-      ),
+    return MultiRangeCalendar(
+      initialRanges: initialRange,
+      onAddRange: (range) {
+        print(range.start);
+        CycleModel cycle = CycleModel.startCycle(range.start.startOfDay(), range.end.startOfDay(),);
+        DatabaseHandler.insertCycle(cycle);
+      },
+      onDeleteRange: (ranges) {
+        ranges.forEach((range) {
+          DatabaseHandler.deleteCycle(range.start.startOfDay().millisecondsSinceEpoch);
+        });
+      },
     );
   }
 }

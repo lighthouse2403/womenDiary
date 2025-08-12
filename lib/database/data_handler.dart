@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart' hide Action;
 import 'package:women_diary/actions_history/action_type.dart';
-import 'package:women_diary/actions_history/user_action_model.dart';
+import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:flutter/foundation.dart';
@@ -10,8 +10,7 @@ class DatabaseHandler {
   static String databasePath    = 'womenDiary.db';
   static String cycleTable      = 'cycleTable';
   static String scheduleTable   = 'scheduleTable';
-  static String diaryTable      = 'diaryTable';
-  static String userActionTable = 'userActionTable';
+  static String actionTable     = 'actionTable';
 
   static Future<sql.Database> db(String tableName) async {
     return sql.openDatabase(
@@ -26,7 +25,7 @@ class DatabaseHandler {
   static Future<void> createTables(sql.Database database) async {
     await database.execute("CREATE TABLE $cycleTable(id TEXT PRIMARY KEY, cycleStartTime INTEGER, cycleEndTime INTEGER, menstruationEndTime INTEGER, note TEXT, createdTime INTEGER, updatedTime INTEGER)");
     await database.execute("CREATE TABLE $scheduleTable(id TEXT PRIMARY KEY, time INTEGER, title TEXT, note TEXT, createdTime INTEGER, updatedTime INTEGER, isReminderOn INTEGER)");
-    await database.execute("CREATE TABLE $userActionTable(id TEXT PRIMARY KEY, type INTEGER, time INTEGER, emoji TEXT, note TEXT, title TEXT, createdTime INTEGER, updatedTime INTEGER)");
+    await database.execute("CREATE TABLE $actionTable(id TEXT PRIMARY KEY, type INTEGER, time INTEGER, emoji TEXT, note TEXT, title TEXT, createdTime INTEGER, updatedTime INTEGER)");
   }
 
   static Future<void> clearData() async {
@@ -76,6 +75,18 @@ class DatabaseHandler {
           cycleTable,
           where: 'cycleStartTime = ?',
           whereArgs: [cycleStartTime]);
+    } catch (err) {
+      debugPrint("Something went wrong when deleting an item: $err");
+    }
+  }
+
+  static Future<void> deleteCycleById(String id) async {
+    final db = await DatabaseHandler.db(cycleTable);
+    try {
+      await db.delete(
+          cycleTable,
+          where: 'id = ?',
+          whereArgs: [id]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
@@ -178,23 +189,23 @@ class DatabaseHandler {
   }
 
   ///---------------------------- USER ACTION ----------------------------------
-  static Future<void> insertNewAction(UserAction action) async {
-    final db = await DatabaseHandler.db(userActionTable);
+  static Future<void> insertNewAction(ActionModel action) async {
+    final db = await DatabaseHandler.db(actionTable);
     await db.insert(
-      userActionTable,
+      actionTable,
       action.toJson(),
       conflictAlgorithm: sql.ConflictAlgorithm.replace,
     );
   }
 
-  static Future<UserAction> getAction(String id) async {
-    final db = await DatabaseHandler.db(userActionTable);
-    final List<Map<String, dynamic>> maps = await db.query(userActionTable, where: 'id = ?', whereArgs: [id]);
-    return UserAction.fromDatabase(maps.first);
+  static Future<ActionModel> getAction(String id) async {
+    final db = await DatabaseHandler.db(actionTable);
+    final List<Map<String, dynamic>> maps = await db.query(actionTable, where: 'id = ?', whereArgs: [id]);
+    return ActionModel.fromDatabase(maps.first);
   }
 
-  static Future<List<UserAction>> getActions({int? startTime, int? endTime, ActionType? type}) async {
-    final db = await DatabaseHandler.db(userActionTable);
+  static Future<List<ActionModel>> getActions({int? startTime, int? endTime, ActionType? type}) async {
+    final db = await DatabaseHandler.db(actionTable);
 
     final whereClauses = <String>[];
     final whereArgs = <dynamic>[];
@@ -218,28 +229,28 @@ class DatabaseHandler {
     final whereString = whereClauses.isNotEmpty ? whereClauses.join(' AND ') : null;
 
     final List<Map<String, dynamic>> list = await db.query(
-      userActionTable,
+      actionTable,
       where: whereString,
       whereArgs: whereArgs,
       orderBy: 'time DESC',
     );
     print('list ${list}');
 
-    return list.map((e) => UserAction.fromDatabase(e)).toList();
+    return list.map((e) => ActionModel.fromDatabase(e)).toList();
   }
 
-  static Future<List<UserAction>> getAllAction() async {
-    final db = await DatabaseHandler.db(userActionTable);
-    final List<Map<String, dynamic>> list = await db.query(userActionTable);
-    return list.map((e) => UserAction.fromDatabase(e)).toList();
+  static Future<List<ActionModel>> getAllAction() async {
+    final db = await DatabaseHandler.db(actionTable);
+    final List<Map<String, dynamic>> list = await db.query(actionTable);
+    return list.map((e) => ActionModel.fromDatabase(e)).toList();
   }
 
   // Update an item by id
-  static Future<void> updateAction(UserAction action) async {
-    final db = await DatabaseHandler.db(userActionTable);
+  static Future<void> updateAction(ActionModel action) async {
+    final db = await DatabaseHandler.db(actionTable);
 
     await db.update(
-      userActionTable,
+      actionTable,
       action.toJson(),
       where: 'id = ?',
       whereArgs: [action.id],
@@ -248,10 +259,10 @@ class DatabaseHandler {
 
   // Delete
   static Future<void> deleteAction(String id) async {
-    final db = await DatabaseHandler.db(userActionTable);
+    final db = await DatabaseHandler.db(actionTable);
     try {
       await db.delete(
-          userActionTable,
+          actionTable,
           where: "id = ?",
           whereArgs: [id]);
     } catch (err) {
@@ -260,10 +271,10 @@ class DatabaseHandler {
   }
 
   static Future<void> deleteAllAction() async {
-    final db = await DatabaseHandler.db(userActionTable);
+    final db = await DatabaseHandler.db(actionTable);
     try {
       await db.delete(
-          userActionTable
+          actionTable
       );
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");

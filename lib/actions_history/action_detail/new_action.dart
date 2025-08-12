@@ -15,7 +15,7 @@ class NewAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => UserActionBloc(),
+      create: (_) => ActionBloc(),
       child: const _CreateActionView(),
     );
   }
@@ -26,7 +26,7 @@ class _CreateActionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<UserActionBloc, UserActionState>(
+    return BlocListener<ActionBloc, ActionState>(
       listenWhen: (prev, curr) => curr is ActionSavedSuccessfullyState,
       listener: (context, state) async {
         await showDialog(
@@ -99,7 +99,7 @@ class _CreateActionView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _section("Thời gian"),
-        BlocBuilder<UserActionBloc, UserActionState>(
+        BlocBuilder<ActionBloc, ActionState>(
           buildWhen: (previous, current) => current is TimeUpdatedState,
           builder: (context, state) {
             DateTime time = state is TimeUpdatedState ? state.time : DateTime.now();
@@ -145,7 +145,7 @@ class _CreateActionView extends StatelessWidget {
       pickedTime.minute,
     );
 
-    context.read<UserActionBloc>().add(UpdateTimeEvent(result));
+    context.read<ActionBloc>().add(UpdateTimeEvent(result));
   }
 
   Widget _emoji() {
@@ -155,7 +155,7 @@ class _CreateActionView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _section("Cảm xúc"),
-        BlocBuilder<UserActionBloc, UserActionState>(
+        BlocBuilder<ActionBloc, ActionState>(
           buildWhen: (pre, current) => current is EmojiUpdatedState,
           builder: (context, state) {
             String selectedEmoji = state is EmojiUpdatedState ? state.emoji : '';
@@ -165,7 +165,7 @@ class _CreateActionView extends StatelessWidget {
               children: emojis.map((emoji) {
                 final isSelected = selectedEmoji == emoji;
                 return GestureDetector(
-                  onTap: () => context.read<UserActionBloc>().add(UpdateEmojiEvent(emoji)),
+                  onTap: () => context.read<ActionBloc>().add(UpdateEmojiEvent(emoji)),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
                     padding: const EdgeInsets.all(12),
@@ -194,7 +194,7 @@ class _CreateActionView extends StatelessWidget {
       children: [
         _section("Tiêu đề"),
         TextField(
-          onChanged: (text) => context.read<UserActionBloc>().add(UpdateTitleEvent(text)),
+          onChanged: (text) => context.read<ActionBloc>().add(UpdateTitleEvent(text)),
           decoration: InputDecoration(
             hintText: "Nhập tiêu đề ngắn gọn...",
             fillColor: AppColors.pinkBackgroundColor,
@@ -217,7 +217,7 @@ class _CreateActionView extends StatelessWidget {
         _section("Ghi chú"),
         TextField(
           maxLines: 3,
-          onChanged: (text) => context.read<UserActionBloc>().add(UpdateNoteEvent(text)),
+          onChanged: (text) => context.read<ActionBloc>().add(UpdateNoteEvent(text)),
           decoration: InputDecoration(
             hintText: "Nhập ghi chú nhẹ nhàng...",
             fillColor: AppColors.pinkBackgroundColor,
@@ -238,7 +238,7 @@ class _CreateActionView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _section("Loại hành động"),
-        BlocBuilder<UserActionBloc, UserActionState>(
+        BlocBuilder<ActionBloc, ActionState>(
           buildWhen: (pre, current) => current is ActionTypeUpdatedState,
           builder: (context, state) {
             ActionType? selectedType = state is ActionTypeUpdatedState
@@ -252,7 +252,7 @@ class _CreateActionView extends StatelessWidget {
                 return ChoiceChip(
                   label: Text(type.display),
                   selected: isSelected,
-                  onSelected: (_) => context.read<UserActionBloc>().add(
+                  onSelected: (_) => context.read<ActionBloc>().add(
                       UpdateActionTypeEvent(isSelected ? null : type)),
                   checkmarkColor: Colors.pinkAccent,
                   selectedColor: Colors.pink.shade100,
@@ -271,7 +271,7 @@ class _CreateActionView extends StatelessWidget {
   }
 
   Widget _saveButton(BuildContext context) {
-    return BlocBuilder<UserActionBloc, UserActionState>(
+    return BlocBuilder<ActionBloc, ActionState>(
       buildWhen: (pre, current) => current is SaveButtonState,
       builder: (context, state) {
         final isEnabled = state is SaveButtonState ? state.isEnable : false;
@@ -280,7 +280,7 @@ class _CreateActionView extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: isEnabled
-                ? () { context.read<UserActionBloc>().add(CreateActionDetailEvent()); }
+                ? () { context.read<ActionBloc>().add(CreateActionDetailEvent()); }
                 : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: isEnabled ? Colors.pink : Colors.pink.shade100,

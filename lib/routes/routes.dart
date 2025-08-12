@@ -1,13 +1,13 @@
 import 'package:women_diary/actions_history/action_detail/action_detail.dart';
 import 'package:women_diary/actions_history/action_list/action_history.dart';
 import 'package:women_diary/actions_history/action_detail/new_action.dart';
-import 'package:women_diary/actions_history/user_action_model.dart';
+import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/bottom_tab_bar/bottom_tab_bar.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/cycle/first_setup/cycle_setup.dart';
 import 'package:women_diary/cycle/list/cycle_history.dart';
-import 'package:women_diary/cycle/menstruation_calendar.dart';
-import 'package:women_diary/cycle/menstruation_detail.dart';
+import 'package:women_diary/cycle/detail/cycle_calendar.dart';
+import 'package:women_diary/cycle/detail/cycle_detail.dart';
 import 'package:women_diary/home/home.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +58,7 @@ class Routes {
             ),
             GoRoute(
               parentNavigatorKey: _shellNavigatorKey,
-              path: RoutesName.menstruationHistory,
+              path: RoutesName.cycleList,
               pageBuilder: (context, state) {
                 return _createPageFadeTransition(state: state, child: CycleHistory());
               },
@@ -94,14 +94,14 @@ class Routes {
           },
         ),
         GoRoute(
-          path: RoutesName.menstruationCalendar,
+          path: RoutesName.cycleCalendar,
           pageBuilder: (context, state) {
             List<CycleModel> cycleList = state.extra as List<CycleModel>;
             return _createPageFadeTransition(state: state, child: CycleCalendar(cycle: cycleList));
           },
         ),
         GoRoute(
-          path: RoutesName.menstruationDetail,
+          path: RoutesName.cycleDetail,
           pageBuilder: (context, state) {
             CycleModel cycle = state.extra as CycleModel;
             return _createPageFadeTransition(state: state, child: CycleDetail(cycle: cycle));
@@ -110,7 +110,7 @@ class Routes {
         GoRoute(
           path: RoutesName.actionDetail,
           pageBuilder: (context, state) {
-            UserAction action = state.extra as UserAction;
+            ActionModel action = state.extra as ActionModel;
             return _createPageFadeTransition(state: state, child: ActionDetail(action: action));
           },
         ),

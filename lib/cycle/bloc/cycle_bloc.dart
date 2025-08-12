@@ -10,7 +10,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
 
   CycleBloc() : super(const CycleState()) {
     on<LoadAllCycleEvent>(_loadAllCycle);
-    on<DeleteCycleEvent>(_deleteCycle);
+    on<DeleteCycleFromListEvent>(_deleteCycleFromList);
 
   }
 
@@ -22,10 +22,10 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
     }
   }
 
-  Future<void> _deleteCycle(DeleteCycleEvent event, Emitter<CycleState> emit) async {
+  Future<void> _deleteCycleFromList(DeleteCycleFromListEvent event, Emitter<CycleState> emit) async {
     try {
-      await DatabaseHandler.deleteCycle(event.startTime.startOfDay().millisecondsSinceEpoch);
-      cycleList = await DatabaseHandler.getAllCycle();
+      await DatabaseHandler.deleteCycleById(event.id);
+      cycleList.removeWhere((e) => e.id == event.id);
       emit(LoadedAllCycleState(cycleList));
     } catch (error) {
     }

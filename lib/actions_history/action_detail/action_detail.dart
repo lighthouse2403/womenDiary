@@ -5,7 +5,7 @@ import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/bloc/action_bloc.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
-import 'package:women_diary/actions_history/user_action_model.dart';
+import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
@@ -13,12 +13,12 @@ import 'package:women_diary/common/extension/text_extension.dart';
 class ActionDetail extends StatelessWidget {
   const ActionDetail({super.key, required this.action});
 
-  final UserAction action;
+  final ActionModel action;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => UserActionBloc()..add(InitActionDetailEvent(action)),
+      create: (_) => ActionBloc()..add(InitActionDetailEvent(action)),
       child: _ActionDetailView(action: action,),
     );
   }
@@ -26,7 +26,7 @@ class ActionDetail extends StatelessWidget {
 
 class _ActionDetailView extends StatefulWidget {
   const _ActionDetailView({required this.action});
-  final UserAction action;
+  final ActionModel action;
 
   @override
   State<_ActionDetailView> createState() => _ActionDetailViewState();
@@ -52,7 +52,7 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<UserActionBloc, UserActionState>(
+    return BlocListener<ActionBloc, ActionState>(
       listenWhen: (prev, curr) => curr is ActionSavedSuccessfullyState,
       listener: (context, state) async {
         await showDialog(
@@ -131,7 +131,7 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _section("Thời gian"),
-        BlocBuilder<UserActionBloc, UserActionState>(
+        BlocBuilder<ActionBloc, ActionState>(
           buildWhen: (previous, current) => current is TimeUpdatedState,
           builder: (context, state) {
             DateTime time = state is TimeUpdatedState ? state.time : DateTime.now();
@@ -177,7 +177,7 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
       pickedTime.minute,
     );
 
-    context.read<UserActionBloc>().add(UpdateTimeEvent(result));
+    context.read<ActionBloc>().add(UpdateTimeEvent(result));
   }
 
   Widget _emoji() {
@@ -187,7 +187,7 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _section("Cảm xúc"),
-        BlocBuilder<UserActionBloc, UserActionState>(
+        BlocBuilder<ActionBloc, ActionState>(
           buildWhen: (pre, current) => current is EmojiUpdatedState,
           builder: (context, state) {
             String selectedEmoji = state is EmojiUpdatedState ? state.emoji : '';
@@ -197,7 +197,7 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
               children: emojis.map((emoji) {
                 final isSelected = selectedEmoji == emoji;
                 return GestureDetector(
-                  onTap: () => context.read<UserActionBloc>().add(UpdateEmojiEvent(emoji)),
+                  onTap: () => context.read<ActionBloc>().add(UpdateEmojiEvent(emoji)),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
                     padding: const EdgeInsets.all(12),
@@ -227,7 +227,7 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
         _section("Tiêu đề"),
         TextField(
           controller: titleController,
-          onChanged: (text) => context.read<UserActionBloc>().add(UpdateTitleEvent(text)),
+          onChanged: (text) => context.read<ActionBloc>().add(UpdateTitleEvent(text)),
           decoration: InputDecoration(
             hintText: "Nhập tiêu đề ngắn gọn...",
             fillColor: AppColors.pinkBackgroundColor,
@@ -251,7 +251,7 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
         TextField(
           controller: noteController,
           maxLines: 3,
-          onChanged: (text) => context.read<UserActionBloc>().add(UpdateNoteEvent(text)),
+          onChanged: (text) => context.read<ActionBloc>().add(UpdateNoteEvent(text)),
           decoration: InputDecoration(
             hintText: "Nhập ghi chú nhẹ nhàng...",
             fillColor: AppColors.pinkBackgroundColor,
@@ -272,7 +272,7 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _section("Loại hành động"),
-        BlocBuilder<UserActionBloc, UserActionState>(
+        BlocBuilder<ActionBloc, ActionState>(
           buildWhen: (pre, current) => current is ActionTypeUpdatedState,
           builder: (context, state) {
             ActionType? selectedType = state is ActionTypeUpdatedState
@@ -286,7 +286,7 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
                 return ChoiceChip(
                   label: Text(type.display),
                   selected: isSelected,
-                  onSelected: (_) => context.read<UserActionBloc>().add(
+                  onSelected: (_) => context.read<ActionBloc>().add(
                       UpdateActionTypeEvent(isSelected ? null : type)),
                   checkmarkColor: Colors.pinkAccent,
                   selectedColor: Colors.pink.shade100,
@@ -305,7 +305,7 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
   }
 
   Widget _saveButton(BuildContext context) {
-    return BlocBuilder<UserActionBloc, UserActionState>(
+    return BlocBuilder<ActionBloc, ActionState>(
       buildWhen: (pre, current) => current is SaveButtonState,
       builder: (context, state) {
         final isEnabled = state is SaveButtonState ? state.isEnable : false;
@@ -314,7 +314,7 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: isEnabled
-                ? () { context.read<UserActionBloc>().add(CreateActionDetailEvent()); }
+                ? () { context.read<ActionBloc>().add(CreateActionDetailEvent()); }
                 : null,
             style: ElevatedButton.styleFrom(
               backgroundColor: isEnabled ? Colors.pink : Colors.pink.shade100,
@@ -353,7 +353,7 @@ class _ActionDetailViewState extends State<_ActionDetailView> {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              context.read<UserActionBloc>().add(DeleteActionDetailEvent(widget.action.id));
+              context.read<ActionBloc>().add(DeleteActionDetailEvent(widget.action.id));
               Navigator.of(context).pop(); // thoát khỏi màn detail
             },
             child: const Text("Xoá").text16().w600().pinkColor(),

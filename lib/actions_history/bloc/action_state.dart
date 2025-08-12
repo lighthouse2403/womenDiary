@@ -1,19 +1,19 @@
 import 'package:equatable/equatable.dart';
 import 'package:women_diary/actions_history/action_type.dart';
-import 'package:women_diary/actions_history/user_action_model.dart';
+import 'package:women_diary/actions_history/action_model.dart';
 
-class UserActionState extends Equatable {
-  const UserActionState();
+class ActionState extends Equatable {
+  const ActionState();
 
   @override
   List<Object?> get props => [];
 }
 
-class ActionHistoryInitial extends UserActionState {}
+class ActionHistoryInitial extends ActionState {}
 
-class ActionHistoryLoading extends UserActionState {}
+class ActionHistoryLoading extends ActionState {}
 
-class ActionTypeUpdatedState extends UserActionState {
+class ActionTypeUpdatedState extends ActionState {
   final ActionType? type;
 
   const ActionTypeUpdatedState({required this.type});
@@ -22,27 +22,27 @@ class ActionTypeUpdatedState extends UserActionState {
   List<Object?> get props => [type];
 }
 
-class UserActionLoadedState extends UserActionState {
-  final List<UserAction> actions;
+class ActionLoadedState extends ActionState {
+  final List<ActionModel> actions;
 
-  const UserActionLoadedState({required this.actions,});
+  const ActionLoadedState({required this.actions,});
 
   @override
   List<Object?> get props => [actions.length];
 }
 
-class UserActionLoadedErrorState extends UserActionState {
+class ActionLoadedErrorState extends ActionState {
   final String message;
 
-  const UserActionLoadedErrorState(this.message);
+  const ActionLoadedErrorState(this.message);
 
   @override
   List<Object?> get props => [message];
 }
 
 /// Action detail
-class ActionDetailUpdatedState extends UserActionState {
-  final UserAction initialAction;
+class ActionDetailUpdatedState extends ActionState {
+  final ActionModel initialAction;
 
   const ActionDetailUpdatedState(this.initialAction);
 
@@ -50,7 +50,7 @@ class ActionDetailUpdatedState extends UserActionState {
   List<Object?> get props => [initialAction];
 }
 
-class SaveButtonState extends UserActionState {
+class SaveButtonState extends ActionState {
   const SaveButtonState(this.isEnable);
 
   final bool isEnable;
@@ -58,7 +58,7 @@ class SaveButtonState extends UserActionState {
   List<Object?> get props => [isEnable];
 }
 
-class EmojiUpdatedState extends UserActionState {
+class EmojiUpdatedState extends ActionState {
   final String emoji;
 
   const EmojiUpdatedState(this.emoji);
@@ -67,7 +67,7 @@ class EmojiUpdatedState extends UserActionState {
   List<Object?> get props => [emoji];
 }
 
-class TitleUpdatedState extends UserActionState {
+class TitleUpdatedState extends ActionState {
   final String title;
 
   const TitleUpdatedState(this.title);
@@ -76,7 +76,7 @@ class TitleUpdatedState extends UserActionState {
   List<Object?> get props => [title];
 }
 
-class TimeUpdatedState extends UserActionState {
+class TimeUpdatedState extends ActionState {
   final DateTime time;
 
   const TimeUpdatedState(this.time);
@@ -85,7 +85,7 @@ class TimeUpdatedState extends UserActionState {
   List<Object?> get props => [time];
 }
 
-class NoteUpdatedState extends UserActionState {
+class NoteUpdatedState extends ActionState {
   final String note;
 
   const NoteUpdatedState(this.note);
@@ -94,7 +94,7 @@ class NoteUpdatedState extends UserActionState {
   List<Object?> get props => [note];
 }
 
-class ActionSavedSuccessfullyState extends UserActionState {
+class ActionSavedSuccessfullyState extends ActionState {
   const ActionSavedSuccessfullyState();
 
   @override

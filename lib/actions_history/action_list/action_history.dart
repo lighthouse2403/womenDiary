@@ -7,7 +7,7 @@ import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/bloc/action_bloc.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
-import 'package:women_diary/actions_history/user_action_model.dart';
+import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/routes/route_name.dart';
@@ -19,7 +19,7 @@ class ActionHistory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => UserActionBloc()..add(LoadUserActionEvent()),
+      create: (_) => ActionBloc()..add(LoadActionEvent()),
       child: const _ActionHistoryView(),
     );
   }
@@ -53,7 +53,7 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
   }
 
   Widget _filterChips() {
-    return BlocBuilder<UserActionBloc, UserActionState>(
+    return BlocBuilder<ActionBloc, ActionState>(
       buildWhen: (pre, current) => current is ActionTypeUpdatedState,
       builder: (context, state) {
         ActionType? selectedType = state is ActionTypeUpdatedState ? state.type : null;
@@ -82,7 +82,7 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
                 ),
                 visualDensity: VisualDensity.compact,
                 onSelected: (_) {
-                  context.read<UserActionBloc>().add(UpdateActionTypeEvent(null));
+                  context.read<ActionBloc>().add(UpdateActionTypeEvent(null));
                 },
               ),
               ...ActionType.values.map(
@@ -106,7 +106,7 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
                   ),
                   visualDensity: VisualDensity.compact,
                   onSelected: (_) {
-                    context.read<UserActionBloc>().add(UpdateActionTypeEvent(type));
+                    context.read<ActionBloc>().add(UpdateActionTypeEvent(type));
                   },
                 ),
               ),
@@ -118,11 +118,11 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
   }
 
   Widget _buildList() {
-    return BlocBuilder<UserActionBloc, UserActionState>(
-      buildWhen: (pre, current) => current is UserActionLoadedState,
+    return BlocBuilder<ActionBloc, ActionState>(
+      buildWhen: (pre, current) => current is ActionLoadedState,
       builder: (context, state) {
-        final List<UserAction> actionList =
-        (state is UserActionLoadedState) ? state.actions : [];
+        final List<ActionModel> actionList =
+        (state is ActionLoadedState) ? state.actions : [];
 
         if (actionList.isEmpty) {
           return Center(
@@ -144,7 +144,7 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
           );
         }
 
-        final Map<String, List<UserAction>> groupedByDate = {};
+        final Map<String, List<ActionModel>> groupedByDate = {};
         for (var action in actionList) {
           final date = DateFormat('dd/MM/yyyy').format(action.time);
           groupedByDate.putIfAbsent(date, () => []).add(action);
@@ -177,7 +177,7 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
     );
   }
 
-  Widget _dismissibleCard(UserAction action, BuildContext context) {
+  Widget _dismissibleCard(ActionModel action, BuildContext context) {
     return Slidable(
       key: ValueKey(action.id),
       endActionPane: ActionPane(
@@ -217,11 +217,11 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
     );
   }
 
-  Widget _actionCard(UserAction action, BuildContext context) {
+  Widget _actionCard(ActionModel action, BuildContext context) {
     String actionTime = DateFormat('HH:mm').format(action.time);
     return GestureDetector(
       onTap: () => context.navigateTo(RoutesName.actionDetail, arguments: action).then((value) {
-        context.read<UserActionBloc>().add(const LoadUserActionEvent());
+        context.read<ActionBloc>().add(const LoadActionEvent());
       }),
       child: Container(
         margin: const EdgeInsets.only(bottom: 20),

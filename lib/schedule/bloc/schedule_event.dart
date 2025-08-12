@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:women_diary/actions_history/action_type.dart';
-import 'package:women_diary/actions_history/user_action_model.dart';
+import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
 
 class ScheduleEvent extends Equatable {

@@ -1,23 +1,22 @@
 import 'package:equatable/equatable.dart';
-import 'package:women_diary/actions_history/action_detail/new_action.dart';
 import 'package:women_diary/actions_history/action_type.dart';
-import 'package:women_diary/actions_history/user_action_model.dart';
+import 'package:women_diary/actions_history/action_model.dart';
 
-class UserActionEvent extends Equatable {
-  const UserActionEvent();
-
-  @override
-  List<Object?> get props => [];
-}
-
-class LoadUserActionEvent extends UserActionEvent {
-  const LoadUserActionEvent();
+class ActionEvent extends Equatable {
+  const ActionEvent();
 
   @override
   List<Object?> get props => [];
 }
 
-class UpdateActionTypeEvent extends UserActionEvent {
+class LoadActionEvent extends ActionEvent {
+  const LoadActionEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class UpdateActionTypeEvent extends ActionEvent {
   final ActionType? actionType;
 
   const UpdateActionTypeEvent(this.actionType);
@@ -26,7 +25,7 @@ class UpdateActionTypeEvent extends UserActionEvent {
   List<Object?> get props => [actionType];
 }
 
-class UpdateDateRangeEvent extends UserActionEvent {
+class UpdateDateRangeEvent extends ActionEvent {
   final DateTime startTime;
   final DateTime endTime;
 
@@ -37,8 +36,8 @@ class UpdateDateRangeEvent extends UserActionEvent {
 }
 
 /// Action detail
-class InitActionDetailEvent extends UserActionEvent {
-  final UserAction initialAction;
+class InitActionDetailEvent extends ActionEvent {
+  final ActionModel initialAction;
 
   const InitActionDetailEvent(this.initialAction);
 
@@ -46,21 +45,21 @@ class InitActionDetailEvent extends UserActionEvent {
   List<Object?> get props => [initialAction];
 }
 
-class UpdateActionDetailEvent extends UserActionEvent {
+class UpdateActionDetailEvent extends ActionEvent {
   const UpdateActionDetailEvent();
 
   @override
   List<Object?> get props => [];
 }
 
-class CreateActionDetailEvent extends UserActionEvent {
+class CreateActionDetailEvent extends ActionEvent {
   const CreateActionDetailEvent();
 
   @override
   List<Object?> get props => [];
 }
 
-class DeleteActionFromListEvent extends UserActionEvent {
+class DeleteActionFromListEvent extends ActionEvent {
   const DeleteActionFromListEvent(this.id);
   final String id;
 
@@ -68,7 +67,7 @@ class DeleteActionFromListEvent extends UserActionEvent {
   List<Object?> get props => [id];
 }
 
-class DeleteActionDetailEvent extends UserActionEvent {
+class DeleteActionDetailEvent extends ActionEvent {
   const DeleteActionDetailEvent(this.id);
   final String id;
 
@@ -76,7 +75,7 @@ class DeleteActionDetailEvent extends UserActionEvent {
   List<Object?> get props => [id];
 }
 
-class UpdateTimeEvent extends UserActionEvent {
+class UpdateTimeEvent extends ActionEvent {
   final DateTime time;
 
   const UpdateTimeEvent(this.time);
@@ -85,7 +84,7 @@ class UpdateTimeEvent extends UserActionEvent {
   List<Object?> get props => [time];
 }
 
-class UpdateEmojiEvent extends UserActionEvent {
+class UpdateEmojiEvent extends ActionEvent {
   final String emoji;
 
   const UpdateEmojiEvent(this.emoji);
@@ -94,7 +93,7 @@ class UpdateEmojiEvent extends UserActionEvent {
   List<Object?> get props => [emoji];
 }
 
-class UpdateTitleEvent extends UserActionEvent {
+class UpdateTitleEvent extends ActionEvent {
   final String title;
 
   const UpdateTitleEvent(this.title);
@@ -103,7 +102,7 @@ class UpdateTitleEvent extends UserActionEvent {
   List<Object?> get props => [title];
 }
 
-class UpdateNoteEvent extends UserActionEvent {
+class UpdateNoteEvent extends ActionEvent {
   final String note;
 
   const UpdateNoteEvent(this.note);
