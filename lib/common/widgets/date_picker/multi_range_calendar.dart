@@ -20,19 +20,12 @@ class MultiRangeCalendar extends StatefulWidget {
 }
 
 class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
-  late List<CycleModel> _ranges;
   DateTime? _pendingStart;
-
-  @override
-  void initState() {
-    super.initState();
-    _ranges = List.from(widget.initialRanges);
-  }
 
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final months = _generateMonths(DateTime(now.year, now.month - 6), 13);
+    final months = _generateMonths(DateTime(now.year, now.month - 6, 1), 13);
 
     return Scaffold(
       appBar: AppBar(
@@ -55,8 +48,7 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
   }
 
   Widget _rowInMonth(DateTime month) {
-    final daysInMonth =
-    DateUtils.getDaysInMonth(month.year, month.month);
+    final daysInMonth = DateUtils.getDaysInMonth(month.year, month.month);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,57 +79,59 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
       a.year == b.year && a.month == b.month && a.day == b.day;
 
   bool _isInRange(DateTime day, CycleModel range) =>
-      !day.isBefore(range.cycleStartTime) && !day.isAfter(range.menstruationEndTime);
+      !day.isBefore(range.cycleStartTime) &&
+          !day.isAfter(range.menstruationEndTime);
 
   String? _findRangeId(DateTime day) {
-    final match = _ranges.firstWhere(
-          (r) => _isInRange(day, r),
-      orElse: () => CycleModel.init(DateTime(0), DateTime(0)),
-    );
-    return match.id.isEmpty ? null : match.id;
+    for (final r in widget.initialRanges) {
+      if (_isInRange(day, r)) return r.id;
+    }
+    return null;
   }
 
   void _onDayTapped(DateTime date) {
-    setState(() {
-      final rangeId = _findRangeId(date);
+    debugPrint('MultiRangeCalendar: tapped $date');
 
-      if (rangeId != null) {
-        // Xóa range đã chọn
-        _pendingStart = null;
-        widget.onDeleteRange(rangeId);
-        _ranges.removeWhere((r) => r.id == rangeId);
-        return;
-      }
+    final rangeId = _findRangeId(date);
 
-      if (_pendingStart == null) {
-        // Chưa có ngày bắt đầu, bắt đầu chọn
-        _pendingStart = date;
-      } else {
-        // Có ngày bắt đầu rồi, tạo range mới
-        final start = _pendingStart!;
-        DateTime cycleStartTime = start.isBefore(date) ? start : date;
-        DateTime cycleEndTime = cycleStartTime.add(Duration(days: 30));
-        DateTime menstruationEndTime = start.isAfter(date) ? start : date;
-        final newRange = CycleModel.startCycle(
-            cycleStartTime,
-            cycleEndTime,
-            menstruationEndTime
-        );
-        _ranges.add(newRange);
-        _pendingStart = null;
-        widget.onAddRange(newRange);
-      }
-    });
+    if (rangeId != null) {
+      // Xóa range đã chọn
+      _pendingStart = null;
+      widget.onDeleteRange(rangeId);
+      return;
+    }
+
+    if (_pendingStart == null) {
+      // Bắt đầu chọn
+      _pendingStart = DateTime(date.year, date.month, date.day);
+    } else {
+      // Hoàn thành range
+      final start = _pendingStart!;
+      final d1 = DateTime(start.year, start.month, start.day);
+      final d2 = DateTime(date.year, date.month, date.day);
+
+      final cycleStartTime = d1.isBefore(d2) ? d1 : d2;
+      final menstruationEndTime = d1.isAfter(d2) ? d1 : d2;
+      final cycleEndTime = DateTime(cycleStartTime.year, cycleStartTime.month,
+          cycleStartTime.day)
+          .add(const Duration(days: 30));
+
+      final newRange = CycleModel.startCycle(
+        cycleStartTime,
+        cycleEndTime,
+        menstruationEndTime,
+      );
+
+      _pendingStart = null;
+      widget.onAddRange(newRange);
+    }
   }
 
   void _resetRanges() {
-    setState(() {
-      for (var r in _ranges) {
-        widget.onDeleteRange(r.id);
-      }
-      _ranges.clear();
-      _pendingStart = null;
-    });
+    for (var r in widget.initialRanges) {
+      widget.onDeleteRange(r.id);
+    }
+    _pendingStart = null;
   }
 
   List<DateTime> _generateMonths(DateTime from, int count) {
@@ -150,7 +144,7 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
     bool isStart = false;
     bool isEnd = false;
 
-    for (final r in _ranges) {
+    for (final r in widget.initialRanges) {
       if (_isInRange(day, r)) {
         isInRange = true;
         if (_isSameDay(day, r.cycleStartTime)) isStart = true;
@@ -162,27 +156,32 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
     final isToday = _isSameDay(day, DateTime.now());
     final isPending = _pendingStart != null && _isSameDay(_pendingStart!, day);
 
-    Color dateColor = (isStart || isEnd || isInRange || isPending)
+    final dateColor = (isStart || isEnd || isInRange || isPending)
         ? Colors.white
         : Colors.black87;
-    return GestureDetector(
-      onTap: () => _onDayTapped(day),
-      child: Container(
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isStart || isEnd
-              ? Colors.blue
-              : isInRange
-              ? Colors.blue.withAlpha(70)
-              : isPending
-              ? Colors.orange.withAlpha(70)
-              : null,
-          border: isToday
-              ? Border.all(color: Colors.red, width: 1.5)
-              : Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(6),
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(6),
+        onTap: () => _onDayTapped(day),
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isStart || isEnd
+                ? Colors.blue
+                : isInRange
+                ? Colors.blue.withAlpha(70)
+                : isPending
+                ? Colors.orange.withAlpha(70)
+                : null,
+            border: isToday
+                ? Border.all(color: Colors.red, width: 1.5)
+                : Border.all(color: Colors.grey.shade300),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text('${day.day}').customColor(dateColor),
         ),
-        child: Text('${day.day}').customColor(dateColor),
       ),
     );
   }

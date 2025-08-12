@@ -40,14 +40,16 @@ class _CycleCalendarViewState extends State<_CycleCalendarView> {
     return BlocBuilder<CycleBloc, CycleState>(
       builder: (context, state) {
         List<CycleModel> cycles = state is LoadedAllCycleState ? state.cycleList : [];
+        print('initialRanges: ${cycles.length}');
 
         return MultiRangeCalendar(
           initialRanges: cycles,
           onAddRange: (range) {
+            print('onAddRange: ${range.cycleStartTime} - ${range.menstruationEndTime}');
             context.read<CycleBloc>().add(CreateCycleEvent(range));
           },
           onDeleteRange: (rangeId) {
-            context.read<CycleBloc>().add(DeleteCycleEvent(rangeId));
+            // context.read<CycleBloc>().add(DeleteCycleEvent(rangeId));
           },
         );
         },
