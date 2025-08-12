@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:women_diary/common/constants/constants.dart';
-import 'package:women_diary/cycle_setup/bloc/cycle_setup_bloc.dart';
-import 'package:women_diary/cycle_setup/bloc/cycle_setup_event.dart';
-import 'package:women_diary/cycle_setup/bloc/cycle_setup_state.dart';
+import 'package:women_diary/cycle/first_setup/bloc/cycle_setup_bloc.dart';
+import 'package:women_diary/cycle/first_setup/bloc/cycle_setup_event.dart';
+import 'package:women_diary/cycle/first_setup/bloc/cycle_setup_state.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 import 'package:intl/intl.dart';

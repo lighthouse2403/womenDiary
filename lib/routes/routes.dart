@@ -3,15 +3,12 @@ import 'package:women_diary/actions_history/action_list/action_history.dart';
 import 'package:women_diary/actions_history/action_detail/new_action.dart';
 import 'package:women_diary/actions_history/user_action_model.dart';
 import 'package:women_diary/bottom_tab_bar/bottom_tab_bar.dart';
-import 'package:women_diary/chat/chat_detail.dart';
-import 'package:women_diary/chat/chat_list.dart';
-import 'package:women_diary/chat/model/thread_model.dart';
-import 'package:women_diary/cycle_setup/cycle_setup.dart';
+import 'package:women_diary/cycle/cycle_model.dart';
+import 'package:women_diary/cycle/first_setup/cycle_setup.dart';
+import 'package:women_diary/cycle/list/cycle_history.dart';
+import 'package:women_diary/cycle/menstruation_calendar.dart';
+import 'package:women_diary/cycle/menstruation_detail.dart';
 import 'package:women_diary/home/home.dart';
-import 'package:women_diary/menstruation/menstruation_calendar.dart';
-import 'package:women_diary/menstruation/menstruation_detail.dart';
-import 'package:women_diary/menstruation/list/menstruation_history.dart';
-import 'package:women_diary/menstruation/menstruation_model.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -63,7 +60,7 @@ class Routes {
               parentNavigatorKey: _shellNavigatorKey,
               path: RoutesName.menstruationHistory,
               pageBuilder: (context, state) {
-                return _createPageFadeTransition(state: state, child: const MenstruationHistory());
+                return _createPageFadeTransition(state: state, child: CycleHistory());
               },
             ),
             GoRoute(
@@ -99,15 +96,15 @@ class Routes {
         GoRoute(
           path: RoutesName.menstruationCalendar,
           pageBuilder: (context, state) {
-            List<MenstruationModel> menstruationList = state.extra as List<MenstruationModel>;
-            return _createPageFadeTransition(state: state, child: MenstruationCalendar(menstruation: menstruationList));
+            List<CycleModel> cycleList = state.extra as List<CycleModel>;
+            return _createPageFadeTransition(state: state, child: CycleCalendar(cycle: cycleList));
           },
         ),
         GoRoute(
           path: RoutesName.menstruationDetail,
           pageBuilder: (context, state) {
-            MenstruationModel menstruation = state.extra as MenstruationModel;
-            return _createPageFadeTransition(state: state, child: MenstruationDetail(menstruation: menstruation));
+            CycleModel cycle = state.extra as CycleModel;
+            return _createPageFadeTransition(state: state, child: CycleDetail(cycle: cycle));
           },
         ),
         GoRoute(

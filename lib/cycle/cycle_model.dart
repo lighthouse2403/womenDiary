@@ -1,32 +1,32 @@
 
-class MenstruationModel {
+class CycleModel {
   String id = '${DateTime.now().millisecondsSinceEpoch}';
   String note = '';
-  DateTime startTime = DateTime.now();
-  DateTime endTime = DateTime.now();
+  DateTime cycleStartTime = DateTime.now();
+  DateTime cycleEndTime = DateTime.now();
+  DateTime menstruationEndTime = DateTime.now();
   DateTime createdTime = DateTime.now();
   DateTime updatedTime = DateTime.now();
 
 
-  MenstruationModel({
-    required this.endTime,
-    required this.startTime,
-  });
+  CycleModel(
+    this.cycleStartTime,
+  );
 
-  MenstruationModel.init(DateTime startTime, DateTime endTime) {
+  CycleModel.init(DateTime cycleStartTime, DateTime cycleEndTime) {
     id = '${DateTime.now().millisecondsSinceEpoch}';
     note = '';
-    this.startTime = startTime;
-    this.endTime = endTime;
+    this.cycleStartTime = cycleStartTime;
+    this.cycleEndTime = cycleEndTime;
     createdTime = DateTime.now();
     updatedTime = DateTime.now();
   }
 
-  MenstruationModel.fromDatabase(Map<String, dynamic> json) {
+  CycleModel.fromDatabase(Map<String, dynamic> json) {
     id = json['id'];
     note = json['note'];
-    startTime = DateTime.fromMillisecondsSinceEpoch(json['startTime'] as int);
-    endTime = DateTime.fromMillisecondsSinceEpoch(json['endTime'] as int);
+    cycleStartTime = DateTime.fromMillisecondsSinceEpoch(json['cycleStartTime'] as int);
+    cycleEndTime = DateTime.fromMillisecondsSinceEpoch(json['cycleEndTime'] as int);
     createdTime = DateTime.fromMillisecondsSinceEpoch(json['createdTime'] as int);
     updatedTime = DateTime.fromMillisecondsSinceEpoch(json['updatedTime'] as int);
   }
@@ -35,8 +35,9 @@ class MenstruationModel {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['note'] = note;
     data['id'] = id;
-    data['endTime'] = endTime.millisecondsSinceEpoch;
-    data['startTime'] = startTime.millisecondsSinceEpoch;
+    data['cycleStartTime'] = cycleStartTime.millisecondsSinceEpoch;
+    data['cycleEndTime'] = cycleEndTime.millisecondsSinceEpoch;
+    data['menstruationEndTime'] = menstruationEndTime.millisecondsSinceEpoch;
     data['createdTime'] = createdTime.millisecondsSinceEpoch;
     data['updatedTime'] = updatedTime.millisecondsSinceEpoch;
     return data;

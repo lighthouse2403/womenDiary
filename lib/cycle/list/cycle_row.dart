@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:women_diary/common/extension/date_time_extension.dart';
-import 'package:women_diary/menstruation/menstruation_model.dart';
+import 'package:women_diary/cycle/cycle_model.dart';
 
-class MenstruationRow extends StatelessWidget {
-  const MenstruationRow({super.key, required this.menstruation});
-  final MenstruationModel menstruation;
+class CycleRow extends StatelessWidget {
+  const CycleRow({super.key, required this.cycle});
+  final CycleModel cycle;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final duration = menstruation.endTime.difference(menstruation.startTime).inDays + 1;
+    final duration = cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -45,7 +45,7 @@ class MenstruationRow extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '${menstruation.startTime.globalDateFormat()} → ${menstruation.endTime.globalDateFormat()}',
+                  '${cycle.cycleStartTime.globalDateFormat()} → ${cycle.cycleEndTime.globalDateFormat()}',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: Colors.grey.shade800,
                   ),
@@ -54,7 +54,7 @@ class MenstruationRow extends StatelessWidget {
             ],
           ),
           // Ghi chú nếu có
-          if (menstruation.note.trim().isNotEmpty) ...[
+          if (cycle.note.trim().isNotEmpty) ...[
             const SizedBox(height: 12),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +63,7 @@ class MenstruationRow extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    menstruation.note.trim(),
+                    cycle.note.trim(),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: Colors.grey.shade800,
                       fontStyle: FontStyle.italic,

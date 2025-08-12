@@ -1,27 +1,27 @@
 
 import 'package:equatable/equatable.dart';
 
-class MenstruationEvent extends Equatable {
-  const MenstruationEvent();
+class CycleEvent extends Equatable {
+  const CycleEvent();
   @override
   List<Object?> get props => [];
 }
 
-class LoadAllMenstruationEvent extends MenstruationEvent {
-  const LoadAllMenstruationEvent();
+class LoadAllCycleEvent extends CycleEvent {
+  const LoadAllCycleEvent();
 
   @override
   List<Object?> get props => [];
 }
 
-class CreateActionDetailEvent extends MenstruationEvent {
+class CreateActionDetailEvent extends CycleEvent {
   const CreateActionDetailEvent();
 
   @override
   List<Object?> get props => [];
 }
 
-class DeleteActionFromListEvent extends MenstruationEvent {
+class DeleteActionFromListEvent extends CycleEvent {
   const DeleteActionFromListEvent(this.id);
   final String id;
 
@@ -29,7 +29,7 @@ class DeleteActionFromListEvent extends MenstruationEvent {
   List<Object?> get props => [id];
 }
 
-class DeleteActionDetailEvent extends MenstruationEvent {
+class DeleteActionDetailEvent extends CycleEvent {
   const DeleteActionDetailEvent(this.id);
   final String id;
 
@@ -37,7 +37,7 @@ class DeleteActionDetailEvent extends MenstruationEvent {
   List<Object?> get props => [id];
 }
 
-class UpdateStartTimeEvent extends MenstruationEvent {
+class UpdateStartTimeEvent extends CycleEvent {
   final DateTime startTime;
 
   const UpdateStartTimeEvent(this.startTime);
@@ -46,7 +46,7 @@ class UpdateStartTimeEvent extends MenstruationEvent {
   List<Object?> get props => [startTime];
 }
 
-class UpdateNoteEvent extends MenstruationEvent {
+class UpdateNoteEvent extends CycleEvent {
   final String note;
 
   const UpdateNoteEvent(this.note);
@@ -55,8 +55,8 @@ class UpdateNoteEvent extends MenstruationEvent {
   List<Object?> get props => [note];
 }
 
-class DeleteMenstruationEvent extends MenstruationEvent {
-  const DeleteMenstruationEvent({ required this.startTime, required this.endTime });
+class DeleteCycleEvent extends CycleEvent {
+  const DeleteCycleEvent({ required this.startTime, required this.endTime });
 
   final DateTime startTime;
   final DateTime endTime;

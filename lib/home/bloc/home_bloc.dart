@@ -5,10 +5,10 @@ import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/phase_model.dart';
-import 'package:women_diary/menstruation/menstruation_model.dart';
+import 'package:women_diary/cycle/cycle_model.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  List<MenstruationModel> menstruationList = [];
+  List<CycleModel> menstruationList = [];
 
   HomeBloc() : super(const HomeState()) {
     on<LoadRedDateEvent>(_loadPeriods);
@@ -20,20 +20,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     int menstruationLength = await LocalStorageService.getMenstruationLength();
     bool isUsingAverageValue = await LocalStorageService.isUsingAverageValue();
 
-    List<MenstruationModel> menstruationList = await DatabaseHandler.getAllMenstruation();
-    MenstruationModel lastMenstruation = menstruationList.first;
-    int currentDay = DateTime.now().difference(lastMenstruation.startTime).inDays;
+    List<CycleModel> menstruationList = await DatabaseHandler.getAllCycle();
+    CycleModel lastMenstruation = menstruationList.first;
+    int currentDay = DateTime.now().difference(lastMenstruation.cycleStartTime).inDays;
 
     if (isUsingAverageValue && menstruationList.length > 1) {
       int numberOfCycle = 0;
       int allMenstruationDay = 0;
       menstruationList.forEach((menstruation) {
         numberOfCycle += 1;
-        int numberOfMenstruation = menstruation.endTime.difference(menstruation.startTime).inDays;
+        int numberOfMenstruation = menstruation.cycleEndTime.difference(menstruation.cycleStartTime).inDays;
         allMenstruationDay += numberOfMenstruation;
       });
       menstruationLength = (allMenstruationDay/numberOfCycle).round();
-      cycleLength = (menstruationList.last.startTime.difference(menstruationList.first.startTime).inDays/(menstruationList.length - 1)).round();
+      cycleLength = (menstruationList.last.cycleStartTime.difference(menstruationList.first.cycleStartTime).inDays/(menstruationList.length - 1)).round();
     }
 
     /// Show phase information
@@ -60,7 +60,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   Future<void> _loadPeriods(LoadRedDateEvent event, Emitter<HomeState> emit) async {
     try {
-      menstruationList = await DatabaseHandler.getAllMenstruation();
+      menstruationList = await DatabaseHandler.getAllCycle();
     } catch (error) {
     }
   }

@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:women_diary/cycle_setup/bloc/cycle_setup_event.dart';
-import 'package:women_diary/cycle_setup/bloc/cycle_setup_state.dart';
+import 'package:women_diary/cycle/first_setup/bloc/cycle_setup_event.dart';
+import 'package:women_diary/cycle/first_setup/bloc/cycle_setup_state.dart';
 import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/database/local_storage_service.dart';
-import 'package:women_diary/menstruation/menstruation_model.dart';
+import 'package:women_diary/cycle/cycle_model.dart';
 
 class CycleSetupBloc extends Bloc<CycleSetupEvent, CycleSetupState> {
   int cycleLength = 30;
@@ -33,8 +33,8 @@ class CycleSetupBloc extends Bloc<CycleSetupEvent, CycleSetupState> {
     LocalStorageService.updateCycleLength(cycleLength);
     LocalStorageService.updateMenstruationLength(menstruationLength);
 
-    MenstruationModel menstruation = MenstruationModel(endTime: lastPeriodDate.add(Duration(days: menstruationLength)), startTime: lastPeriodDate);
-    DatabaseHandler.insertMenstruation(menstruation);
+    CycleModel cycle = CycleModel(lastPeriodDate);
+    DatabaseHandler.insertCycle(cycle);
     emit(SavedCycleInformationState());
   }
 }

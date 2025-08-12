@@ -6,21 +6,21 @@ import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/common/widgets/empty_view.dart';
-import 'package:women_diary/menstruation/bloc/menstruation_bloc.dart';
-import 'package:women_diary/menstruation/bloc/menstruation_event.dart';
-import 'package:women_diary/menstruation/bloc/menstruation_state.dart';
-import 'package:women_diary/menstruation/list/menstruation_row.dart';
-import 'package:women_diary/menstruation/menstruation_model.dart';
+import 'package:women_diary/cycle/bloc/cycle_bloc.dart';
+import 'package:women_diary/cycle/bloc/cycle_event.dart';
+import 'package:women_diary/cycle/bloc/cycle_state.dart';
+import 'package:women_diary/cycle/list/cycle_row.dart';
+import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 
-class MenstruationHistory extends StatelessWidget {
-  const MenstruationHistory({super.key});
+class CycleHistory extends StatelessWidget {
+  const CycleHistory({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => MenstruationBloc()..add(const LoadAllMenstruationEvent()),
+      create: (_) => CycleBloc()..add(const LoadAllCycleEvent()),
       child: const _MenstruationHistoryView(),
     );
   }
@@ -43,8 +43,8 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
         actions: [
           IconButton(
             onPressed: () {
-              context.navigateTo(RoutesName.menstruationCalendar, arguments:  context.read<MenstruationBloc>().menstruationList).then((_) {
-                context.read<MenstruationBloc>().add(const LoadAllMenstruationEvent());
+              context.navigateTo(RoutesName.menstruationCalendar, arguments:  context.read<CycleBloc>().cycleList).then((_) {
+                context.read<CycleBloc>().add(const LoadAllCycleEvent());
               });
             },
             icon: Assets.icons.add.svg(
@@ -60,10 +60,10 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
   }
 
   Widget _menstruationList() {
-    return BlocBuilder<MenstruationBloc, MenstruationState>(
-      buildWhen: (pre, current) => current is LoadedAllMenstruationState,
+    return BlocBuilder<CycleBloc, CycleState>(
+      buildWhen: (pre, current) => current is LoadedAllCycleState,
       builder: (context, state) {
-        List<MenstruationModel> list = state is LoadedAllMenstruationState ? state.menstruationList : [];
+        List<CycleModel> list = state is LoadedAllCycleState ? state.cycleList : [];
         print('_menstruationList ${list.length}');
         return list.isNotEmpty
             ? _list(list)
@@ -75,26 +75,26 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
     );
   }
 
-  Widget _list(List<MenstruationModel> list) {
+  Widget _list(List<CycleModel> list) {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       itemCount: list.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
-        final menstruation = list[index];
+        final cycle = list[index];
 
         return Slidable(
-          key: ValueKey(menstruation.startTime.millisecondsSinceEpoch),
+          key: ValueKey(cycle.cycleStartTime.millisecondsSinceEpoch),
           endActionPane: ActionPane(
             motion: const ScrollMotion(),
             extentRatio: 0.25,
             children: [
               SlidableAction(
                 onPressed: (_) {
-                  context.read<MenstruationBloc>().add(
-                    DeleteMenstruationEvent(
-                      startTime: menstruation.startTime.startOfDay(),
-                      endTime: menstruation.endTime.startOfDay(),
+                  context.read<CycleBloc>().add(
+                    DeleteCycleEvent(
+                      startTime: cycle.cycleStartTime.startOfDay(),
+                      endTime: cycle.cycleEndTime.startOfDay(),
                     ),
                   );
                 },
@@ -110,7 +110,7 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
             onTap: () {
               context.navigateTo(
                 RoutesName.menstruationDetail,
-                arguments: menstruation,
+                arguments: cycle,
               );
             },
             child: Card(
@@ -121,7 +121,7 @@ class _MenstruationHistoryViewState extends State<_MenstruationHistoryView> {
               shadowColor: AppColors.mainColor.withAlpha(40),
               child: Padding(
                 padding: const EdgeInsets.all(12),
-                child: MenstruationRow(menstruation: menstruation),
+                child: CycleRow(cycle: cycle),
               ),
             ),
           ),

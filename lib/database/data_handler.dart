@@ -1,16 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/user_action_model.dart';
-import 'package:women_diary/menstruation/menstruation_model.dart';
+import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart' as sql;
 
 class DatabaseHandler {
-  static String databasePath = 'womenDiary.db';
-  static String menstruationTable = 'menstruationTable';
-  static String scheduleTable = 'scheduleTable';
-  static String diaryTable = 'diaryTable';
+  static String databasePath    = 'womenDiary.db';
+  static String cycleTable      = 'cycleTable';
+  static String scheduleTable   = 'scheduleTable';
+  static String diaryTable      = 'diaryTable';
   static String userActionTable = 'userActionTable';
 
   static Future<sql.Database> db(String tableName) async {
@@ -24,7 +24,7 @@ class DatabaseHandler {
   }
 
   static Future<void> createTables(sql.Database database) async {
-    await database.execute("CREATE TABLE $menstruationTable(id TEXT PRIMARY KEY, startTime INTEGER, endTime INTEGER, note TEXT, createdTime INTEGER, updatedTime INTEGER)");
+    await database.execute("CREATE TABLE $cycleTable(id TEXT PRIMARY KEY, cycleStartTime INTEGER, cycleEndTime INTEGER, menstruationEndTime INTEGER, note TEXT, createdTime INTEGER, updatedTime INTEGER)");
     await database.execute("CREATE TABLE $scheduleTable(id TEXT PRIMARY KEY, time INTEGER, title TEXT, note TEXT, createdTime INTEGER, updatedTime INTEGER, isReminderOn INTEGER)");
     await database.execute("CREATE TABLE $userActionTable(id TEXT PRIMARY KEY, type INTEGER, time INTEGER, emoji TEXT, note TEXT, title TEXT, createdTime INTEGER, updatedTime INTEGER)");
   }
@@ -34,59 +34,58 @@ class DatabaseHandler {
   }
 
   ///----------------------- Menstruation PERIOD -------------------------------
-  static Future<void> insertMenstruation(MenstruationModel menstruation) async {
-    final db = await DatabaseHandler.db(menstruationTable);
+  static Future<void> insertCycle(CycleModel menstruation) async {
+    final db = await DatabaseHandler.db(cycleTable);
     await db.insert(
-      menstruationTable,
+      cycleTable,
       menstruation.toJson(),
       conflictAlgorithm: sql.ConflictAlgorithm.replace,
     );
   }
 
-  static Future<MenstruationModel> getMenstruation(int startTime, int endTime) async {
-    final db = await DatabaseHandler.db(menstruationTable);
-    final List<Map<String, dynamic>> maps = await db.query(menstruationTable, where: 'startTime = ? AND endTime = ?', whereArgs: [startTime, endTime]);
-    return MenstruationModel.fromDatabase(maps.first);
+  static Future<CycleModel> getCycle(int cycleStartTime) async {
+    final db = await DatabaseHandler.db(cycleTable);
+    final List<Map<String, dynamic>> maps = await db.query(cycleTable, where: 'cycleStartTime = ?', whereArgs: [cycleStartTime]);
+    return CycleModel.fromDatabase(maps.first);
   }
 
-  static Future<List<MenstruationModel>> getAllMenstruation() async {
-    final db = await DatabaseHandler.db(menstruationTable);
-    final List<Map<String, dynamic>> list = await db.query(menstruationTable);
-    List<MenstruationModel> allMenstruation = list.map((e) => MenstruationModel.fromDatabase(e)).toList();
-    allMenstruation.sort((a, b) => a.startTime.compareTo(b.startTime));
-    return allMenstruation;
+  static Future<List<CycleModel>> getAllCycle() async {
+    final db = await DatabaseHandler.db(cycleTable);
+    final List<Map<String, dynamic>> list = await db.query(cycleTable);
+    List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
+    allCycle.sort((a, b) => a.cycleStartTime.compareTo(b.cycleStartTime));
+    return allCycle;
   }
 
-  // Update an item by id
-  static Future<void> updateMenstruation(MenstruationModel menstruation) async {
-    final db = await DatabaseHandler.db(menstruationTable);
+  static Future<void> updateCycle(CycleModel allCycle) async {
+    final db = await DatabaseHandler.db(cycleTable);
 
     await db.update(
-      menstruationTable,
-      menstruation.toJson(),
-      where: 'startTime = ? AND endTime = ?',
-      whereArgs: [menstruation.startTime, menstruation.endTime],
+      cycleTable,
+      allCycle.toJson(),
+      where: 'cycleStartTime = ?',
+      whereArgs: [allCycle.cycleStartTime],
     );
   }
 
   // Delete
-  static Future<void> deleteMenstruation(int startTime, int endTime) async {
-    final db = await DatabaseHandler.db(menstruationTable);
+  static Future<void> deleteCycle(int cycleStartTime) async {
+    final db = await DatabaseHandler.db(cycleTable);
     try {
       await db.delete(
-          menstruationTable,
-          where: 'startTime = ? AND endTime = ?',
-          whereArgs: [startTime, endTime]);
+          cycleTable,
+          where: 'cycleStartTime = ?',
+          whereArgs: [cycleStartTime]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
   }
 
-  static Future<void> deleteAllMenstruation() async {
-    final db = await DatabaseHandler.db(menstruationTable);
+  static Future<void> deleteAllCycle() async {
+    final db = await DatabaseHandler.db(cycleTable);
     try {
       await db.delete(
-          menstruationTable
+          cycleTable
       );
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
