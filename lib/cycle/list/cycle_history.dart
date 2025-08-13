@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:women_diary/_gen/assets.gen.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/common/widgets/empty_view.dart';
 import 'package:women_diary/cycle/bloc/cycle_bloc.dart';
 import 'package:women_diary/cycle/bloc/cycle_event.dart';
@@ -44,10 +45,12 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
         actions: [
           IconButton(
             onPressed: () {
-              context.navigateTo(
+              context
+                  .navigateTo(
                 RoutesName.cycleCalendar,
                 arguments: context.read<CycleBloc>().cycleList,
-              ).then((_) {
+              )
+                  .then((_) {
                 context.read<CycleBloc>().add(const LoadAllCycleEvent());
               });
             },
@@ -75,11 +78,8 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
   }
 
   Widget _buildCycleList(List<CycleModel> list) {
-    // Tìm chu kỳ dài nhất để so sánh
     final maxDays = list
-        .map((e) => e.cycleEndTime != null
-        ? e.cycleEndTime!.difference(e.cycleStartTime).inDays + 1
-        : 0)
+        .map((e) => e.cycleEndTime.difference(e.cycleStartTime).inDays + 1)
         .fold<int>(0, (prev, e) => e > prev ? e : prev);
 
     return ListView.separated(
@@ -88,17 +88,20 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
       separatorBuilder: (_, __) => const SizedBox(height: 14),
       itemBuilder: (context, index) {
         final cycle = list[index];
-        final cycleDays = cycle.cycleEndTime != null
-            ? cycle.cycleEndTime!.difference(cycle.cycleStartTime).inDays + 1
-            : null;
-        final menstruationDays = cycle.menstruationEndTime != null
-            ? cycle.menstruationEndTime!.difference(cycle.cycleStartTime).inDays + 1
-            : null;
 
-        // Tính tỷ lệ % để vẽ progress
-        final progress = cycleDays != null && maxDays > 0
+        // Giữ nguyên công thức từ file cũ
+        final int? cycleDays = cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
+
+        final int? menstruationDays = cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
+
+        final double totalRatio = (cycleDays != null && maxDays > 0)
             ? cycleDays / maxDays
-            : 0.0;
+            : 0;
+        final double menstruationRatio = (menstruationDays != null && maxDays > 0)
+            ? menstruationDays / maxDays
+            : 0;
+
+        final bool isLongest = (cycleDays != null && cycleDays == maxDays);
 
         return Slidable(
           key: ValueKey(cycle.cycleStartTime.millisecondsSinceEpoch),
@@ -127,26 +130,33 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
             },
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.pink.shade50,
-                borderRadius: BorderRadius.circular(18),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: isLongest
+                    ? Border.all(color: Colors.pink.shade200, width: 1.5)
+                    : null,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.pink.shade100.withOpacity(0.3),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  )
+                    color: Colors.pink.shade100.withAlpha(70),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
                 ],
               ),
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Ngày
+                  // Header
                   Row(
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.pink.shade100,
+                          gradient: LinearGradient(
+                            colors: [Colors.pink.shade200, Colors.pink.shade50],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
                           shape: BoxShape.circle,
                         ),
                         padding: const EdgeInsets.all(10),
@@ -156,7 +166,7 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
                       Expanded(
                         child: Text(
                           '${dateFormat.format(cycle.cycleStartTime)} - '
-                              '${cycle.cycleEndTime != null ? dateFormat.format(cycle.cycleEndTime!) : "..."}',
+                              '${ dateFormat.format(cycle.cycleEndTime)}',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -166,40 +176,90 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  // Progress
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 10,
-                      backgroundColor: Colors.pink.shade100.withOpacity(0.4),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Colors.pinkAccent.shade100,
-                      ),
-                    ),
+                  const SizedBox(height: 12),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      const double minLabelWidth = 28.0;
+
+                      final totalWidth = constraints.maxWidth;
+                      final rawCycleWidth = totalWidth * totalRatio;
+                      final rawMensWidth = totalWidth * menstruationRatio;
+                      final double cycleWidth = rawCycleWidth.isFinite
+                          ? rawCycleWidth.clamp(0.0, totalWidth)
+                          : 0.0;
+                      double mensWidth = rawMensWidth.isFinite ? rawMensWidth : 0.0;
+                      if (mensWidth > cycleWidth) mensWidth = cycleWidth;
+
+                      final double remainingWidth = (cycleWidth - mensWidth).clamp(0.0, totalWidth);
+
+                      return Container(
+                        height: 18,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          color: Colors.grey.shade200,
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: Row(
+                          children: [
+                            // Menstruation segment (hồng đậm)
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 600),
+                              curve: Curves.easeOutCubic,
+                              width: mensWidth,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Colors.red.shade200, Colors.pink.shade200],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                              ),
+                              child: (menstruationDays != null && menstruationDays > 0 && mensWidth >= minLabelWidth)
+                                  ? Center(
+                                child: Text(
+                                  '${menstruationDays}d',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              )
+                                  : const SizedBox.shrink(),
+                            ),
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 600),
+                              curve: Curves.easeOutCubic,
+                              width: remainingWidth,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Colors.pink.shade100, Colors.pink.shade50],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                              ),
+                              child: (cycleDays != null && remainingWidth >= minLabelWidth)
+                                  ? Center(
+                                child: Text(
+                                  '${cycleDays - (menstruationDays ?? 0)}d',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Colors.grey.shade700,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              )
+                                  : const SizedBox.shrink(),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 8),
-                  // Info ngày
-                  Text(
-                    'Chu kỳ: ${cycleDays ?? "--"} ngày • '
-                        'Hành kinh: ${menstruationDays ?? "--"} ngày',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade700,
-                    ),
-                  ),
-                  if (cycleDays == maxDays)
+                  if (isLongest)
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        '🌟 Dài nhất',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.pink.shade400,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      child: Text('🌟 Chu kỳ dài nhất').text13().w600().customColor(Colors.pink.shade400),
                     ),
                 ],
               ),
