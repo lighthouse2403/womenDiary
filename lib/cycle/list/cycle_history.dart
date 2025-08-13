@@ -240,7 +240,7 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
                               child: (cycleDays != null && remainingWidth >= minLabelWidth)
                                   ? Center(
                                 child: Text(
-                                  '${cycleDays - (menstruationDays ?? 0)}d',
+                                  '${cycleDays}d',
                                   style: TextStyle(
                                     fontSize: 10,
                                     color: Colors.grey.shade700,

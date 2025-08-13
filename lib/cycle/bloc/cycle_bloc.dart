@@ -35,44 +35,28 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
       // --- Tính chu kỳ trung bình --
       bool isUsingAverage = LocalStorageService.isUsingAverageValue();
       int averageCycleLength = LocalStorageService.getCycleLength();
-      int averageMenstruationLength = LocalStorageService.getMenstruationLength();
 
       if ((cycleList.length > 1) && isUsingAverage) {
         int totalCycleDays = 0;
-        int totalMenstruationDays = 0;
         int countCycle = 0;
-        int countMenstruation = 0;
 
         for (var cycle in cycleList) {
-          if (cycle.cycleStartTime != null && cycle.cycleEndTime != null) {
-            totalCycleDays += cycle.cycleEndTime
-                .difference(cycle.cycleStartTime)
-                .inDays + 1;
-            countCycle++;
-          }
-
-          if (cycle.cycleStartTime != null && cycle.menstruationEndTime != null) {
-            totalMenstruationDays += cycle.menstruationEndTime
-                .difference(cycle.cycleStartTime)
-                .inDays + 1;
-            countMenstruation++;
-          }
+          totalCycleDays += cycle.cycleEndTime
+              .difference(cycle.cycleStartTime)
+              .inDays + 1;
+          countCycle++;
         }
 
         if (countCycle > 0) {
           averageCycleLength = (totalCycleDays / countCycle).round();
         }
 
-        if (countMenstruation > 0) {
-          averageMenstruationLength = (totalMenstruationDays / countMenstruation).round();
-        }
         LocalStorageService.updateAverageCycleLength(averageCycleLength);
-        LocalStorageService.updateAverageMenstruationLength(averageMenstruationLength);
       }
 
-      event.newCycle.cycleEndTime = event.newCycle.cycleStartTime.add(Duration(days: averageCycleLength));
-      event.newCycle.menstruationEndTime = event.newCycle.cycleStartTime.add(Duration(days: averageMenstruationLength));
+      event.newCycle.cycleEndTime = event.newCycle.cycleStartTime.add(Duration(days: averageCycleLength -1));
 
+      print('newCycle: ${event.newCycle.toJson()}');
       // Lưu cycle mới
       await DatabaseHandler.insertCycle(event.newCycle);
       cycleList.add(event.newCycle);
