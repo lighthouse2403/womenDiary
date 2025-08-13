@@ -49,7 +49,8 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
       backgroundColor: Colors.pink[50],
       appBar: BaseAppBar(
         backgroundColor: Colors.pink[200],
-        title: "Nhật ký chu kỳ",
+        title: "Chu kỳ",
+        hasBack: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),

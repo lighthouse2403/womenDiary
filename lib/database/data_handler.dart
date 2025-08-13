@@ -42,9 +42,9 @@ class DatabaseHandler {
     );
   }
 
-  static Future<CycleModel> getCycle(int cycleStartTime) async {
+  static Future<CycleModel> getCycle(String id) async {
     final db = await DatabaseHandler.db(cycleTable);
-    final List<Map<String, dynamic>> maps = await db.query(cycleTable, where: 'cycleStartTime = ?', whereArgs: [cycleStartTime]);
+    final List<Map<String, dynamic>> maps = await db.query(cycleTable, where: 'id = ?', whereArgs: [id]);
     return CycleModel.fromDatabase(maps.first);
   }
 
@@ -56,14 +56,14 @@ class DatabaseHandler {
     return allCycle;
   }
 
-  static Future<void> updateCycle(CycleModel allCycle) async {
+  static Future<void> updateCycle(CycleModel existCycle) async {
     final db = await DatabaseHandler.db(cycleTable);
 
     await db.update(
       cycleTable,
-      allCycle.toJson(),
-      where: 'cycleStartTime = ?',
-      whereArgs: [allCycle.cycleStartTime],
+      existCycle.toJson(),
+      where: 'id = ?',
+      whereArgs: [existCycle.id],
     );
   }
 

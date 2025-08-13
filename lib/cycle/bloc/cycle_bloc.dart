@@ -24,6 +24,12 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
 
   Future<void> _createCycle(CreateCycleEvent event, Emitter<CycleState> emit) async {
     try {
+      if (cycleList.isNotEmpty) {
+        CycleModel lastCycle = cycleList.first;
+        lastCycle.cycleEndTime = event.newCycle.cycleEndTime.subtract(Duration(days: 1));
+        await DatabaseHandler.updateCycle(lastCycle);
+
+      }
       await DatabaseHandler.insertCycle(event.newCycle);
       cycleList.add(event.newCycle);
       emit(LoadedAllCycleState(cycleList));
