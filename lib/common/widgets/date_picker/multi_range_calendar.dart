@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/extension/date_time_extension.dart';
-import 'package:women_diary/common/extension/font_size_extension.dart';
-import 'package:women_diary/common/extension/font_weight_extension.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 
@@ -67,10 +65,23 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
 
   Widget _buildMonthView(DateTime month) {
     final daysInMonth = DateUtils.getDaysInMonth(month.year, month.month);
+    final firstWeekday = DateTime(month.year, month.month, 1).weekday; // Thứ của ngày đầu tiên
+    final dayHeaders = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+
+    // Tạo danh sách ngày, bao gồm các ô trống trước ngày 1
+    final totalCells = daysInMonth + (firstWeekday - 1);
+    final cells = List<DateTime?>.generate(totalCells, (index) {
+      final dayNum = index - (firstWeekday - 2);
+      if (dayNum > 0 && dayNum <= daysInMonth) {
+        return DateTime(month.year, month.month, dayNum);
+      }
+      return null;
+    });
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Tiêu đề tháng
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
@@ -89,6 +100,28 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
           ),
           child: Text(month.globalMonthFormat('vi')).text18().w700().pinkColor(),
         ),
+
+        // Hàng tiêu đề thứ
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: Row(
+            children: List.generate(7, (index) {
+              return Expanded(
+                child: Center(
+                  child: Text(
+                    dayHeaders[index],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+
+        // Lưới các ngày
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -98,15 +131,19 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
             mainAxisSpacing: 4,
             crossAxisSpacing: 4,
           ),
-          itemCount: daysInMonth,
-          itemBuilder: (context, dayIndex) {
-            final day = DateTime(month.year, month.month, dayIndex + 1);
+          itemCount: cells.length,
+          itemBuilder: (context, index) {
+            final day = cells[index];
+            if (day == null) {
+              return const SizedBox.shrink();
+            }
             return _buildDayCell(day);
           },
         ),
       ],
     );
   }
+
 
   Widget _buildDayCell(DateTime day) {
     bool isInRange = false;
