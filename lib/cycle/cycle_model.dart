@@ -39,6 +39,7 @@ class CycleModel {
     note = json['note'];
     cycleStartTime = DateTime.fromMillisecondsSinceEpoch(json['cycleStartTime'] as int);
     cycleEndTime = DateTime.fromMillisecondsSinceEpoch(json['cycleEndTime'] as int);
+    menstruationEndTime = DateTime.fromMillisecondsSinceEpoch(json['menstruationEndTime'] as int);
     createdTime = DateTime.fromMillisecondsSinceEpoch(json['createdTime'] as int);
     updatedTime = DateTime.fromMillisecondsSinceEpoch(json['updatedTime'] as int);
   }

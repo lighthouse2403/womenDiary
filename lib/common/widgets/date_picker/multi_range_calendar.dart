@@ -6,7 +6,7 @@ import 'package:women_diary/cycle/cycle_model.dart';
 class MultiRangeCalendar extends StatefulWidget {
   final List<CycleModel> initialRanges;
   final void Function(CycleModel) onAddRange;
-  final void Function(String) onDeleteRange; // xóa theo id
+  final void Function(String) onDeleteRange;
 
   const MultiRangeCalendar({
     super.key,
@@ -21,6 +21,21 @@ class MultiRangeCalendar extends StatefulWidget {
 
 class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
   DateTime? _pendingStart;
+  late List<CycleModel> _ranges; // list cục bộ để hiển thị ngay
+
+  @override
+  void didUpdateWidget(covariant MultiRangeCalendar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialRanges != widget.initialRanges) {
+      _ranges = List.from(widget.initialRanges);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _ranges = List.from(widget.initialRanges);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,15 +54,12 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
       ),
       body: ListView.builder(
         itemCount: months.length,
-        itemBuilder: (context, index) {
-          final month = months[index];
-          return _rowInMonth(month);
-        },
+        itemBuilder: (context, index) => _buildMonthView(months[index]),
       ),
     );
   }
 
-  Widget _rowInMonth(DateTime month) {
+  Widget _buildMonthView(DateTime month) {
     final daysInMonth = DateUtils.getDaysInMonth(month.year, month.month);
 
     return Column(
@@ -68,83 +80,20 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
           ),
           itemCount: daysInMonth,
           itemBuilder: (context, dayIndex) {
-            return _gridCell(dayIndex, month);
+            final day = DateTime(month.year, month.month, dayIndex + 1);
+            return _buildDayCell(day);
           },
-        )
+        ),
       ],
     );
   }
 
-  bool _isSameDay(DateTime a, DateTime b) =>
-      a.year == b.year && a.month == b.month && a.day == b.day;
-
-  bool _isInRange(DateTime day, CycleModel range) =>
-      !day.isBefore(range.cycleStartTime) &&
-          !day.isAfter(range.menstruationEndTime);
-
-  String? _findRangeId(DateTime day) {
-    for (final r in widget.initialRanges) {
-      if (_isInRange(day, r)) return r.id;
-    }
-    return null;
-  }
-
-  void _onDayTapped(DateTime date) {
-    debugPrint('MultiRangeCalendar: tapped $date');
-
-    final rangeId = _findRangeId(date);
-
-    if (rangeId != null) {
-      // Xóa range đã chọn
-      _pendingStart = null;
-      widget.onDeleteRange(rangeId);
-      return;
-    }
-
-    if (_pendingStart == null) {
-      // Bắt đầu chọn
-      _pendingStart = DateTime(date.year, date.month, date.day);
-    } else {
-      // Hoàn thành range
-      final start = _pendingStart!;
-      final d1 = DateTime(start.year, start.month, start.day);
-      final d2 = DateTime(date.year, date.month, date.day);
-
-      final cycleStartTime = d1.isBefore(d2) ? d1 : d2;
-      final menstruationEndTime = d1.isAfter(d2) ? d1 : d2;
-      final cycleEndTime = DateTime(cycleStartTime.year, cycleStartTime.month,
-          cycleStartTime.day)
-          .add(const Duration(days: 30));
-
-      final newRange = CycleModel.startCycle(
-        cycleStartTime,
-        cycleEndTime,
-        menstruationEndTime,
-      );
-
-      _pendingStart = null;
-      widget.onAddRange(newRange);
-    }
-  }
-
-  void _resetRanges() {
-    for (var r in widget.initialRanges) {
-      widget.onDeleteRange(r.id);
-    }
-    _pendingStart = null;
-  }
-
-  List<DateTime> _generateMonths(DateTime from, int count) {
-    return List.generate(count, (i) => DateTime(from.year, from.month + i, 1));
-  }
-
-  Widget _gridCell(int dayIndex, DateTime month) {
-    final day = DateTime(month.year, month.month, dayIndex + 1);
+  Widget _buildDayCell(DateTime day) {
     bool isInRange = false;
     bool isStart = false;
     bool isEnd = false;
 
-    for (final r in widget.initialRanges) {
+    for (final r in _ranges) {
       if (_isInRange(day, r)) {
         isInRange = true;
         if (_isSameDay(day, r.cycleStartTime)) isStart = true;
@@ -184,5 +133,78 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
         ),
       ),
     );
+  }
+
+  bool _isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+
+  bool _isInRange(DateTime day, CycleModel range) =>
+      !day.isBefore(range.cycleStartTime) &&
+          !day.isAfter(range.menstruationEndTime);
+
+  String? _findRangeId(DateTime day) {
+    for (final r in _ranges) {
+      if (_isInRange(day, r)) return r.id;
+    }
+    return null;
+  }
+
+  void _onDayTapped(DateTime date) {
+    final rangeId = _findRangeId(date);
+
+    if (rangeId != null) {
+      // Xóa range đã chọn
+      setState(() {
+        _pendingStart = null;
+        _ranges.removeWhere((r) => r.id == rangeId);
+      });
+      widget.onDeleteRange(rangeId);
+      return;
+    }
+
+    if (_pendingStart == null) {
+      // Bắt đầu chọn
+      setState(() {
+        _pendingStart = DateTime(date.year, date.month, date.day);
+      });
+    } else {
+      // Hoàn thành range
+      final start = _pendingStart!;
+      final firstDay =
+      start.isBefore(date) ? start : DateTime(date.year, date.month, date.day);
+      final lastDay =
+      start.isAfter(date) ? start : DateTime(date.year, date.month, date.day);
+
+      final cycleStartTime = firstDay;
+      final menstruationEndTime = lastDay;
+      final cycleEndTime = cycleStartTime.add(const Duration(days: 30));
+
+      final newRange = CycleModel.startCycle(
+        cycleStartTime,
+        cycleEndTime,
+        menstruationEndTime,
+      );
+
+      setState(() {
+        _pendingStart = null;
+        _ranges.add(newRange);
+      });
+
+      widget.onAddRange(newRange);
+    }
+  }
+
+  void _resetRanges() {
+    setState(() {
+      for (var r in _ranges) {
+        widget.onDeleteRange(r.id);
+      }
+      _ranges.clear();
+      _pendingStart = null;
+    });
+  }
+
+  List<DateTime> _generateMonths(DateTime from, int count) {
+    return List.generate(count, (i) => DateTime(from.year, from.month + i, 1));
   }
 }

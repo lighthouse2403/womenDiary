@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/common/widgets/date_picker/multi_range_calendar.dart';
 import 'package:women_diary/cycle/bloc/cycle_bloc.dart';
 import 'package:women_diary/cycle/bloc/cycle_event.dart';
 import 'package:women_diary/cycle/bloc/cycle_state.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
-import 'package:women_diary/database/data_handler.dart';
 
 class CycleCalendar extends StatelessWidget {
   const CycleCalendar({super.key});
@@ -14,7 +12,7 @@ class CycleCalendar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => CycleBloc()..add(LoadAllCycleEvent()),
+      create: (_) => CycleBloc(),
       child: const _CycleCalendarView(),
     );
   }
@@ -32,20 +30,21 @@ class _CycleCalendarViewState extends State<_CycleCalendarView> {
   @override
   initState() {
     super.initState();
+    context.read<CycleBloc>().add(LoadAllCycleEvent());
   }
 
   @override
   Widget build(BuildContext context) {
 
     return BlocBuilder<CycleBloc, CycleState>(
+      buildWhen: (pre, current) => current is LoadedAllCycleState,
       builder: (context, state) {
+        print(state);
         List<CycleModel> cycles = state is LoadedAllCycleState ? state.cycleList : [];
-        print('initialRanges: ${cycles.length}');
 
         return MultiRangeCalendar(
           initialRanges: cycles,
           onAddRange: (range) {
-            print('onAddRange: ${range.cycleStartTime} - ${range.menstruationEndTime}');
             context.read<CycleBloc>().add(CreateCycleEvent(range));
           },
           onDeleteRange: (rangeId) {

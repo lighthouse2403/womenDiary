@@ -9,7 +9,7 @@ class CycleRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final duration = cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
+    final duration = cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -28,7 +28,7 @@ class CycleRow extends StatelessWidget {
               const Icon(Icons.water_drop_outlined, color: Colors.pink, size: 20),
               const SizedBox(width: 8),
               Text(
-                'Giai đoạn hành kinh (${duration} ngày)',
+                'Chu kỳ (${duration} ngày)',
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.pink.shade800,
@@ -45,7 +45,7 @@ class CycleRow extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '${cycle.cycleStartTime.globalDateFormat()} → ${cycle.cycleEndTime.globalDateFormat()}',
+                  '${cycle.cycleStartTime.globalDateFormat()} → ${cycle.menstruationEndTime.globalDateFormat()}',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: Colors.grey.shade800,
                   ),
