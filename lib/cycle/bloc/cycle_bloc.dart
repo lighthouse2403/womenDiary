@@ -3,6 +3,7 @@ import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/cycle/bloc/cycle_event.dart';
 import 'package:women_diary/cycle/bloc/cycle_state.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
+import 'package:women_diary/database/local_storage_service.dart';
 
 class CycleBloc extends Bloc<CycleEvent, CycleState> {
   List<CycleModel> cycleList = [];
@@ -26,14 +27,59 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
     try {
       if (cycleList.isNotEmpty) {
         CycleModel lastCycle = cycleList.first;
-        lastCycle.cycleEndTime = event.newCycle.cycleEndTime.subtract(Duration(days: 1));
+        lastCycle.cycleEndTime =
+            event.newCycle.cycleEndTime.subtract(const Duration(days: 1));
         await DatabaseHandler.updateCycle(lastCycle);
-
       }
+
+      // --- Tính chu kỳ trung bình --
+      bool isUsingAverage = LocalStorageService.isUsingAverageValue();
+      int averageCycleLength = LocalStorageService.getCycleLength();
+      int averageMenstruationLength = LocalStorageService.getMenstruationLength();
+
+      if ((cycleList.length > 1) && isUsingAverage) {
+        int totalCycleDays = 0;
+        int totalMenstruationDays = 0;
+        int countCycle = 0;
+        int countMenstruation = 0;
+
+        for (var cycle in cycleList) {
+          if (cycle.cycleStartTime != null && cycle.cycleEndTime != null) {
+            totalCycleDays += cycle.cycleEndTime
+                .difference(cycle.cycleStartTime)
+                .inDays + 1;
+            countCycle++;
+          }
+
+          if (cycle.cycleStartTime != null && cycle.menstruationEndTime != null) {
+            totalMenstruationDays += cycle.menstruationEndTime
+                .difference(cycle.cycleStartTime)
+                .inDays + 1;
+            countMenstruation++;
+          }
+        }
+
+        if (countCycle > 0) {
+          averageCycleLength = (totalCycleDays / countCycle).round();
+        }
+
+        if (countMenstruation > 0) {
+          averageMenstruationLength = (totalMenstruationDays / countMenstruation).round();
+        }
+        LocalStorageService.updateAverageCycleLength(averageCycleLength);
+        LocalStorageService.updateAverageMenstruationLength(averageMenstruationLength);
+      }
+
+
+      // Lưu cycle mới
       await DatabaseHandler.insertCycle(event.newCycle);
       cycleList.add(event.newCycle);
+
+
+
       emit(LoadedAllCycleState(cycleList));
     } catch (error) {
+      // có thể emit state lỗi
     }
   }
 
