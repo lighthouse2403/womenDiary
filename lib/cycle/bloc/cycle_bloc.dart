@@ -70,12 +70,12 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
         LocalStorageService.updateAverageMenstruationLength(averageMenstruationLength);
       }
 
+      event.newCycle.cycleEndTime = event.newCycle.cycleStartTime.add(Duration(days: averageCycleLength));
+      event.newCycle.menstruationEndTime = event.newCycle.cycleStartTime.add(Duration(days: averageMenstruationLength));
 
       // Lưu cycle mới
       await DatabaseHandler.insertCycle(event.newCycle);
       cycleList.add(event.newCycle);
-
-
 
       emit(LoadedAllCycleState(cycleList));
     } catch (error) {
