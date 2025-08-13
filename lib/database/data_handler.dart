@@ -52,7 +52,7 @@ class DatabaseHandler {
     final db = await DatabaseHandler.db(cycleTable);
     final List<Map<String, dynamic>> list = await db.query(cycleTable);
     List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
-    allCycle.sort((a, b) => a.cycleStartTime.compareTo(b.cycleStartTime));
+    allCycle.sort((a, b) => b.cycleStartTime.compareTo(a.cycleStartTime));
     return allCycle;
   }
 

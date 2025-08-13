@@ -46,8 +46,8 @@ class CycleModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['note'] = note;
     data['id'] = id;
+    data['note'] = note;
     data['cycleStartTime'] = cycleStartTime.millisecondsSinceEpoch;
     data['cycleEndTime'] = cycleEndTime.millisecondsSinceEpoch;
     data['menstruationEndTime'] = menstruationEndTime.millisecondsSinceEpoch;
