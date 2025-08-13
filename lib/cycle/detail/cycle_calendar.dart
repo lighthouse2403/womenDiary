@@ -41,14 +41,13 @@ class _CycleCalendarViewState extends State<_CycleCalendarView> {
       builder: (context, state) {
         print(state);
         List<CycleModel> cycles = state is LoadedAllCycleState ? state.cycleList : [];
-
         return MultiRangeCalendar(
           initialRanges: cycles,
           onAddRange: (range) {
             context.read<CycleBloc>().add(CreateCycleEvent(range));
           },
           onDeleteRange: (rangeId) {
-            // context.read<CycleBloc>().add(DeleteCycleEvent(rangeId));
+            context.read<CycleBloc>().add(DeleteCycleEvent(rangeId));
           },
         );
         },

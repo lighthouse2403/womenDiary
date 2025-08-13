@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:women_diary/common/base/base_app_bar.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
+import 'package:women_diary/common/extension/font_size_extension.dart';
+import 'package:women_diary/common/extension/font_weight_extension.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 
@@ -21,7 +24,13 @@ class MultiRangeCalendar extends StatefulWidget {
 
 class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
   DateTime? _pendingStart;
-  late List<CycleModel> _ranges; // list cục bộ để hiển thị ngay
+  late List<CycleModel> _ranges;
+
+  @override
+  void initState() {
+    super.initState();
+    _ranges = List.from(widget.initialRanges);
+  }
 
   @override
   void didUpdateWidget(covariant MultiRangeCalendar oldWidget) {
@@ -32,22 +41,18 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _ranges = List.from(widget.initialRanges);
-  }
-
-  @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final months = _generateMonths(DateTime(now.year, now.month - 6, 1), 13);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Cycle history"),
+      backgroundColor: Colors.pink[50],
+      appBar: BaseAppBar(
+        backgroundColor: Colors.pink[200],
+        title: "Nhật ký chu kỳ",
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: _resetRanges,
           )
         ],
@@ -65,14 +70,28 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-          child: Text(DateFormat('MMMM yyyy').format(month)).text18().w700(),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.pink[100],
+            borderRadius: const BorderRadius.only(
+              topRight: Radius.circular(20),
+              bottomRight: Radius.circular(20),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.pink.shade100.withAlpha(80),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Text(month.globalMonthFormat('vi')).text18().w700().pinkColor(),
         ),
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.all(8),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 7,
             mainAxisSpacing: 4,
@@ -105,31 +124,44 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
     final isToday = _isSameDay(day, DateTime.now());
     final isPending = _pendingStart != null && _isSameDay(_pendingStart!, day);
 
-    final dateColor = (isStart || isEnd || isInRange || isPending)
-        ? Colors.white
-        : Colors.black87;
+    Color? bgColor;
+    Color textColor = Colors.black87;
+
+    if (isStart) {
+      bgColor = Colors.pink[400];
+      textColor = Colors.white;
+    } else if (isEnd) {
+      bgColor = Colors.pink[300];
+      textColor = Colors.white;
+    } else if (isInRange) {
+      bgColor = Colors.pink[100];
+      textColor = Colors.white;
+    } else if (isPending) {
+      bgColor = Colors.orange[200];
+      textColor = Colors.white;
+    }
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(100),
         onTap: () => _onDayTapped(day),
         child: Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: isStart || isEnd
-                ? Colors.blue
-                : isInRange
-                ? Colors.blue.withAlpha(70)
-                : isPending
-                ? Colors.orange.withAlpha(70)
-                : null,
+            color: bgColor,
+            borderRadius: BorderRadius.circular(100),
             border: isToday
-                ? Border.all(color: Colors.red, width: 1.5)
-                : Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(6),
+                ? Border.all(color: Colors.redAccent, width: 2)
+                : Border.all(color: Colors.transparent),
           ),
-          child: Text('${day.day}').customColor(dateColor),
+          child: Text(
+            '${day.day}',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: textColor,
+            ),
+          ),
         ),
       ),
     );
@@ -153,7 +185,6 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
     final rangeId = _findRangeId(date);
 
     if (rangeId != null) {
-      // Xóa range đã chọn
       setState(() {
         _pendingStart = null;
         _ranges.removeWhere((r) => r.id == rangeId);
@@ -163,26 +194,20 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
     }
 
     if (_pendingStart == null) {
-      // Bắt đầu chọn
       setState(() {
         _pendingStart = DateTime(date.year, date.month, date.day);
       });
     } else {
-      // Hoàn thành range
       final start = _pendingStart!;
       final firstDay =
       start.isBefore(date) ? start : DateTime(date.year, date.month, date.day);
       final lastDay =
       start.isAfter(date) ? start : DateTime(date.year, date.month, date.day);
 
-      final cycleStartTime = firstDay;
-      final menstruationEndTime = lastDay;
-      final cycleEndTime = cycleStartTime.add(const Duration(days: 30));
-
       final newRange = CycleModel.startCycle(
-        cycleStartTime,
-        cycleEndTime,
-        menstruationEndTime,
+        firstDay,
+        firstDay.add(const Duration(days: 30)),
+        lastDay,
       );
 
       setState(() {

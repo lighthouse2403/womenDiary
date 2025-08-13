@@ -16,6 +16,11 @@ extension DateTimeExtension on DateTime {
     return _dateFormat(dateFormat);
   }
 
+
+  String globalMonthFormat(String language) {
+    return DateFormat('MMMM yyyy', language).format(this);
+  }
+
   String globalTimeFormat() {
     String dateFormat = 'HH:mm';
     return _dateFormat(dateFormat);
