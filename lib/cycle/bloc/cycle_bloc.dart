@@ -55,6 +55,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
       }
 
       event.newCycle.cycleEndTime = event.newCycle.cycleStartTime.add(Duration(days: averageCycleLength -1));
+
       // Lưu cycle mới
       await DatabaseHandler.insertCycle(event.newCycle);
       cycleList.add(event.newCycle);

@@ -56,6 +56,14 @@ class DatabaseHandler {
     return allCycle;
   }
 
+  static Future<CycleModel?> getLastCycle() async {
+    final db = await DatabaseHandler.db(cycleTable);
+    final List<Map<String, dynamic>> list = await db.query(cycleTable);
+    List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
+    allCycle.sort((a, b) => b.cycleStartTime.compareTo(a.cycleStartTime));
+    return allCycle.firstOrNull;
+  }
+
   static Future<void> updateCycle(CycleModel existCycle) async {
     final db = await DatabaseHandler.db(cycleTable);
 

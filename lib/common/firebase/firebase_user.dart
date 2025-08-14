@@ -4,6 +4,9 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 import 'package:women_diary/database/local_storage_service.dart';
+import 'dart:ui' as ui;
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:network_info_plus/network_info_plus.dart';
 
 class FirebaseUser {
   FirebaseUser._();
@@ -19,6 +22,7 @@ class FirebaseUser {
     var averageCycleLength = LocalStorageService.getAverageCycleLength();
     var menstruationLength = LocalStorageService.getMenstruationLength();
     var averageMenstruationLength = LocalStorageService.getAverageMenstruationLength();
+    final locale = ui.PlatformDispatcher.instance.locale;
 
     if (!docSnapshot.exists) {
       users.doc(deviceInfo[2]).set({
@@ -29,6 +33,8 @@ class FirebaseUser {
         'averageCycle': averageCycleLength,
         'averageMenstruation': averageMenstruationLength,
         'deviceId': deviceInfo[2],
+        'language': locale.languageCode,
+        'region': locale.countryCode,
         'firstTime': FieldValue.serverTimestamp()
       }).then((value) => print("User Added"))
           .catchError((error) => print("Failed to add user: $error"));
@@ -45,6 +51,7 @@ class FirebaseUser {
         .then((_) => print('Success'))
         .catchError((error) => print('Failed: $error'));
   }
+
 
   Future<List<String>> getDeviceDetails() async {
     String os = Platform.operatingSystem;
@@ -72,5 +79,60 @@ class FirebaseUser {
       print('Failed to get platform version');
     }
     return ['$os $osVersion', deviceName, identifier];
+  }
+
+  Future<Map<String, dynamic>> getFullDeviceInfo() async {
+    final deviceInfoPlugin = DeviceInfoPlugin();
+    final networkInfo = NetworkInfo();
+    final locale = ui.PlatformDispatcher.instance.locale;
+    final packageInfo = await PackageInfo.fromPlatform();
+    String identifier = LocalStorageService.getUuid();
+    String? ssid;
+    String? ip;
+
+    try {
+      ssid = await networkInfo.getWifiName();
+      ip = await networkInfo.getWifiIP();
+    } catch (_) {
+      ssid = null;
+      ip = null;
+    }
+
+    Map<String, dynamic> deviceData = {
+      'os': '${Platform.operatingSystem} ${Platform.operatingSystemVersion}',
+      'language': locale.languageCode,
+      'region': locale.countryCode,
+      'appVersion': packageInfo.version,
+      'buildNumber': packageInfo.buildNumber,
+      'wifiSSID': ssid,
+      'wifiIP': ip,
+    };
+
+    if (Platform.isAndroid) {
+      if (identifier.isEmpty) {
+        identifier = await Uuid().v6();
+        LocalStorageService.updateUuid(identifier);
+      }
+      final androidInfo = await deviceInfoPlugin.androidInfo;
+      deviceData.addAll({
+        'uuid': identifier,
+        'model': androidInfo.model,
+        'totalDiskSize': androidInfo.totalDiskSize,
+        'freeDiskSize': androidInfo.freeDiskSize,
+        'device': androidInfo.device,
+        'manufacturer': androidInfo.manufacturer,
+        'sdkInt': androidInfo.version.sdkInt,
+      });
+    } else if (Platform.isIOS) {
+      final iosInfo = await deviceInfoPlugin.iosInfo;
+      deviceData.addAll({
+        'uuid': iosInfo.identifierForVendor,
+        'model': iosInfo.modelName,
+        'totalDiskSize': iosInfo.totalDiskSize,
+        'freeDiskSize': iosInfo.freeDiskSize,
+      });
+    }
+
+    return deviceData;
   }
 }

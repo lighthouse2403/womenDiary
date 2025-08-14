@@ -16,28 +16,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void _onLoadLocalData(LoadCycleEvent event, Emitter<HomeState> emit) async {
-    int cycleLength = await LocalStorageService.getCycleLength();
-    int menstruationLength = await LocalStorageService.getMenstruationLength();
-    bool isUsingAverageValue = await LocalStorageService.isUsingAverageValue();
+    CycleModel? lastCycle = await DatabaseHandler.getLastCycle();
+    int cycleLength = lastCycle != null
+        ? lastCycle.cycleEndTime.difference(lastCycle.cycleStartTime).inDays
+        : await LocalStorageService.getCycleLength();
 
-    List<CycleModel> menstruationList = await DatabaseHandler.getAllCycle();
-    CycleModel lastMenstruation = menstruationList.first;
-    int currentDay = DateTime.now().difference(lastMenstruation.cycleStartTime).inDays;
+    int menstruationLength = lastCycle != null
+        ? lastCycle.menstruationEndTime.difference(lastCycle.cycleStartTime).inDays
+        : await LocalStorageService.getMenstruationLength();
 
-    if (isUsingAverageValue && menstruationList.length > 1) {
-      int numberOfCycle = 0;
-      int allMenstruationDay = 0;
-      menstruationList.forEach((menstruation) {
-        numberOfCycle += 1;
-        int numberOfMenstruation = menstruation.cycleEndTime.difference(menstruation.cycleStartTime).inDays;
-        allMenstruationDay += numberOfMenstruation;
-      });
-      menstruationLength = (allMenstruationDay/numberOfCycle).round();
-      cycleLength = (menstruationList.last.cycleStartTime.difference(menstruationList.first.cycleStartTime).inDays/(menstruationList.length - 1)).round();
-    }
+    int currentDay = DateTime.now().difference(lastCycle?.cycleStartTime ?? DateTime.now()).inDays;
 
     /// Show phase information
-    final phases = await _buildPhases();
+    final phases = await _buildPhases(cycleLength, menstruationLength);
     final currentPhase = phases.firstWhere((p) => cycleLength >= p.startDay && currentDay < p.startDay + p.days);
     final nextPhase = phases.firstWhere(
           (p) => p.startDay > currentDay,
@@ -65,7 +56,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
-  Future<List<PhaseModel>> _buildPhases() async {
+  Future<List<PhaseModel>> _buildPhases(int cycleLength, int menstruationLength) async {
     final int cycleLength = await LocalStorageService.getCycleLength();
     final int menstruationLength = await LocalStorageService.getMenstruationLength();
 
