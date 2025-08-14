@@ -41,7 +41,8 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: BaseAppBar(
-        title: 'Lịch sử kỳ kinh',
+        backgroundColor: Colors.pink[200],
+        title: 'Lịch sử',
         actions: [
           IconButton(
             onPressed: () {
@@ -57,7 +58,7 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
             icon: Assets.icons.add.svg(
               width: 28,
               height: 28,
-              colorFilter: ColorFilter.mode(AppColors.mainColor, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
             ),
           ),
         ],
