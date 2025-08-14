@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:women_diary/biometric_service.dart';
 import 'package:women_diary/database/local_storage_service.dart';
@@ -5,6 +6,7 @@ import 'package:women_diary/l10n/app_localizations.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 import 'package:women_diary/update_checker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AppStarter extends StatefulWidget {
   const AppStarter({super.key});
@@ -81,7 +83,7 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
               ),
             TextButton(
               onPressed: () {
-                // TODO: mở link store
+                _openStore();
               },
               child: const Text('Cập nhật ngay'),
             ),
@@ -131,4 +133,21 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
     final shouldStart = cycleLength == 0 || menstruationLength == 0;
     return shouldStart ? RoutesName.firstCycleInformation : RoutesName.home;
   }
+
+  Future<void> _openStore() async {
+    String url;
+    if (Platform.isAndroid) {
+      url = 'https://play.google.com/store/apps/details?id=com.example.app';
+    } else if (Platform.isIOS) {
+      url = 'https://apps.apple.com/app/id1234567890';
+    } else {
+      return;
+    }
+
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw Exception('Không thể mở store');
+    }
+  }
+
 }
