@@ -1,134 +1,104 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:local_auth/local_auth.dart';
+import 'package:women_diary/biometric_service.dart';
 import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/l10n/app_localizations.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
+import 'package:women_diary/update_checker.dart';
 
 class AppStarter extends StatefulWidget {
-  final bool useBiometric;
-
-  const AppStarter({super.key, required this.useBiometric});
+  const AppStarter({super.key});
 
   @override
   State<AppStarter> createState() => _AppStarterState();
 }
 
 class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
-  final LocalAuthentication _auth = LocalAuthentication();
   bool _unlocked = false;
-  bool _authInProgress = false;
-  bool _authFailed = false;
-  Timer? _timeoutTimer;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _startAuthenticationWithTimeout();
+    _runSecurityCheck();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _timeoutTimer?.cancel();
     super.dispose();
-  }
-
-  void _onAppResumed() {
-    if (widget.useBiometric && !_unlocked) {
-      _startAuthenticationWithTimeout();
-    }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _onAppResumed();
+      _runSecurityCheck();
     }
   }
 
-  void _startAuthenticationWithTimeout() {
-    if (!widget.useBiometric) {
-      setState(() => _unlocked = true);
+  Future<void> _runSecurityCheck() async {
+    final bioSuccess = await BiometricService().authenticate();
+    if (!bioSuccess) {
+      setState(() => _unlocked = false);
       return;
     }
 
-    _authFailed = false;
-    _unlocked = false;
-
-    _timeoutTimer?.cancel();
-    _timeoutTimer = Timer(const Duration(seconds: 5), () {
-      if (!_unlocked && mounted) {
-        setState(() => _authFailed = true);
-      }
-    });
-
-    Future.delayed(const Duration(milliseconds: 300), _authenticate);
-  }
-
-  Future<void> _authenticate() async {
-    if (_authInProgress) return;
-    _authInProgress = true;
-
-    try {
-      final canCheck = await _auth.canCheckBiometrics;
-      final isSupported = await _auth.isDeviceSupported();
-
-      if (!canCheck || !isSupported) {
-        setState(() {
-          _authFailed = true;
-          _unlocked = false;
-        });
-        return;
-      }
-
-      final didAuth = await _auth.authenticate(
-        localizedReason: 'Xác thực bằng Face ID hoặc Touch ID để tiếp tục',
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: false,
-          useErrorDialogs: true,
-        ),
-      );
-
-      if (didAuth) {
-        _timeoutTimer?.cancel();
-        setState(() {
-          _unlocked = true;
-          _authFailed = false;
-        });
-      } else {
-        setState(() {
-          _unlocked = false;
-          _authFailed = true;
-        });
-      }
-    } catch (e) {
-      debugPrint('Lỗi xác thực: $e');
-      setState(() {
-        _unlocked = false;
-        _authFailed = true;
-      });
-    } finally {
-      _authInProgress = false;
+    final updateStatus = await UpdateChecker().checkForUpdate();
+    if (updateStatus != UpdateStatus.none) {
+      _showUpdateDialog(updateStatus);
+      return;
     }
+
+    setState(() => _unlocked = true);
   }
 
-  Future<String> _determineInitialRoute() async {
-    final cycleLength = await LocalStorageService.getCycleLength();
-    final menstruationLength = await LocalStorageService.getMenstruationLength();
-
-    final shouldStart = cycleLength == 0 || menstruationLength == 0;
-    return shouldStart ? RoutesName.firstCycleInformation : RoutesName.home;
+  void _showUpdateDialog(UpdateStatus status) {
+    showDialog(
+      context: context,
+      barrierDismissible: status != UpdateStatus.force,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: Colors.pink[50],
+          title: Text(
+            status == UpdateStatus.force
+                ? 'Cập nhật bắt buộc'
+                : 'Có bản cập nhật mới',
+            style: const TextStyle(color: Colors.pink, fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            'Phiên bản mới mang lại nhiều cải tiến và trải nghiệm tốt hơn cho bạn.',
+            style: TextStyle(color: Colors.black87),
+          ),
+          actions: [
+            if (status == UpdateStatus.optional)
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() => _unlocked = true);
+                },
+                child: const Text('Để sau'),
+              ),
+            TextButton(
+              onPressed: () {
+                // TODO: mở link store
+              },
+              child: const Text('Cập nhật ngay'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     if (!_unlocked) {
-      return _buildLockedUI();
+      return const MaterialApp(
+        home: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      );
     }
 
     return FutureBuilder<String>(
@@ -155,31 +125,10 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildLockedUI() {
-    return MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.lock_outline, size: 64, color: Colors.grey),
-              const SizedBox(height: 20),
-              const Text('Ứng dụng đã bị khoá', style: TextStyle(fontSize: 18)),
-              const SizedBox(height: 20),
-              if (_authInProgress)
-                const CircularProgressIndicator()
-              else if (_authFailed)
-                ElevatedButton.icon(
-                  onPressed: _authenticate,
-                  icon: const Icon(Icons.fingerprint),
-                  label: const Text('Xác thực lại'),
-                )
-              else
-                const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
-    );
+  Future<String> _determineInitialRoute() async {
+    final cycleLength = await LocalStorageService.getCycleLength();
+    final menstruationLength = await LocalStorageService.getMenstruationLength();
+    final shouldStart = cycleLength == 0 || menstruationLength == 0;
+    return shouldStart ? RoutesName.firstCycleInformation : RoutesName.home;
   }
 }

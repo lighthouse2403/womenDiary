@@ -16,6 +16,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void _onLoadLocalData(LoadCycleEvent event, Emitter<HomeState> emit) async {
+    CycleModel? lastCycle = await DatabaseHandler.getLastCycle();
     int cycleLength = await LocalStorageService.getCycleLength();
     int menstruationLength = await LocalStorageService.getMenstruationLength();
     bool isUsingAverageValue = await LocalStorageService.isUsingAverageValue();
