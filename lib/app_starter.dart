@@ -17,12 +17,14 @@ class AppStarter extends StatefulWidget {
 
 class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
   bool _unlocked = false;
+  String? _initialRoute;
+  UpdateStatus? _pendingUpdate;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _runSecurityCheck();
+    _checkSecurityAndInit();
   }
 
   @override
@@ -34,18 +36,20 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _runSecurityCheck();
+      _checkSecurityAndInit();
     }
   }
 
-  Future<void> _runSecurityCheck() async {
-    // 1. Kiểm tra xem người dùng có bật biometric không
+  Future<void> _checkSecurityAndInit() async {
+    // 1. Check biometric if enabled
     final biometricEnabled = await LocalStorageService.checkUsingBiometric();
-
     if (biometricEnabled) {
       final bioSuccess = await BiometricService().authenticate();
       if (!bioSuccess) {
-        setState(() => _unlocked = false);
+        setState(() {
+          _unlocked = false;
+          _initialRoute = null;
+        });
         return;
       }
     }
@@ -53,92 +57,29 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
     // 2. Check update
     final updateStatus = await UpdateChecker().checkForUpdate();
     if (updateStatus != UpdateStatus.none) {
-      _showUpdateDialog(updateStatus);
-      return;
+      setState(() {
+        _pendingUpdate = updateStatus;
+      });
+      return; // không unlock ngay, chờ dialog xử lý
     }
 
-    // 3. Nếu qua hết các bước, unlock app
-    setState(() => _unlocked = true);
-  }
-
-  void _showUpdateDialog(UpdateStatus status) {
-    showDialog(
-      context: context,
-      barrierDismissible: status != UpdateStatus.force,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          backgroundColor: Colors.pink[50],
-          title: Text(
-            status == UpdateStatus.force
-                ? 'Cập nhật bắt buộc'
-                : 'Có bản cập nhật mới',
-            style: const TextStyle(color: Colors.pink, fontWeight: FontWeight.bold),
-          ),
-          content: const Text(
-            'Phiên bản mới mang lại nhiều cải tiến và trải nghiệm tốt hơn cho bạn.',
-            style: TextStyle(color: Colors.black87),
-          ),
-          actions: [
-            if (status == UpdateStatus.optional)
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  setState(() => _unlocked = true);
-                },
-                child: const Text('Để sau'),
-              ),
-            TextButton(
-              onPressed: () {
-                _openStore();
-              },
-              child: const Text('Cập nhật ngay'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_unlocked) {
-      return const MaterialApp(
-        home: Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
-      );
+    // 3. Determine initial route
+    final route = await _determineInitialRoute();
+    if (mounted) {
+      setState(() {
+        _unlocked = true;
+        _initialRoute = route;
+      });
     }
-
-    return FutureBuilder<String>(
-      future: _determineInitialRoute(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const MaterialApp(
-            home: Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            ),
-          );
-        }
-
-        final initialRoute = snapshot.data!;
-        final router = Routes.generateRouter(initialRoute);
-
-        return MaterialApp.router(
-          themeMode: ThemeMode.light,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          routerConfig: router,
-        );
-      },
-    );
   }
 
   Future<String> _determineInitialRoute() async {
     final cycleLength = await LocalStorageService.getCycleLength();
     final menstruationLength = await LocalStorageService.getMenstruationLength();
     final shouldStart = cycleLength == 0 || menstruationLength == 0;
-    return shouldStart ? RoutesName.firstCycleInformation : RoutesName.home;
+    return shouldStart
+        ? RoutesName.firstCycleInformation
+        : RoutesName.home;
   }
 
   Future<void> _openStore() async {
@@ -157,4 +98,84 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
     }
   }
 
+  void _showUpdateDialog(UpdateStatus status) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        barrierDismissible: status != UpdateStatus.force,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            backgroundColor: Colors.pink[50],
+            title: Text(
+              status == UpdateStatus.force
+                  ? 'Cập nhật bắt buộc'
+                  : 'Có bản cập nhật mới',
+              style: const TextStyle(
+                color: Colors.pink,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            content: const Text(
+              'Phiên bản mới mang lại nhiều cải tiến và trải nghiệm tốt hơn cho bạn.',
+              style: TextStyle(color: Colors.black87),
+            ),
+            actions: [
+              if (status == UpdateStatus.optional)
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _finishUnlock();
+                  },
+                  child: const Text('Để sau'),
+                ),
+              TextButton(
+                onPressed: _openStore,
+                child: const Text('Cập nhật ngay'),
+              ),
+            ],
+          );
+        },
+      );
+    });
+  }
+
+  void _finishUnlock() async {
+    final route = await _determineInitialRoute();
+    if (mounted) {
+      setState(() {
+        _unlocked = true;
+        _initialRoute = route;
+        _pendingUpdate = null;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final router = (_unlocked && _initialRoute != null)
+        ? Routes.generateRouter(_initialRoute!)
+        : null;
+
+    return MaterialApp.router(
+      themeMode: ThemeMode.light,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router ?? _loadingRouter(),
+      builder: (context, child) {
+        if (_pendingUpdate != null) {
+          // Show dialog sau khi đã có MaterialLocalizations
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _showUpdateDialog(_pendingUpdate!);
+          });
+        }
+        return child!;
+      },
+    );
+  }
+
+  RouterConfig<Object> _loadingRouter() {
+    return Routes.generateRouter(RoutesName.home);
+  }
 }
