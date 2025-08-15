@@ -9,33 +9,19 @@ class UpdateChecker {
   /// Kiểm tra trạng thái update
   Future<UpdateStatus> checkForUpdate() async {
     final packageInfo = await PackageInfo.fromPlatform();
-    final currentVersion = packageInfo.version;
+    final currentVersion = int.parse(packageInfo.version.replaceAll('.', ''));
 
+    print(currentVersion);
     final doc = await _firestore.collection('app_config').doc('version').get();
-    final forceUpdateVersion = doc['force_version'] ?? '';
-    final optionalUpdateVersion = doc['optional_version'] ?? '';
+    final forceUpdateVersion = doc['force_version'] ?? 0;
+    final optionalUpdateVersion = doc['optional_version'] ?? 0;
 
-    if (_isVersionLower(currentVersion, forceUpdateVersion)) {
+    if (forceUpdateVersion > currentVersion) {
       return UpdateStatus.force;
-    } else if (_isVersionLower(currentVersion, optionalUpdateVersion)) {
+    } else if (optionalUpdateVersion > currentVersion) {
       return UpdateStatus.optional;
     }
     return UpdateStatus.none;
-  }
-
-  /// So sánh version theo dạng 1.2.3
-  bool _isVersionLower(String current, String target) {
-    if (target.isEmpty) return false;
-
-    final currentParts = current.split('.').map(int.parse).toList();
-    final targetParts = target.split('.').map(int.parse).toList();
-
-    for (int i = 0; i < targetParts.length; i++) {
-      if (currentParts.length <= i) return true; // thiếu số version → thấp hơn
-      if (currentParts[i] < targetParts[i]) return true;
-      if (currentParts[i] > targetParts[i]) return false;
-    }
-    return false;
   }
 
   /// Mở Store tương ứng với nền tảng

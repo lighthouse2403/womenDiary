@@ -54,14 +54,19 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
       }
     }
 
+    print('_checkSecurityAndInit -- checkForUpdate');
     // 2. Check update
     final updateStatus = await UpdateChecker().checkForUpdate();
+    print('updateStatus ${updateStatus}');
+
     if (updateStatus != UpdateStatus.none) {
       setState(() {
         _pendingUpdate = updateStatus;
       });
       return; // không unlock ngay, chờ dialog xử lý
     }
+
+    print('_checkSecurityAndInit -- _determineInitialRoute');
 
     // 3. Determine initial route
     final route = await _determineInitialRoute();
@@ -99,46 +104,45 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
   }
 
   void _showUpdateDialog(UpdateStatus status) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        barrierDismissible: status != UpdateStatus.force,
-        builder: (context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            backgroundColor: Colors.pink[50],
-            title: Text(
-              status == UpdateStatus.force
-                  ? 'Cập nhật bắt buộc'
-                  : 'Có bản cập nhật mới',
-              style: const TextStyle(
-                color: Colors.pink,
-                fontWeight: FontWeight.bold,
-              ),
+    if (!mounted) return;
+    print('_showUpdateDialog');
+    showDialog(
+      context: context,
+      barrierDismissible: status != UpdateStatus.force,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: Colors.pink[50],
+          title: Text(
+            status == UpdateStatus.force
+                ? 'Cập nhật bắt buộc'
+                : 'Có bản cập nhật mới',
+            style: const TextStyle(
+              color: Colors.pink,
+              fontWeight: FontWeight.bold,
             ),
-            content: const Text(
-              'Phiên bản mới mang lại nhiều cải tiến và trải nghiệm tốt hơn cho bạn.',
-              style: TextStyle(color: Colors.black87),
-            ),
-            actions: [
-              if (status == UpdateStatus.optional)
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _finishUnlock();
-                  },
-                  child: const Text('Để sau'),
-                ),
+          ),
+          content: const Text(
+            'Phiên bản mới mang lại nhiều cải tiến và trải nghiệm tốt hơn cho bạn.',
+            style: TextStyle(color: Colors.black87),
+          ),
+          actions: [
+            if (status == UpdateStatus.optional)
               TextButton(
-                onPressed: _openStore,
-                child: const Text('Cập nhật ngay'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _finishUnlock();
+                },
+                child: const Text('Để sau'),
               ),
-            ],
-          );
-        },
-      );
-    });
+            TextButton(
+              onPressed: _openStore,
+              child: const Text('Cập nhật ngay'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _finishUnlock() async {
@@ -154,26 +158,37 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final router = (_unlocked && _initialRoute != null)
-        ? Routes.generateRouter(_initialRoute!)
-        : null;
+    if (_pendingUpdate != null) {
+      return MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Builder(
+          builder: (ctx) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _showUpdateDialog(_pendingUpdate!);
+            });
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          },
+        ),
+      );
+    }
+
+    if (!_unlocked || _initialRoute == null) {
+      return MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: const Scaffold(body: Center(child: CircularProgressIndicator())),
+      );
+    }
 
     return MaterialApp.router(
       themeMode: ThemeMode.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      routerConfig: router ?? _loadingRouter(),
-      builder: (context, child) {
-        if (_pendingUpdate != null) {
-          // Show dialog sau khi đã có MaterialLocalizations
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) _showUpdateDialog(_pendingUpdate!);
-          });
-        }
-        return child!;
-      },
+      routerConfig: Routes.generateRouter(_initialRoute!),
     );
   }
+
 
   RouterConfig<Object> _loadingRouter() {
     return Routes.generateRouter(RoutesName.home);
