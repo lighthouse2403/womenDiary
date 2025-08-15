@@ -102,8 +102,7 @@ class FirebaseUser {
       'os': '${Platform.operatingSystem} ${Platform.operatingSystemVersion}',
       'language': locale.languageCode,
       'region': locale.countryCode,
-      'appVersion': packageInfo.version,
-      'buildNumber': packageInfo.buildNumber,
+      'appVersion': '${packageInfo.version} (${packageInfo.buildNumber})',
       'wifiSSID': ssid,
       'wifiIP': ip,
     };
@@ -119,7 +118,6 @@ class FirebaseUser {
         'model': androidInfo.model,
         'totalDiskSize': androidInfo.totalDiskSize,
         'freeDiskSize': androidInfo.freeDiskSize,
-        'device': androidInfo.device,
         'manufacturer': androidInfo.manufacturer,
         'sdkInt': androidInfo.version.sdkInt,
       });

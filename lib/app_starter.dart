@@ -39,18 +39,25 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
   }
 
   Future<void> _runSecurityCheck() async {
-    final bioSuccess = await BiometricService().authenticate();
-    if (!bioSuccess) {
-      setState(() => _unlocked = false);
-      return;
+    // 1. Kiểm tra xem người dùng có bật biometric không
+    final biometricEnabled = await LocalStorageService.checkUsingBiometric();
+
+    if (biometricEnabled) {
+      final bioSuccess = await BiometricService().authenticate();
+      if (!bioSuccess) {
+        setState(() => _unlocked = false);
+        return;
+      }
     }
 
+    // 2. Check update
     final updateStatus = await UpdateChecker().checkForUpdate();
     if (updateStatus != UpdateStatus.none) {
       _showUpdateDialog(updateStatus);
       return;
     }
 
+    // 3. Nếu qua hết các bước, unlock app
     setState(() => _unlocked = true);
   }
 

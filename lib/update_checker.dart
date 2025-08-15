@@ -9,8 +9,8 @@ class UpdateChecker {
     final currentVersion = packageInfo.version;
 
     final doc = await _firestore.collection('app_config').doc('version').get();
-    final forceUpdateVersion = doc['force_update'] ?? '';
-    final optionalUpdateVersion = doc['optional_update'] ?? '';
+    final forceUpdateVersion = doc['force_version'] ?? '';
+    final optionalUpdateVersion = doc['optional_version'] ?? '';
 
     if (_isVersionLower(currentVersion, forceUpdateVersion)) {
       return UpdateStatus.force;
@@ -24,6 +24,9 @@ class UpdateChecker {
     if (target.isEmpty) return false;
     final currentParts = current.split('.').map(int.parse).toList();
     final targetParts = target.split('.').map(int.parse).toList();
+    print(currentParts);
+    print(targetParts);
+
     for (int i = 0; i < targetParts.length; i++) {
       if (currentParts.length <= i) return true;
       if (currentParts[i] < targetParts[i]) return true;
