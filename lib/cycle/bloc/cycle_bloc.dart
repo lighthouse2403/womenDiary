@@ -81,6 +81,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
   Future<void> _updateNote(UpdateCycleNoteEvent event, Emitter<CycleState> emit) async {
     try {
       cycleDetail.note =event.note;
+
     } catch (error) {
       // Có thể emit state lỗi ở đây
     }

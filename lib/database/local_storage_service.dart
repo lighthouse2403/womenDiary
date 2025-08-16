@@ -86,13 +86,11 @@ class LocalStorageService {
   }
 
   static Future<void> saveSkippedVersion(String version) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_skipVersionKey, version);
+    await _prefs?.setString(_skipVersionKey, version);
   }
 
-  static Future<String?> getSkippedVersion() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_skipVersionKey);
+  static String? getSkippedVersion() {
+    return _prefs?.getString(_skipVersionKey);
   }
 
   static Future<void> clear() async {

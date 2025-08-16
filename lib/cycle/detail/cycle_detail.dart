@@ -40,20 +40,48 @@ class CycleDetail extends StatelessWidget {
             ),
           ],
         ),
-        body: BlocBuilder<CycleBloc, CycleState>(
-          builder: (context, state) {
-            CycleModel cycle = state is LoadedCycleDetailState ? state.cycle : CycleModel(DateTime.now());
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children:  [
+        body: BlocListener<CycleBloc, CycleState>(
+          listener: (context, state) {
+            if (state is CycleSavedSuccessfullyState) {
+              // Hiển thị thông báo
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (_) {
+                  return AlertDialog(
+                    title: const Text('Thông báo'),
+                    content: const Text('Đã lưu thành công!'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // đóng dialog
+                          context.pop(); // quay về màn hình trước
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  );
+                },
+              );
+            }
+          },
+          child: BlocBuilder<CycleBloc, CycleState>(
+            builder: (context, state) {
+              CycleModel cycle = state is LoadedCycleDetailState
+                  ? state.cycle
+                  : CycleModel(DateTime.now());
+              return ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
                   _cycleInformation(cycle),
                   const SizedBox(height: 20),
                   _timeLine(cycle),
                   const Divider(height: 30),
                   _note(context, cycle),
                 ],
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

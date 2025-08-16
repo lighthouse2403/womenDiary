@@ -169,6 +169,7 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
                             ),
                           ),
                           onPressed: () {
+                            UpdateChecker().skipVersion();
                             Navigator.pop(context);
                             _shownVersion = _pendingVersion; // bỏ qua optional version này
                           },

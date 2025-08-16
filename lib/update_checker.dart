@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:women_diary/database/local_storage_service.dart';
 
 enum UpdateStatus { none, optional, force }
 
@@ -27,21 +28,35 @@ class UpdateChecker {
     }
   }
 
+  Future<void> skipVersion() async {
+    try {
+      final doc = await _firestore.collection('app_config').doc('version').get();
+      final data = doc.data() ?? {};
+      final optionalV = (data['optional_version'] ?? '').toString().trim();
+      LocalStorageService.saveSkippedVersion(optionalV);
+    } catch (e) {
+      print("❌ getLatestVersion error: $e");
+    }
+  }
+
   /// --- Kiểm tra trạng thái update hiện tại ---
   Future<UpdateStatus> checkForUpdate() async {
     try {
       final info = await PackageInfo.fromPlatform();
       final currentVersion = info.version;
+      final skipVersion = await LocalStorageService.getSkippedVersion().toString();
 
       final doc = await _firestore.collection('app_config').doc('version').get();
       final data = doc.data() ?? {};
       final forceV = (data['force_version'] ?? '').toString().trim();
       final optionalV = (data['optional_version'] ?? '').toString().trim();
 
+      print('skip version: ${skipVersion.toString()}');
+
       if (forceV.isNotEmpty && isVersionLower(currentVersion, forceV)) {
         return UpdateStatus.force;
       }
-      if (optionalV.isNotEmpty && isVersionLower(currentVersion, optionalV)) {
+      if (optionalV.isNotEmpty && isVersionLower(currentVersion, optionalV) && isVersionLower(skipVersion, optionalV)) {
         return UpdateStatus.optional;
       }
       return UpdateStatus.none;
