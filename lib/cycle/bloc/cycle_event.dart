@@ -26,11 +26,10 @@ class CreateCycleEvent extends CycleEvent {
 }
 
 class UpdateCycleEvent extends CycleEvent {
-  const UpdateCycleEvent(this.newCycle);
-  final CycleModel newCycle;
+  const UpdateCycleEvent();
 
   @override
-  List<Object?> get props => [newCycle.id];
+  List<Object?> get props => [];
 }
 
 /// Delete cycle
@@ -68,4 +67,9 @@ class UpdateCycleNoteEvent extends CycleEvent {
 
   @override
   List<Object?> get props => [note];
+}
+
+class LoadCycleDetailEvent extends CycleEvent {
+  final CycleModel cycle;
+  LoadCycleDetailEvent(this.cycle);
 }

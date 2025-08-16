@@ -30,8 +30,8 @@ class UpdateChecker {
     final packageName = packageInfo.packageName;
 
     final url = Platform.isIOS
-        ? 'https://apps.apple.com/app/id<APP_ID>' // TODO: thay <APP_ID> bằng App Store ID
-        : 'https://play.google.com/store/apps/details?id=$packageName';
+        ? 'https://apps.apple.com/app/id<APP_ID>'
+        : 'https://play.google.com/store/apps/details?id=babyDiary';
 
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);

@@ -12,7 +12,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
     on<LoadAllCycleEvent>(_loadAllCycle);
     on<DeleteCycleEvent>(_deleteCycle);
     on<CreateCycleEvent>(_createCycle);
-
+    on<LoadCycleDetailEvent>(_loadCycleDetail); // ✅ thêm handler
   }
 
   Future<void> _loadAllCycle(LoadAllCycleEvent event, Emitter<CycleState> emit) async {
@@ -63,6 +63,16 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
       emit(LoadedAllCycleState(cycleList));
     } catch (error) {
       // có thể emit state lỗi
+    }
+  }
+
+  Future<void> _loadCycleDetail(
+      LoadCycleDetailEvent event, Emitter<CycleState> emit) async {
+    try {
+      final cycle = await DatabaseHandler.getCycle(event.cycle.id);
+      emit(LoadedCycleDetailState(cycle));
+    } catch (error) {
+      // Có thể emit state lỗi ở đây
     }
   }
 

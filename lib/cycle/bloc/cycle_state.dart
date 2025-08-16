@@ -15,6 +15,14 @@ class LoadedAllCycleState extends CycleState {
   List<Object?> get props => [cycleList.length];
 }
 
+class LoadedCycleDetailState extends CycleState {
+  final CycleModel cycle;
+  const LoadedCycleDetailState(this.cycle);
+
+  @override
+  List<Object?> get props => [cycle];
+}
+
 class CycleSavedSuccessfullyState extends CycleState {
   const CycleSavedSuccessfullyState();
 

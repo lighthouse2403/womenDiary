@@ -1,145 +1,60 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:intl/intl.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/cycle/bloc/cycle_bloc.dart';
 import 'package:women_diary/cycle/bloc/cycle_event.dart';
+import 'package:women_diary/cycle/bloc/cycle_state.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 
-class CycleDetail extends StatefulWidget {
+class CycleDetail extends StatelessWidget {
   final CycleModel cycle;
-
-  const CycleDetail({super.key, required this.cycle});
-
-  @override
-  State<CycleDetail> createState() => _CycleDetailState();
-}
-
-class _CycleDetailState extends State<CycleDetail> {
   final dateFormat = DateFormat('dd/MM/yyyy');
-  final noteController = TextEditingController();
 
-  double mensWidth = 0;
-  double follicularWidth = 0;
-  double ovulationWidth = 0;
-  double lutealWidth = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    noteController.text = widget.cycle.note ?? '';
-
-    // Chạy animation sau khi build xong
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _runTimelineAnimation();
-    });
-  }
-
-  void _runTimelineAnimation() async {
-    final cycleDays =
-        widget.cycle.cycleEndTime.difference(widget.cycle.cycleStartTime).inDays + 1;
-    final menstruationDays =
-        widget.cycle.menstruationEndTime.difference(widget.cycle.cycleStartTime).inDays + 1;
-    final ovulationDate =
-    widget.cycle.cycleEndTime.subtract(const Duration(days: 14));
-    final ovulationIndex =
-        ovulationDate.difference(widget.cycle.cycleStartTime).inDays + 1;
-
-    final follicularDays = ovulationIndex - menstruationDays;
-    final lutealDays = cycleDays - ovulationIndex;
-
-    // Tỉ lệ
-    final totalFlex = cycleDays.toDouble();
-    setState(() => mensWidth = 0);
-
-    await Future.delayed(const Duration(milliseconds: 200));
-    setState(() => mensWidth = menstruationDays / totalFlex);
-
-    await Future.delayed(const Duration(milliseconds: 200));
-    setState(() => follicularWidth = follicularDays / totalFlex);
-
-    await Future.delayed(const Duration(milliseconds: 200));
-    setState(() => ovulationWidth = 1 / totalFlex);
-
-    await Future.delayed(const Duration(milliseconds: 200));
-    setState(() => lutealWidth = lutealDays / totalFlex);
-  }
-
-  @override
-  void dispose() {
-    noteController.dispose();
-    super.dispose();
-  }
+  CycleDetail({super.key, required this.cycle});
 
   @override
   Widget build(BuildContext context) {
-    final cycleDays =
-        widget.cycle.cycleEndTime.difference(widget.cycle.cycleStartTime).inDays + 1;
-    final menstruationDays =
-        widget.cycle.menstruationEndTime.difference(widget.cycle.cycleStartTime).inDays + 1;
-    final ovulationDate =
-    widget.cycle.cycleEndTime.subtract(const Duration(days: 14));
-
-    final ovulationIndex =
-        ovulationDate.difference(widget.cycle.cycleStartTime).inDays + 1;
-
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: BaseAppBar(
-        title: 'Chi tiết chu kỳ',
-        actions: [
-          IconButton(
-            onPressed: () {
-              widget.cycle.note = noteController.text.trim();
-              context.read<CycleBloc>().add(UpdateCycleEvent(widget.cycle));
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.save, color: Colors.pink),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoRow('Bắt đầu', dateFormat.format(widget.cycle.cycleStartTime)),
-            _buildInfoRow('Kết thúc', dateFormat.format(widget.cycle.cycleEndTime)),
-            const Divider(height: 24),
-            _buildInfoRow('Số ngày chu kỳ', '$cycleDays ngày'),
-            _buildInfoRow('Số ngày kinh nguyệt', '$menstruationDays ngày'),
-            _buildInfoRow('Ngày rụng trứng', dateFormat.format(ovulationDate)),
-            const SizedBox(height: 20),
-            _buildTimelineAnimated(
-              cycleDays: cycleDays,
-              menstruationDays: menstruationDays,
-              ovulationIndex: ovulationIndex,
-            ),
-            const Divider(height: 30),
-            Text('Ghi chú', style: const TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            TextField(
-              controller: noteController,
-              decoration: InputDecoration(
-                hintText: 'Nhập ghi chú...',
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              maxLines: 4,
+    return BlocProvider(
+      create: (_) => CycleBloc()..add(LoadCycleDetailEvent(cycle)),
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: BaseAppBar(
+          backgroundColor: Colors.pink[200],
+          hasBack: true,
+          title: 'Chi tiết',
+          actions: [
+            IconButton(
+              onPressed: () {
+                context.read<CycleBloc>().add(UpdateCycleEvent());
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.save, color: Colors.white),
             ),
           ],
+        ),
+        body: BlocBuilder<CycleBloc, CycleState>(
+          builder: (context, state) {
+            CycleModel cycle = state is LoadedCycleDetailState ? state.cycle : CycleModel(DateTime.now());
+            return ListView(
+              padding: const EdgeInsets.all(16),
+              children:  [
+                  _cycleInformation(cycle),
+                  const SizedBox(height: 20),
+                  _timeLine(cycle),
+                  const Divider(height: 30),
+                  _note(context, cycle),
+                ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -151,54 +66,117 @@ class _CycleDetailState extends State<CycleDetail> {
     );
   }
 
-  Widget _buildTimelineAnimated({
-    required int cycleDays,
-    required int menstruationDays,
-    required int ovulationIndex,
-  }) {
+  Widget _cycleInformation(CycleModel cycle) {
+    final cycleDays =
+        cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
+    final menstruationDays =
+        cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
+    final ovulationDate =
+    cycle.cycleEndTime.subtract(const Duration(days: 14));
+
+    return Column(
+      children: [
+        buildInfoRow('Bắt đầu', dateFormat.format(cycle.cycleStartTime)),
+        buildInfoRow('Kết thúc', dateFormat.format(cycle.cycleEndTime)),
+        const Divider(height: 24),
+        buildInfoRow('Số ngày chu kỳ', '$cycleDays ngày'),
+        buildInfoRow('Số ngày kinh nguyệt', '$menstruationDays ngày'),
+        buildInfoRow('Ngày rụng trứng', dateFormat.format(ovulationDate)),
+      ],
+    );
+  }
+
+  Widget _note(BuildContext context, CycleModel cycle) {
+    final controller = TextEditingController(text: cycle.note);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Diễn biến chu kỳ', style: const TextStyle(fontWeight: FontWeight.w700)),
+        Text('Ghi chú', style: const TextStyle(fontWeight: FontWeight.w600)),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: 'Nhập ghi chú...',
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+          maxLines: 4,
+          onChanged: (value) =>
+              context.read<CycleBloc>().add(UpdateCycleNoteEvent(value)),
+        ),
+      ],
+    );
+  }
+
+  Widget _timeLine(CycleModel cycle) {
+    int cycleDays = cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
+    int menstruationDays = cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
+    final ovulationDate = cycle.cycleEndTime.subtract(const Duration(days: 14));
+    final ovulationIndex = ovulationDate.difference(cycle.cycleStartTime).inDays + 1;
+    final follicularDays = ovulationIndex - menstruationDays;
+    final lutealDays = cycleDays - ovulationIndex;
+
+    double mensWidth = menstruationDays / cycleDays;
+    double follicularWidth = follicularDays / cycleDays;
+    double ovulationWidth = 1 / cycleDays;
+    double lutealWidth = lutealDays / cycleDays;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Diễn biến chu kỳ',
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+        ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            _animatedPhase(mensWidth, Colors.pink.shade300, '💗'),
-            _animatedPhase(follicularWidth, Colors.pink.shade100, '🌱'),
-            _animatedPhase(ovulationWidth, Colors.amber.shade300, '🌸'),
-            _animatedPhase(lutealWidth, Colors.purple.shade100, '💜'),
-          ],
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Row(
+            children: [
+              _animatedPhase(mensWidth, Colors.pink.shade300, '💗 ${menstruationDays}'),
+              _animatedPhase(follicularWidth, Colors.pink.shade100, '🌱 ${follicularDays}'),
+              _animatedPhase(ovulationWidth, Colors.amber.shade300, '🌸'),
+              _animatedPhase(lutealWidth, Colors.purple.shade100,'💜 ${lutealDays}'),
+            ],
+          ),
         ),
         const SizedBox(height: 12),
         Wrap(
           spacing: 14,
           runSpacing: 8,
           children: [
-            _legendItem(Colors.pink.shade300, 'Kinh nguyệt'),
-            _legendItem(Colors.pink.shade100, 'Nang trứng'),
-            _legendItem(Colors.amber.shade300, 'Rụng trứng'),
-            _legendItem(Colors.purple.shade100, 'Hoàng thể'),
+            _legendItem(Colors.pink.shade300, 'Kinh nguyệt 💗'),
+            _legendItem(Colors.pink.shade100, 'Nang trứng 🌱'),
+            _legendItem(Colors.amber.shade300, 'Rụng trứng 🌸'),
+            _legendItem(Colors.purple.shade100, 'Hoàng thể 💜'),
           ],
         ),
       ],
     );
   }
 
-  Widget _animatedPhase(double ratio, Color color, String icon) {
+  Widget _animatedPhase(double ratio, Color color, String text) {
     return Expanded(
-      flex: (ratio * 1000).toInt(), // flex tỉ lệ
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 500),
+      flex: (ratio * 1000).round(),
+      child: TweenAnimationBuilder<double>(
+        duration: const Duration(milliseconds: 800),
         curve: Curves.easeOutCubic,
-        height: 28,
-        margin: const EdgeInsets.symmetric(horizontal: 1),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: ratio > 0
-            ? Center(child: Text(icon, style: const TextStyle(fontSize: 16)))
-            : null,
+        tween: Tween(begin: 0, end: 1),
+        builder: (context, value, child) {
+          return FractionallySizedBox(
+            widthFactor: value,
+            alignment: Alignment.centerLeft,
+            child: Container(
+              height: 22,
+              color: color,
+              child: Text(text).text12().w500().greyColor(),
+            ),
+          );
+        },
       ),
     );
   }
@@ -207,10 +185,20 @@ class _CycleDetailState extends State<CycleDetail> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(width: 14, height: 14, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(4))),
+        Container(
+          width: 14,
+          height: 14,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
         const SizedBox(width: 6),
-        Text(text, style: const TextStyle(fontSize: 12)),
+        Text(text, style: const TextStyle(fontSize: 13)),
       ],
     );
   }
+
+
 }
+
