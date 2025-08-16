@@ -7,12 +7,15 @@ import 'package:women_diary/database/local_storage_service.dart';
 
 class CycleBloc extends Bloc<CycleEvent, CycleState> {
   List<CycleModel> cycleList = [];
+  CycleModel cycleDetail = CycleModel(DateTime.now());
 
   CycleBloc() : super(const CycleState()) {
     on<LoadAllCycleEvent>(_loadAllCycle);
     on<DeleteCycleEvent>(_deleteCycle);
     on<CreateCycleEvent>(_createCycle);
     on<LoadCycleDetailEvent>(_loadCycleDetail); // ✅ thêm handler
+    on<UpdateCycleNoteEvent>(_updateNote); // ✅ thêm handler
+    on<UpdateCycleEvent>(_updateCycleDetail); // ✅ thêm handler
   }
 
   Future<void> _loadAllCycle(LoadAllCycleEvent event, Emitter<CycleState> emit) async {
@@ -66,11 +69,27 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
     }
   }
 
-  Future<void> _loadCycleDetail(
-      LoadCycleDetailEvent event, Emitter<CycleState> emit) async {
+  Future<void> _loadCycleDetail(LoadCycleDetailEvent event, Emitter<CycleState> emit) async {
     try {
-      final cycle = await DatabaseHandler.getCycle(event.cycle.id);
-      emit(LoadedCycleDetailState(cycle));
+      cycleDetail = await DatabaseHandler.getCycle(event.cycle.id);
+      emit(LoadedCycleDetailState(cycleDetail));
+    } catch (error) {
+      // Có thể emit state lỗi ở đây
+    }
+  }
+
+  Future<void> _updateNote(UpdateCycleNoteEvent event, Emitter<CycleState> emit) async {
+    try {
+      cycleDetail.note =event.note;
+    } catch (error) {
+      // Có thể emit state lỗi ở đây
+    }
+  }
+
+  Future<void> _updateCycleDetail(UpdateCycleEvent event, Emitter<CycleState> emit) async {
+    try {
+      await DatabaseHandler.updateCycle(cycleDetail);
+      emit(CycleSavedSuccessfullyState());
     } catch (error) {
       // Có thể emit state lỗi ở đây
     }

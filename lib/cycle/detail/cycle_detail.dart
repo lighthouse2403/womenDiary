@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
@@ -26,12 +27,16 @@ class CycleDetail extends StatelessWidget {
           hasBack: true,
           title: 'Chi tiết',
           actions: [
-            IconButton(
-              onPressed: () {
-                context.read<CycleBloc>().add(UpdateCycleEvent());
-                Navigator.pop(context);
+            Builder(
+              builder: (context) {
+                return IconButton(
+                  onPressed: () {
+                    context.read<CycleBloc>().add(UpdateCycleEvent());
+                    context.pop();
+                  },
+                  icon: const Icon(Icons.save, color: Colors.white),
+                );
               },
-              icon: const Icon(Icons.save, color: Colors.white),
             ),
           ],
         ),
@@ -165,7 +170,6 @@ class CycleDetail extends StatelessWidget {
 
   Widget _progressPhase(double progress, double width, Color color, String text, bool isFirst, bool isLast) {
     double visible = (progress <= 0) ? 0 : (progress < width ? progress : width);
-
     return Expanded(
       flex: (width * 1000).round(),
       child: FractionallySizedBox(
