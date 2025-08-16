@@ -18,13 +18,15 @@ class AppStarter extends StatefulWidget {
 class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
   bool _unlocked = false;
   String? _initialRoute;
+
   UpdateStatus? _pendingUpdate;
+  bool _updateShown = false; // tránh mở dialog lặp lại
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _checkSecurityAndInit();
+    _bootstrap();
   }
 
   @override
@@ -36,161 +38,200 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _checkSecurityAndInit();
+      _bootstrap(); // quay lại app thì check lại (sẽ mở lại popup nếu force)
     }
   }
 
-  Future<void> _checkSecurityAndInit() async {
-    // 1. Check biometric if enabled
-    final biometricEnabled = await LocalStorageService.checkUsingBiometric();
-    if (biometricEnabled) {
-      final bioSuccess = await BiometricService().authenticate();
-      if (!bioSuccess) {
-        setState(() {
-          _unlocked = false;
-          _initialRoute = null;
-        });
-        return;
-      }
-    }
+  Future<void> _bootstrap() async {
+    // 1) Biometric
+    final canProceed = await _checkBiometric();
+    if (!canProceed) return;
 
-    print('_checkSecurityAndInit -- checkForUpdate');
-    // 2. Check update
-    final updateStatus = await UpdateChecker().checkForUpdate();
-    print('updateStatus ${updateStatus}');
+    // 2) Update
+    await _checkUpdate(); // chỉ set _pendingUpdate, không chặn unlock
 
-    if (updateStatus != UpdateStatus.none) {
+    // 3) Determine route và unlock
+    await _unlockApp();
+  }
+
+  Future<bool> _checkBiometric() async {
+    final enabled = await LocalStorageService.checkUsingBiometric();
+    if (!enabled) return true;
+
+    final ok = await BiometricService().authenticate();
+    if (!ok) {
+      if (!mounted) return false;
       setState(() {
-        _pendingUpdate = updateStatus;
+        _unlocked = false;
+        _initialRoute = null;
       });
-      return; // không unlock ngay, chờ dialog xử lý
+      return false;
     }
+    return true;
+  }
 
-    print('_checkSecurityAndInit -- _determineInitialRoute');
+  Future<void> _checkUpdate() async {
+    final status = await UpdateChecker().checkForUpdate();
+    if (!mounted) return;
+    if (status != UpdateStatus.none) {
+      // có update → đánh dấu để hiển thị popup sau khi UI render xong
+      setState(() {
+        _pendingUpdate = status;
+        _updateShown = false;
+      });
+    } else {
+      setState(() {
+        _pendingUpdate = null;
+        _updateShown = false;
+      });
+    }
+  }
 
-    // 3. Determine initial route
+  Future<void> _unlockApp() async {
     final route = await _determineInitialRoute();
-    if (mounted) {
-      setState(() {
-        _unlocked = true;
-        _initialRoute = route;
-      });
-    }
+    if (!mounted) return;
+    setState(() {
+      _unlocked = true;
+      _initialRoute = route;
+    });
   }
 
   Future<String> _determineInitialRoute() async {
-    final cycleLength = await LocalStorageService.getCycleLength();
-    final menstruationLength = await LocalStorageService.getMenstruationLength();
-    final shouldStart = cycleLength == 0 || menstruationLength == 0;
-    return shouldStart
+    final cycle = await LocalStorageService.getCycleLength();
+    final menstruation = await LocalStorageService.getMenstruationLength();
+    return (cycle == 0 || menstruation == 0)
         ? RoutesName.firstCycleInformation
         : RoutesName.home;
   }
 
   Future<void> _openStore() async {
-    String url;
-    if (Platform.isAndroid) {
-      url = 'https://play.google.com/store/apps/details?id=com.example.app';
-    } else if (Platform.isIOS) {
-      url = 'https://apps.apple.com/app/id1234567890';
-    } else {
-      return;
-    }
+    final url = Platform.isAndroid
+        ? 'https://play.google.com/store/apps/details?id=com.example.app'
+        : Platform.isIOS
+        ? 'https://apps.apple.com/app/id1234567890'
+        : null;
 
-    final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+    if (url == null) return;
+
+    final uri = Uri.parse(url);
+    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!ok) {
       throw Exception('Không thể mở store');
     }
   }
 
-  void _showUpdateDialog(UpdateStatus status) {
-    if (!mounted) return;
-    print('_showUpdateDialog');
-    showDialog(
-      context: context,
-      barrierDismissible: status != UpdateStatus.force,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          backgroundColor: Colors.pink[50],
-          title: Text(
-            status == UpdateStatus.force
-                ? 'Cập nhật bắt buộc'
-                : 'Có bản cập nhật mới',
-            style: const TextStyle(
-              color: Colors.pink,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: const Text(
-            'Phiên bản mới mang lại nhiều cải tiến và trải nghiệm tốt hơn cho bạn.',
-            style: TextStyle(color: Colors.black87),
-          ),
-          actions: [
-            if (status == UpdateStatus.optional)
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _finishUnlock();
-                },
-                child: const Text('Để sau'),
-              ),
-            TextButton(
-              onPressed: _openStore,
-              child: const Text('Cập nhật ngay'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  void _maybeShowUpdatePopup(BuildContext materialContext) {
+    if (_pendingUpdate == null || _updateShown) return;
+    _updateShown = true; // đánh dấu trước để tránh mở nhiều lần
 
-  void _finishUnlock() async {
-    final route = await _determineInitialRoute();
-    if (mounted) {
-      setState(() {
-        _unlocked = true;
-        _initialRoute = route;
-        _pendingUpdate = null;
-      });
-    }
+    // Đảm bảo chạy sau frame hiện tại để context đã nằm bên trong MaterialApp
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierColor: Colors.pink.shade100.withOpacity(0.4),
+        builder: (context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.auto_awesome, size: 48, color: Colors.pink),
+                  const SizedBox(height: 12),
+                  const Text(
+                    "🌸 Có phiên bản mới!",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.pink,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Cập nhật ngay để trải nghiệm trọn vẹn và mượt mà hơn 💖",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.pink, // màu chữ
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          textStyle: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12), // bo nhẹ
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Để sau"),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.pink,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          UpdateChecker().openStore();
+                        },
+                        child: const Text("Cập nhật"),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_pendingUpdate != null) {
+    // Chưa unlock hoặc chưa có route → hiển thị loading (bên trong MaterialApp để có localizations)
+    if (!_unlocked || _initialRoute == null) {
       return MaterialApp(
+        debugShowCheckedModeBanner: false,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: Builder(
-          builder: (ctx) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _showUpdateDialog(_pendingUpdate!);
-            });
-            return const Scaffold(body: Center(child: CircularProgressIndicator()));
-          },
+        home: const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
         ),
       );
     }
 
-    if (!_unlocked || _initialRoute == null) {
-      return MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: const Scaffold(body: Center(child: CircularProgressIndicator())),
-      );
-    }
-
+    // Đã unlock: chạy app qua RouterConfig. Dùng builder để có context bên trong MaterialApp.
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: Routes.generateRouter(_initialRoute!),
+      builder: (materialContext, child) {
+        // nếu có update → mở popup đè lên UI (child là app chính)
+        _maybeShowUpdatePopup(materialContext);
+        return child!;
+      },
     );
-  }
-
-
-  RouterConfig<Object> _loadingRouter() {
-    return Routes.generateRouter(RoutesName.home);
   }
 }
