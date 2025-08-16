@@ -119,7 +119,6 @@ class CycleDetail extends StatelessWidget {
     final ovulationIndex = ovulationDate.difference(cycle.cycleStartTime).inDays + 1;
     final follicularDays = ovulationIndex - menstruationDays;
     final lutealDays = cycleDays - ovulationIndex;
-
     double mensWidth = menstruationDays / cycleDays;
     double follicularWidth = follicularDays / cycleDays;
     double ovulationWidth = 1 / cycleDays;
@@ -128,22 +127,27 @@ class CycleDetail extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Diễn biến chu kỳ',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-        ),
+        const Text('Chi tiết').text16().w700(),
         const SizedBox(height: 12),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Row(
-            children: [
-              _animatedPhase(mensWidth, Colors.pink.shade300, '💗 ${menstruationDays}'),
-              _animatedPhase(follicularWidth, Colors.pink.shade100, '🌱 ${follicularDays}'),
-              _animatedPhase(ovulationWidth, Colors.amber.shade300, '🌸'),
-              _animatedPhase(lutealWidth, Colors.purple.shade100,'💜 ${lutealDays}'),
-            ],
-          ),
+        TweenAnimationBuilder<double>(
+          duration: const Duration(milliseconds: 1200),
+          curve: Curves.easeOutCubic,
+          tween: Tween(begin: 0, end: 1),
+          builder: (context, progress, _) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Row(
+                children: [
+                  _progressPhase(progress, mensWidth, Colors.pink.shade300, '💗 $menstruationDays', true, false),
+                  _progressPhase(progress - mensWidth, follicularWidth, Colors.pink.shade100, '🌱 $follicularDays', false, false),
+                  _progressPhase(progress - mensWidth - follicularWidth, ovulationWidth, Colors.amber.shade300, '🌸', false, false),
+                  _progressPhase(progress - mensWidth - follicularWidth - ovulationWidth, lutealWidth, Colors.purple.shade100, '💜 $lutealDays', false, true),
+                ],
+              ),
+            );
+          },
         ),
+
         const SizedBox(height: 12),
         Wrap(
           spacing: 14,
@@ -159,24 +163,29 @@ class CycleDetail extends StatelessWidget {
     );
   }
 
-  Widget _animatedPhase(double ratio, Color color, String text) {
+  Widget _progressPhase(double progress, double width, Color color, String text, bool isFirst, bool isLast) {
+    double visible = (progress <= 0) ? 0 : (progress < width ? progress : width);
+
     return Expanded(
-      flex: (ratio * 1000).round(),
-      child: TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 800),
-        curve: Curves.easeOutCubic,
-        tween: Tween(begin: 0, end: 1),
-        builder: (context, value, child) {
-          return FractionallySizedBox(
-            widthFactor: value,
-            alignment: Alignment.centerLeft,
-            child: Container(
-              height: 22,
-              color: color,
-              child: Text(text).text12().w500().greyColor(),
+      flex: (width * 1000).round(),
+      child: FractionallySizedBox(
+        widthFactor: visible / width,
+        alignment: Alignment.centerLeft,
+        child: Container(
+          alignment: Alignment.center,
+          height: 26,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.horizontal(
+              left: isFirst ? const Radius.circular(16) : Radius.zero,
+              right: isLast ? const Radius.circular(16) : Radius.zero,
             ),
-          );
-        },
+          ),
+          child: Text(text,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
+            textAlign: TextAlign.center,
+          ),
+        ),
       ),
     );
   }
