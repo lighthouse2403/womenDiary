@@ -5,6 +5,7 @@ import 'package:women_diary/setting/bloc/setting_state.dart';
 class LocalStorageService {
   static SharedPreferences? _prefs;
   String cycleLengthKey = 'cycleLength';
+  static String _skipVersionKey = "skip_version";
 
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -82,6 +83,16 @@ class LocalStorageService {
 
   static int getAverageCycleLength() {
     return _prefs?.getInt('averageCycleLength') ?? 30;
+  }
+
+  static Future<void> saveSkippedVersion(String version) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_skipVersionKey, version);
+  }
+
+  static Future<String?> getSkippedVersion() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_skipVersionKey);
   }
 
   static Future<void> clear() async {

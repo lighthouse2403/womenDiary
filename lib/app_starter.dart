@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:women_diary/biometric_service.dart';
 import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/l10n/app_localizations.dart';
-import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
+import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/update_checker.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AppStarter extends StatefulWidget {
@@ -20,7 +22,9 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
   String? _initialRoute;
 
   UpdateStatus? _pendingUpdate;
-  bool _updateShown = false; // tránh mở dialog lặp lại
+  String? _pendingVersion;
+  String? _shownVersion; // version đã show popup để optional không lặp
+  bool _forceUpdateActive = false;
 
   @override
   void initState() {
@@ -38,19 +42,15 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _bootstrap(); // quay lại app thì check lại (sẽ mở lại popup nếu force)
+      _bootstrap(); // check lại khi quay lại app
     }
   }
 
   Future<void> _bootstrap() async {
-    // 1) Biometric
     final canProceed = await _checkBiometric();
     if (!canProceed) return;
 
-    // 2) Update
-    await _checkUpdate(); // chỉ set _pendingUpdate, không chặn unlock
-
-    // 3) Determine route và unlock
+    await _checkUpdate(); // update _pendingUpdate + _pendingVersion
     await _unlockApp();
   }
 
@@ -72,17 +72,18 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
 
   Future<void> _checkUpdate() async {
     final status = await UpdateChecker().checkForUpdate();
+    final latestVersion = await UpdateChecker().getLatestVersion();
+
     if (!mounted) return;
     if (status != UpdateStatus.none) {
-      // có update → đánh dấu để hiển thị popup sau khi UI render xong
       setState(() {
         _pendingUpdate = status;
-        _updateShown = false;
+        _pendingVersion = latestVersion;
       });
     } else {
       setState(() {
         _pendingUpdate = null;
-        _updateShown = false;
+        _pendingVersion = null;
       });
     }
   }
@@ -104,35 +105,22 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
         : RoutesName.home;
   }
 
-  Future<void> _openStore() async {
-    final url = Platform.isAndroid
-        ? 'https://play.google.com/store/apps/details?id=com.example.app'
-        : Platform.isIOS
-        ? 'https://apps.apple.com/app/id1234567890'
-        : null;
-
-    if (url == null) return;
-
-    final uri = Uri.parse(url);
-    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!ok) {
-      throw Exception('Không thể mở store');
-    }
-  }
-
   void _maybeShowUpdatePopup(BuildContext materialContext) {
-    if (_pendingUpdate == null || _updateShown) return;
-    _updateShown = true; // đánh dấu trước để tránh mở nhiều lần
+    if (_pendingUpdate == null || _pendingVersion == null) return;
+    if (_pendingUpdate == UpdateStatus.optional &&
+        _pendingVersion == _shownVersion) return;
 
-    // Đảm bảo chạy sau frame hiện tại để context đã nằm bên trong MaterialApp
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
 
+      final isForce = _pendingUpdate == UpdateStatus.force;
+      _forceUpdateActive = isForce;
+
       showDialog(
-        context: context,
-        barrierDismissible: true,
+        context: materialContext,
+        barrierDismissible: !isForce,
         barrierColor: Colors.pink.shade100.withOpacity(0.4),
-        builder: (context) {
+        builder: (_) {
           return Dialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -145,41 +133,47 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.auto_awesome, size: 48, color: Colors.pink),
+                  Icon(Icons.auto_awesome, size: 48, color: Colors.pink),
                   const SizedBox(height: 12),
-                  const Text(
-                    "🌸 Có phiên bản mới!",
-                    style: TextStyle(
+                  Text(
+                    isForce ? "🌸 Cập nhật bắt buộc!" : "🌸 Có phiên bản mới!",
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                       color: Colors.pink,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    "Cập nhật ngay để trải nghiệm trọn vẹn và mượt mà hơn 💖",
+                  Text(
+                    isForce
+                        ? "Phiên bản này bắt buộc cập nhật để tiếp tục sử dụng 💖"
+                        : "Cập nhật ngay để trải nghiệm mượt mà hơn 💖",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.black87),
+                    style: const TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.pink, // màu chữ
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                          textStyle: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                      if (!isForce)
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.pink,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            textStyle: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12), // bo nhẹ
-                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _shownVersion = _pendingVersion; // bỏ qua optional version này
+                          },
+                          child: const Text("Để sau"),
                         ),
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text("Để sau"),
-                      ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.pink,
@@ -202,13 +196,11 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
           );
         },
       );
-
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Chưa unlock hoặc chưa có route → hiển thị loading (bên trong MaterialApp để có localizations)
     if (!_unlocked || _initialRoute == null) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -220,7 +212,6 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
       );
     }
 
-    // Đã unlock: chạy app qua RouterConfig. Dùng builder để có context bên trong MaterialApp.
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
@@ -228,7 +219,6 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
       supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: Routes.generateRouter(_initialRoute!),
       builder: (materialContext, child) {
-        // nếu có update → mở popup đè lên UI (child là app chính)
         _maybeShowUpdatePopup(materialContext);
         return child!;
       },
