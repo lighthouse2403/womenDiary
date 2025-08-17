@@ -91,14 +91,13 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
   List<CycleModel> _applyFilter(List<CycleModel> src) {
     switch (_filter) {
       case _CycleFilter.withNotes:
-        return src.where((c) => (c.note?.trim().isNotEmpty ?? false)).toList();
+        return src.where((c) => (c.note.trim().isNotEmpty)).toList();
       case _CycleFilter.last3Months:
         final now = DateTime.now();
         final threeMonthsAgo = DateTime(now.year, now.month - 3, now.day);
         return src.where((c) => c.cycleStartTime.isAfter(threeMonthsAgo)).toList();
       case _CycleFilter.all:
-      default:
-        return src;
+      return src;
     }
   }
 
@@ -124,7 +123,7 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const Text('Bộ lọc', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                const Text('Bộ lọc').w700().text14(),
                 const SizedBox(height: 12),
                 _filterTile(title: 'Tất cả', value: _CycleFilter.all),
                 _filterTile(title: 'Có ghi chú', value: _CycleFilter.withNotes),
@@ -254,20 +253,13 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
                           shape: BoxShape.circle,
                         ),
                         padding: const EdgeInsets.all(6),
-                        child: const Text('🌸', style: TextStyle(fontSize: 16)),
+                        child: const Text('🌸').text16(),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          '${dateFormat.format(cycle.cycleStartTime)} - ${dateFormat.format(cycle.cycleEndTime)}',
-                          style: const TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black87,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                          '${dateFormat.format(cycle.cycleStartTime)} - ${dateFormat.format(cycle.cycleEndTime)}'
+                        ).text13().w700().blackColor().ellipsis().numberOfLines(1),
                       ),
                       if (isCurrent)
                         Container(
@@ -277,19 +269,11 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
                             color: Colors.pink.shade100,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Text(
-                            'Hiện tại',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.redAccent,
-                            ),
-                          ),
+                          child: const Text('Hiện tại').text12().w700().customColor(Colors.redAccent),
                         ),
                     ],
                   ),
                   const SizedBox(height: 10),
-
                   // Progress bar (vẫn 2 đoạn: menstruation + remaining, scale theo maxDays)
                   LayoutBuilder(
                     builder: (context, constraints) {
@@ -396,7 +380,7 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
                       _pill('Kinh: ${menstruationDays}d', Colors.red.shade50, Colors.red.shade400),
                       const SizedBox(width: 6),
                       _pill('Chu kỳ: ${cycleDays}d', Colors.pink.shade50, Colors.pink.shade400),
-                      if (cycle.note?.trim().isNotEmpty ?? false) ...[
+                      if (cycle.note.trim().isNotEmpty) ...[
                         const SizedBox(width: 6),
                         Flexible(
                           child: _pill(
@@ -418,7 +402,6 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
     );
   }
 
-  // Chip nhỏ gọn
   Widget _pill(String text, Color bg, Color fg, {int maxLines = 1}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
