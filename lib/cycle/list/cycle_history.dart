@@ -33,8 +33,11 @@ class _CycleHistoryView extends StatefulWidget {
   State<_CycleHistoryView> createState() => _CycleHistoryViewState();
 }
 
+enum _CycleFilter { all, withNotes, last3Months }
+
 class _CycleHistoryViewState extends State<_CycleHistoryView> {
   final dateFormat = DateFormat('dd/MM/yyyy');
+  _CycleFilter _filter = _CycleFilter.all;
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +47,11 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
         backgroundColor: Colors.pink[200],
         title: 'Lịch sử',
         actions: [
+          IconButton(
+            tooltip: 'Bộ lọc',
+            onPressed: _openFilterSheet,
+            icon: Icon(Icons.filter_alt_rounded, color: Colors.white.withOpacity(0.95)),
+          ),
           IconButton(
             onPressed: () {
               context
@@ -56,9 +64,9 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
               });
             },
             icon: Assets.icons.add.svg(
-              width: 28,
-              height: 28,
-              colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+              width: 26,
+              height: 26,
+              colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
             ),
           ),
         ],
@@ -67,7 +75,8 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
         buildWhen: (pre, current) => current is LoadedAllCycleState,
         builder: (context, state) {
           if (state is LoadedAllCycleState && state.cycleList.isNotEmpty) {
-            return _buildCycleList(state.cycleList);
+            final filtered = _applyFilter(state.cycleList);
+            return _buildCycleList(filtered);
           }
           return const EmptyView(
             title: 'Chưa có kỳ kinh nào',
@@ -78,31 +87,109 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
     );
   }
 
+  // ===== Filter helpers =====
+  List<CycleModel> _applyFilter(List<CycleModel> src) {
+    switch (_filter) {
+      case _CycleFilter.withNotes:
+        return src.where((c) => (c.note?.trim().isNotEmpty ?? false)).toList();
+      case _CycleFilter.last3Months:
+        final now = DateTime.now();
+        final threeMonthsAgo = DateTime(now.year, now.month - 3, now.day);
+        return src.where((c) => c.cycleStartTime.isAfter(threeMonthsAgo)).toList();
+      case _CycleFilter.all:
+      default:
+        return src;
+    }
+  }
+
+  void _openFilterSheet() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40, height: 4,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const Text('Bộ lọc', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 12),
+                _filterTile(title: 'Tất cả', value: _CycleFilter.all),
+                _filterTile(title: 'Có ghi chú', value: _CycleFilter.withNotes),
+                _filterTile(title: '3 tháng gần nhất', value: _CycleFilter.last3Months),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _filterTile({required String title, required _CycleFilter value}) {
+    final selected = _filter == value;
+    return ListTile(
+      dense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+      leading: Icon(
+        selected ? Icons.radio_button_checked : Icons.radio_button_off,
+        color: selected ? Colors.pink : Colors.grey,
+        size: 20,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+          color: selected ? Colors.pink : Colors.black87,
+        ),
+      ),
+      onTap: () {
+        setState(() => _filter = value);
+        Navigator.pop(context);
+      },
+    );
+  }
+
+  // ===== Main list (giữ nguyên tên hàm) =====
   Widget _buildCycleList(List<CycleModel> list) {
+    // maxDays theo danh sách đang hiển thị để scale progress
     final maxDays = list
         .map((e) => e.cycleEndTime.difference(e.cycleStartTime).inDays + 1)
         .fold<int>(0, (prev, e) => e > prev ? e : prev);
 
     return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
       itemCount: list.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 14),
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final cycle = list[index];
 
-        // Giữ nguyên công thức từ file cũ
-        final int? cycleDays = cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
+        // Logic gốc giữ nguyên
+        final int cycleDays =
+            cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
+        final int menstruationDays =
+            cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
 
-        final int? menstruationDays = cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
+        final double totalRatio = (maxDays > 0) ? cycleDays / maxDays : 0;
+        final double menstruationRatio = (maxDays > 0) ? menstruationDays / maxDays : 0;
 
-        final double totalRatio = (cycleDays != null && maxDays > 0)
-            ? cycleDays / maxDays
-            : 0;
-        final double menstruationRatio = (menstruationDays != null && maxDays > 0)
-            ? menstruationDays / maxDays
-            : 0;
-
-        final bool isLongest = (cycleDays != null && cycleDays == maxDays);
+        // Nhấn mạnh CHU KỲ HIỆN TẠI (now ∈ [start, end])
+        final now = DateTime.now();
+        final bool isCurrent = now.isAfter(cycle.cycleStartTime.subtract(const Duration(days: 0)))
+            && now.isBefore(cycle.cycleEndTime.add(const Duration(days: 1)));
 
         return Slidable(
           key: ValueKey(cycle.cycleStartTime.millisecondsSinceEpoch),
@@ -124,150 +211,224 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
           ),
           child: GestureDetector(
             onTap: () {
-              context.navigateTo(
-                RoutesName.cycleDetail,
-                arguments: cycle,
-              );
+              context.navigateTo(RoutesName.cycleDetail, arguments: cycle);
             },
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: isLongest
-                    ? Border.all(color: Colors.pink.shade200, width: 1.5)
+                // Nổi bật nhưng không rối: current có nền gradient rất nhẹ + viền hồng
+                gradient: isCurrent
+                    ? LinearGradient(
+                  colors: [Colors.pink.shade50, Colors.white],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
                     : null,
+                color: isCurrent ? null : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isCurrent ? Colors.pink.shade300 : Colors.grey.shade200,
+                  width: isCurrent ? 1.5 : 1,
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.pink.shade100.withAlpha(70),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+                    color: (isCurrent ? Colors.pink.shade100 : Colors.black12).withOpacity(0.10),
+                    blurRadius: isCurrent ? 12 : 6,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header
+                  // Header gọn & rõ
                   Row(
                     children: [
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Colors.pink.shade200, Colors.pink.shade50],
+                            colors: [Colors.pink.shade400, Colors.red.shade300],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           shape: BoxShape.circle,
                         ),
-                        padding: const EdgeInsets.all(10),
-                        child: const Text('🌸', style: TextStyle(fontSize: 22)),
+                        padding: const EdgeInsets.all(6),
+                        child: const Text('🌸', style: TextStyle(fontSize: 16)),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          '${dateFormat.format(cycle.cycleStartTime)} - '
-                              '${ dateFormat.format(cycle.cycleEndTime)}',
+                          '${dateFormat.format(cycle.cycleStartTime)} - ${dateFormat.format(cycle.cycleEndTime)}',
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 13.5,
                             fontWeight: FontWeight.w700,
                             color: Colors.black87,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      if (isCurrent)
+                        Container(
+                          margin: const EdgeInsets.only(left: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.pink.shade100,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Text(
+                            'Hiện tại',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.redAccent,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
+
+                  // Progress bar (vẫn 2 đoạn: menstruation + remaining, scale theo maxDays)
                   LayoutBuilder(
                     builder: (context, constraints) {
                       const double minLabelWidth = 28.0;
+                      final barHeight = isCurrent ? 22.0 : 18.0;
 
                       final totalWidth = constraints.maxWidth;
-                      final rawCycleWidth = totalWidth * totalRatio;
-                      final rawMensWidth = totalWidth * menstruationRatio;
+                      final rawCycleWidth = totalWidth * totalRatio; // scale theo max
+                      final rawMensWidth  = totalWidth * menstruationRatio;
+
                       final double cycleWidth = rawCycleWidth.isFinite
                           ? rawCycleWidth.clamp(0.0, totalWidth)
                           : 0.0;
+
                       double mensWidth = rawMensWidth.isFinite ? rawMensWidth : 0.0;
                       if (mensWidth > cycleWidth) mensWidth = cycleWidth;
 
-                      final double remainingWidth = (cycleWidth - mensWidth).clamp(0.0, totalWidth);
+                      final double remainingWidth =
+                      (cycleWidth - mensWidth).clamp(0.0, totalWidth);
 
-                      return Container(
-                        height: 18,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          color: Colors.grey.shade200,
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child: Row(
+                      return SizedBox(
+                        height: barHeight,
+                        child: Stack(
+                          alignment: Alignment.center,
                           children: [
-                            // Menstruation segment (hồng đậm)
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 600),
-                              curve: Curves.easeOutCubic,
-                              width: mensWidth,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [Colors.red.shade200, Colors.pink.shade200],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
+                            Row(
+                              children: [
+                                // Menstruation segment (đậm)
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 380),
+                                  curve: Curves.easeOutCubic,
+                                  width: mensWidth,
+                                  height: barHeight,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.horizontal(
+                                      left: const Radius.circular(50),
+                                      right: Radius.circular(remainingWidth == 0 ? 50 : 0),
+                                    ),
+                                    gradient: LinearGradient(
+                                      colors: isCurrent
+                                          ? [Colors.red.shade400, Colors.pink.shade300]
+                                          : [Colors.red.shade300, Colors.pink.shade200],
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                    ),
+                                  ),
+                                  child: (menstruationDays > 0 && mensWidth >= minLabelWidth)
+                                      ? Center(
+                                    child: Text(
+                                      '${menstruationDays}d',
+                                      style: const TextStyle(
+                                        fontSize: 10.5,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                  )
+                                      : const SizedBox.shrink(),
                                 ),
-                              ),
-                              child: (menstruationDays != null && menstruationDays > 0 && mensWidth >= minLabelWidth)
-                                  ? Center(
-                                child: Text(
-                                  '${menstruationDays}d',
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700,
+                                // Remaining segment (nhạt)
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 380),
+                                  curve: Curves.easeOutCubic,
+                                  width: remainingWidth,
+                                  height: barHeight,
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.horizontal(
+                                      right: Radius.circular(50),
+                                    ),
+                                    gradient: LinearGradient(
+                                      colors: isCurrent
+                                          ? [Colors.pink.shade100, Colors.white]
+                                          : [Colors.pink.shade50, Colors.white],
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                    ),
                                   ),
                                 ),
-                              )
-                                  : const SizedBox.shrink(),
+                              ],
                             ),
-                            AnimatedContainer(
-                              duration: const Duration(milliseconds: 600),
-                              curve: Curves.easeOutCubic,
-                              width: remainingWidth,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [Colors.pink.shade100, Colors.pink.shade50],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
+                            // Tổng số ngày luôn hiển thị, nhỏ gọn; current đậm hơn
+                            IgnorePointer(
+                              child: Text(
+                                '${cycleDays} ngày',
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: isCurrent
+                                      ? Colors.black.withOpacity(0.8)
+                                      : Colors.black.withOpacity(0.60),
                                 ),
                               ),
-                              child: (cycleDays != null && remainingWidth >= minLabelWidth)
-                                  ? Center(
-                                child: Text(
-                                  '${cycleDays}d',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.grey.shade700,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              )
-                                  : const SizedBox.shrink(),
                             ),
                           ],
                         ),
                       );
                     },
                   ),
+
+                  // Dòng thông tin phụ gọn, tránh rối
                   const SizedBox(height: 8),
-                  if (isLongest)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text('🌟 Chu kỳ dài nhất').text13().w600().customColor(Colors.pink.shade400),
-                    ),
+                  Row(
+                    children: [
+                      _pill('Kinh: ${menstruationDays}d', Colors.red.shade50, Colors.red.shade400),
+                      const SizedBox(width: 6),
+                      _pill('Chu kỳ: ${cycleDays}d', Colors.pink.shade50, Colors.pink.shade400),
+                      if (cycle.note?.trim().isNotEmpty ?? false) ...[
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: _pill(
+                            '📝 ${cycle.note!.trim()}',
+                            Colors.orange.shade50,
+                            Colors.orange.shade600,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ],
               ),
             ),
           ),
         );
       },
+    );
+  }
+
+  // Chip nhỏ gọn
+  Widget _pill(String text, Color bg, Color fg, {int maxLines = 1}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
+      child: Text(
+        text,
+        maxLines: maxLines,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: fg),
+      ),
     );
   }
 }
