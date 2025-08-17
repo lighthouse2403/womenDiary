@@ -89,8 +89,12 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
       cycleList.removeWhere((e) => e.id == event.id);
 
       /// Update average cycle length
+      cycleList.sort((a, b) => a.cycleStartTime.compareTo(b.cycleStartTime));
+
       int totalCycleDays = 0;
       int countCycle = 0;
+
+      // Update cycleEndTime dựa theo cycleStartTime của cycle kế tiếp
       for (int i = 0; i < cycleList.length; i++) {
         if (i < cycleList.length - 1) {
           cycleList[i].cycleEndTime =
