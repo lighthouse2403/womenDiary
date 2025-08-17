@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
+import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/setting/bloc/setting_bloc.dart';
 import 'package:women_diary/setting/bloc/setting_event.dart';
 import 'package:women_diary/setting/bloc/setting_state.dart';
@@ -336,12 +337,31 @@ class _SettingViewState extends State<SettingView> {
     builder: (context, state) {
       bool isEnabled =
       (state is UpdateUsingAverageState) ? state.isUsingAverage : false;
+      int avgLength = LocalStorageService.getAverageCycleLength();
 
-      return SwitchTile(
-        label: "Sử dụng giá trị trung bình",
-        value: isEnabled,
-        onChanged: (val) =>
-            context.read<SettingBloc>().add(ToggleAverageEvent(val)),
+      print('avgLength: ${avgLength}');
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SwitchTile(
+            label: "Sử dụng giá trị trung bình",
+            value: isEnabled,
+            onChanged: (val) =>
+                context.read<SettingBloc>().add(ToggleAverageEvent(val)),
+          ),
+          if (avgLength > 0) // chỉ hiển thị khi có dữ liệu
+            Padding(
+              padding: const EdgeInsets.only(left: 16, top: 4),
+              child: Text(
+                "Giá trị trung bình hiện tại: $avgLength ngày",
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+        ],
       );
     },
   );

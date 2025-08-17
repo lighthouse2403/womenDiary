@@ -28,44 +28,31 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
 
   Future<void> _createCycle(CreateCycleEvent event, Emitter<CycleState> emit) async {
     try {
-      if (cycleList.isNotEmpty) {
-        CycleModel lastCycle = cycleList.first;
-        lastCycle.cycleEndTime =
-            event.newCycle.cycleEndTime.subtract(const Duration(days: 1));
-        await DatabaseHandler.updateCycle(lastCycle);
-      }
-
-      // --- Tính chu kỳ trung bình --
-      bool isUsingAverage = LocalStorageService.isUsingAverageValue();
-      int averageCycleLength = LocalStorageService.getCycleLength();
-
-      if ((cycleList.length > 1) && isUsingAverage) {
-        int totalCycleDays = 0;
-        int countCycle = 0;
-
-        for (var cycle in cycleList) {
-          totalCycleDays += cycle.cycleEndTime
-              .difference(cycle.cycleStartTime)
-              .inDays + 1;
-          countCycle++;
-        }
-
-        if (countCycle > 0) {
-          averageCycleLength = (totalCycleDays / countCycle).round();
-        }
-
-        LocalStorageService.updateAverageCycleLength(averageCycleLength);
-      }
-
-      event.newCycle.cycleEndTime = event.newCycle.cycleStartTime.add(Duration(days: averageCycleLength -1));
-
-      // Lưu cycle mới
+      // Thêm chu kỳ mới vào DB
       await DatabaseHandler.insertCycle(event.newCycle);
-      cycleList.add(event.newCycle);
 
+      // Lấy lại toàn bộ danh sách cycle và sắp xếp theo ngày bắt đầu
+      cycleList = await DatabaseHandler.getAllCycle();
+      cycleList.sort((a, b) => a.cycleStartTime.compareTo(b.cycleStartTime));
+
+      int totalCycleDays = 0;
+      int countCycle = 0;
+
+      // Update cycleEndTime dựa theo cycleStartTime của cycle kế tiếp
+      for (int i = 0; i < cycleList.length; i++) {
+        if (i < cycleList.length - 1) {
+          cycleList[i].cycleEndTime =
+              cycleList[i + 1].cycleStartTime.subtract(const Duration(days: 1));
+
+          totalCycleDays += cycleList[i].cycleEndTime.difference(cycleList[i].cycleStartTime).inDays;
+          countCycle += 1;
+        }
+        await DatabaseHandler.updateCycle(cycleList[i]);
+      }
+      await LocalStorageService.updateAverageCycleLength((totalCycleDays/countCycle).round());
       emit(LoadedAllCycleState(cycleList));
     } catch (error) {
-      // có thể emit state lỗi
+      // emit state lỗi nếu cần
     }
   }
 
@@ -100,6 +87,21 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
     try {
       await DatabaseHandler.deleteCycleById(event.id);
       cycleList.removeWhere((e) => e.id == event.id);
+
+      /// Update average cycle length
+      int totalCycleDays = 0;
+      int countCycle = 0;
+      for (int i = 0; i < cycleList.length; i++) {
+        if (i < cycleList.length - 1) {
+          cycleList[i].cycleEndTime =
+              cycleList[i + 1].cycleStartTime.subtract(const Duration(days: 1));
+
+          totalCycleDays += cycleList[i].cycleEndTime.difference(cycleList[i].cycleStartTime).inDays;
+          countCycle += 1;
+        }
+        await DatabaseHandler.updateCycle(cycleList[i]);
+      }
+      await LocalStorageService.updateAverageCycleLength((totalCycleDays/countCycle).round());
       emit(LoadedAllCycleState(cycleList));
     } catch (error) {
     }

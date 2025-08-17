@@ -6,6 +6,7 @@ class LocalStorageService {
   static SharedPreferences? _prefs;
   String cycleLengthKey = 'cycleLength';
   static String _skipVersionKey = "skip_version";
+  static String _averageCycle = 'averageCycleLength';
 
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -78,11 +79,11 @@ class LocalStorageService {
 
   /// Average Cycle length
   static Future<void> updateAverageCycleLength(int cycleLength) async {
-    await _prefs?.setInt('averageCycleLength', cycleLength);
+    await _prefs?.setInt(_averageCycle, cycleLength);
   }
 
   static int getAverageCycleLength() {
-    return _prefs?.getInt('averageCycleLength') ?? 30;
+    return _prefs?.getInt(_averageCycle) ?? 30;
   }
 
   static Future<void> saveSkippedVersion(String version) async {
