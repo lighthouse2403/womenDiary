@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/cycle/bloc/cycle_event.dart';
 import 'package:women_diary/cycle/bloc/cycle_state.dart';
@@ -21,6 +22,10 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
   Future<void> _loadAllCycle(LoadAllCycleEvent event, Emitter<CycleState> emit) async {
     try {
       cycleList = await DatabaseHandler.getAllCycle();
+      for (int i = 0; i < cycleList.length; i++) {
+        print(cycleList[i].menstruationEndTime.globalDateFormat());
+        print(cycleList[i].cycleStartTime.globalDateFormat());
+      }
       emit(LoadedAllCycleState(cycleList));
     } catch (error) {
     }
@@ -93,8 +98,6 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
 
       int totalCycleDays = 0;
       int countCycle = 0;
-
-      // Update cycleEndTime dựa theo cycleStartTime của cycle kế tiếp
       for (int i = 0; i < cycleList.length; i++) {
         if (i < cycleList.length - 1) {
           cycleList[i].cycleEndTime =
@@ -103,6 +106,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
           totalCycleDays += cycleList[i].cycleEndTime.difference(cycleList[i].cycleStartTime).inDays;
           countCycle += 1;
         }
+
         await DatabaseHandler.updateCycle(cycleList[i]);
       }
       await LocalStorageService.updateAverageCycleLength((totalCycleDays/countCycle).round());
