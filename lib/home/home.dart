@@ -8,6 +8,8 @@ import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/phase_model.dart';
 import 'package:women_diary/home/pretty_cycle_painter.dart';
+import 'package:women_diary/routes/route_name.dart';
+import 'package:women_diary/routes/routes.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -195,6 +197,29 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 12),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.purple.shade100,
+                        foregroundColor: Colors.purple.shade700,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      icon: const Icon(Icons.settings),
+                      label: const Text(
+                        "Thiết lập cá nhân",
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      onPressed: () {
+                        context.navigateTo(RoutesName.setting);
+                      },
+                    ),
                   ),
                 ],
               ),
