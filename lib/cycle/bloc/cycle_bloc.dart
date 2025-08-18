@@ -36,7 +36,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
       // Thêm chu kỳ mới vào DB
       bool isUsingAverage = LocalStorageService.isUsingAverageValue();
       if (isUsingAverage) {
-        event.newCycle.cycleEndTime = event.newCycle.cycleStartTime.add(Duration(days: LocalStorageService.getAverageCycleLength()));
+        event.newCycle.cycleEndTime = event.newCycle.cycleStartTime.add(Duration(days: LocalStorageService.getAverageCycleLength() - 1));
       }
       await DatabaseHandler.insertCycle(event.newCycle);
 

@@ -362,8 +362,8 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.w800,
                                   color: isCurrent
-                                      ? Colors.black.withOpacity(0.8)
-                                      : Colors.black.withOpacity(0.60),
+                                      ? Colors.black.withAlpha(200)
+                                      : Colors.black.withAlpha(150),
                                 ),
                               ),
                             ),
