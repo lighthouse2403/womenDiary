@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:women_diary/home/phase_model.dart';
 
@@ -21,7 +20,7 @@ class PrettyCyclePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final strokeWidth = 34.0;
+    final strokeWidth = 36.0;
     final radius = min(size.width, size.height) / 2 - strokeWidth / 2;
     final arcRect = Rect.fromCircle(center: center, radius: radius);
     final dotRadiusBase = size.width * 0.009;

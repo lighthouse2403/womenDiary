@@ -35,6 +35,10 @@ extension TextExtension on Text? {
     return Text(this?.data ?? '', style: this?.style?.blackColor(), textAlign: this?.textAlign, overflow: this?.overflow, maxLines: this?.maxLines);
   }
 
+  Text black87Color() {
+    return Text(this?.data ?? '', style: this?.style?.black87Color(), textAlign: this?.textAlign, overflow: this?.overflow, maxLines: this?.maxLines);
+  }
+
   Text mainColor() {
     return Text(this?.data ?? '', style: this?.style?.mainColor(), textAlign: this?.textAlign, overflow: this?.overflow, maxLines: this?.maxLines);
   }

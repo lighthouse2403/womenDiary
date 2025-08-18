@@ -39,6 +39,15 @@ extension FontWeightExtension on TextStyle? {
     );
   }
 
+  TextStyle black87Color() {
+    return TextStyle(
+        fontWeight: this?.fontWeight,
+        fontSize: this?.fontSize,
+        color:  Colors.black87,
+        overflow: this?.overflow
+    );
+  }
+
   TextStyle whiteColor() {
     return TextStyle(
         fontWeight: this?.fontWeight,
