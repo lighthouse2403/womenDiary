@@ -57,4 +57,11 @@ class Constants {
   static String iOSPeriodTrackerAppId = '1528917480';
   static String androidPeriodTrackerAppId = '1528917480';
   static String audioPath = 'asset:///assets/data/audios/';
+
+  static List<String> locations = [
+    'Hà Nội',
+    'Hồ Chí Minh',
+    'Đà Nẵng',
+    'Hải Phòng'
+  ];
 }

@@ -3,6 +3,7 @@ import 'package:women_diary/actions_history/action_list/action_history.dart';
 import 'package:women_diary/actions_history/action_detail/new_action.dart';
 import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/bottom_tab_bar/bottom_tab_bar.dart';
+import 'package:women_diary/chat/chat_list.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/cycle/first_setup/cycle_setup.dart';
 import 'package:women_diary/cycle/list/cycle_history.dart';
@@ -79,9 +80,9 @@ class Routes {
             ),
             GoRoute(
               parentNavigatorKey: _shellNavigatorKey,
-              path: RoutesName.setting,
+              path: RoutesName.chat,
               pageBuilder: (context, state) {
-                return _createPageFadeTransition(state: state, child: Setting());
+                return _createPageFadeTransition(state: state, child: Chat());
               },
             ),
           ],
