@@ -18,14 +18,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   void _onLoadLocalData(LoadCycleEvent event, Emitter<HomeState> emit) async {
     CycleModel? lastCycle = await DatabaseHandler.getLastCycle();
     int cycleLength = lastCycle != null
-        ? lastCycle.cycleEndTime.difference(lastCycle.cycleStartTime).inDays
+        ? lastCycle.cycleEndTime.difference(lastCycle.cycleStartTime).inDays + 1
         : await LocalStorageService.getCycleLength();
 
     int menstruationLength = lastCycle != null
-        ? lastCycle.menstruationEndTime.difference(lastCycle.cycleStartTime).inDays
+        ? lastCycle.menstruationEndTime.difference(lastCycle.cycleStartTime).inDays + 1
         : await LocalStorageService.getMenstruationLength();
 
-    int currentDay = DateTime.now().difference(lastCycle?.cycleStartTime ?? DateTime.now()).inDays;
+    int currentDay = DateTime.now().difference(lastCycle?.cycleStartTime ?? DateTime.now()).inDays + 1;
 
     /// Show phase information
     final phases = await _buildPhases(cycleLength, menstruationLength);
