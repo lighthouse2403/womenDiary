@@ -345,8 +345,8 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
                                     ),
                                     gradient: LinearGradient(
                                       colors: isCurrent
-                                          ? [Colors.pink.shade100, Colors.white]
-                                          : [Colors.pink.shade50, Colors.white],
+                                          ? [Colors.pink.shade200, Colors.pink.shade50]
+                                          : [Colors.pink.shade100, Colors.pink.shade50],
                                       begin: Alignment.centerLeft,
                                       end: Alignment.centerRight,
                                     ),

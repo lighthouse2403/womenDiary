@@ -57,9 +57,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   Future<List<PhaseModel>> _buildPhases(int cycleLength, int menstruationLength) async {
-    final int cycleLength = await LocalStorageService.getCycleLength();
-    final int menstruationLength = await LocalStorageService.getMenstruationLength();
-
     final int ovulationDay = cycleLength - 14; // VD: ngày 14
     final int fertileStart = ovulationDay - 5; // VD: ngày 9
     final int fertileEnd = ovulationDay + 1;   // VD: ngày 15

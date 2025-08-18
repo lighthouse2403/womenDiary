@@ -74,7 +74,7 @@ class LocalStorageService {
   }
 
   static int getAverageMenstruationLength() {
-    return _prefs?.getInt('averageMenstruationLength') ?? 7;
+    return _prefs?.getInt('averageMenstruationLength') ?? getMenstruationLength();
   }
 
   /// Average Cycle length
@@ -83,7 +83,7 @@ class LocalStorageService {
   }
 
   static int getAverageCycleLength() {
-    return _prefs?.getInt(_averageCycle) ?? 30;
+    return _prefs?.getInt(_averageCycle) ?? getCycleLength();
   }
 
   static Future<void> saveSkippedVersion(String version) async {

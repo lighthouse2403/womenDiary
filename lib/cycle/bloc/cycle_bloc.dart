@@ -34,6 +34,10 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
   Future<void> _createCycle(CreateCycleEvent event, Emitter<CycleState> emit) async {
     try {
       // Thêm chu kỳ mới vào DB
+      bool isUsingAverage = LocalStorageService.isUsingAverageValue();
+      if (isUsingAverage) {
+        event.newCycle.cycleEndTime = event.newCycle.cycleStartTime.add(Duration(days: LocalStorageService.getAverageCycleLength()));
+      }
       await DatabaseHandler.insertCycle(event.newCycle);
 
       // Lấy lại toàn bộ danh sách cycle và sắp xếp theo ngày bắt đầu
