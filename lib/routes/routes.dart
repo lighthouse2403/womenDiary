@@ -3,7 +3,9 @@ import 'package:women_diary/actions_history/action_list/action_history.dart';
 import 'package:women_diary/actions_history/action_detail/new_action.dart';
 import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/bottom_tab_bar/bottom_tab_bar.dart';
+import 'package:women_diary/chat/chat_detail.dart';
 import 'package:women_diary/chat/chat_list.dart';
+import 'package:women_diary/chat/model/thread_model.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/cycle/first_setup/cycle_setup.dart';
 import 'package:women_diary/cycle/list/cycle_history.dart';
@@ -84,7 +86,7 @@ class Routes {
               pageBuilder: (context, state) {
                 return _createPageFadeTransition(state: state, child: Chat());
               },
-            ),
+            )
           ],
         ),
         GoRoute(
@@ -145,7 +147,14 @@ class Routes {
           pageBuilder: (context, state) {
             return _createPageFadeTransition(state: state, child: NewSchedule());
           },
-        )
+        ),
+        GoRoute(
+          path: RoutesName.chatDetail,
+          pageBuilder: (context, state) {
+            ThreadModel thread = state.extra as ThreadModel;
+            return _createPageFadeTransition(state: state, child: ChatDetail(thread: thread));
+          },
+        ),
       ],
     );
   }

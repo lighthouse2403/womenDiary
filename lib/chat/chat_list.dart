@@ -9,6 +9,7 @@ import 'package:women_diary/chat/bloc/chat_state.dart';
 import 'package:women_diary/common/admob_handle.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/base/base_statefull_widget.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/common/firebase/firebase_chat.dart';
 import 'package:women_diary/routes/route_name.dart';
@@ -47,11 +48,12 @@ class _ChatState extends BaseStatefulState<Chat> {
   @override
   PreferredSizeWidget? buildAppBar() {
     return BaseAppBar(
+      backgroundColor: AppColors.pinkTextColor,
       title: 'Giao lưu',
       actions: [
         TextButton(
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const NewThread())).then((res) => chatBloc.add(const LoadThreads()));
+              context.navigateTo(RoutesName.newChat).then((res) => chatBloc.add(const LoadThreads()));
             },
             child: const Text('Hỏi').w600().text14().whiteColor()
         )
