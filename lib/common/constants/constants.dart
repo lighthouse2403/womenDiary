@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class Constants {
   /// Color
-  static Color mainColor() => const Color(0xFF47AC66);
+  static Color mainColor() => const Color(0xFFFF66A3);
   static Color pinkTextColor() => const Color(0xFFFF66A3);
   static Color primaryTextColor() => const Color(0xFF0B0B1E);
   static Color secondaryTextColor() => const Color(0xFFA3A3AC);

@@ -22,10 +22,6 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
   Future<void> _loadAllCycle(LoadAllCycleEvent event, Emitter<CycleState> emit) async {
     try {
       cycleList = await DatabaseHandler.getAllCycle();
-      for (int i = 0; i < cycleList.length; i++) {
-        print(cycleList[i].menstruationEndTime.globalDateFormat());
-        print(cycleList[i].cycleStartTime.globalDateFormat());
-      }
       emit(LoadedAllCycleState(cycleList));
     } catch (error) {
     }

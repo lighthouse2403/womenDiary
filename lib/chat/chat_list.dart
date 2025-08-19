@@ -49,13 +49,15 @@ class _ChatState extends BaseStatefulState<Chat> {
   PreferredSizeWidget? buildAppBar() {
     return BaseAppBar(
       backgroundColor: AppColors.pinkTextColor,
-      title: 'Giao lưu',
+      title: '💞 Giao lưu',
       actions: [
-        TextButton(
-            onPressed: () {
-              context.navigateTo(RoutesName.newChat).then((res) => chatBloc.add(const LoadThreads()));
-            },
-            child: const Text('Hỏi').w600().text14().whiteColor()
+        IconButton(
+          onPressed: () {
+            context.navigateTo(RoutesName.newChat)
+                .then((res) => chatBloc.add(const LoadThreads()));
+          },
+          icon: const Icon(Icons.edit_note, color: Colors.white),
+          tooltip: "Tạo câu hỏi",
         )
       ],
     );
@@ -65,57 +67,79 @@ class _ChatState extends BaseStatefulState<Chat> {
   Widget? buildBody() {
     return BlocProvider(
       create: (context) => chatBloc,
-      child: BlocListener<ChatBloc, ChatState> (
-          listener: (context, state) {
-            if (state is LoadingState) {
-              loadingView.show(context);
-              return;
-            }
-
-            if (state is LoadingSuccessfulState) {
-              setState(() {
-                _loading = false;
-              });
-              loadingView.hide();
-            }
-            },
-          child: CustomScrollView(
-            controller: _controller,
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
-            slivers: [
-              CupertinoSliverRefreshControl(
-                onRefresh: _refresh,
+      child: BlocListener<ChatBloc, ChatState>(
+        listener: (context, state) {
+          if (state is LoadingState) {
+            loadingView.show(context);
+          } else if (state is LoadingSuccessfulState) {
+            setState(() => _loading = false);
+            loadingView.hide();
+          }
+        },
+        child: Stack(
+          children: [
+            CustomScrollView(
+              controller: _controller,
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
               ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  return InkWell(
-                    onTap: () {
-                      AdsHelper.showAds(dismiss: () {
-                        context.navigateTo(
-                            RoutesName.chatDetail,
-                            arguments: chatBloc.threads[index]
-                        ).then((value) => chatBloc.add(const LoadThreads()));
-                      });
-                    },
-                    child: ThreadRow(thread: chatBloc.threads[index]),
-                  );
-                },
-                  childCount: chatBloc.threads.length,
+              slivers: [
+                CupertinoSliverRefreshControl(
+                  onRefresh: _refresh,
                 ),
-              ),
-              SliverToBoxAdapter(
-                child: SizedBox(
-                    height: 30,
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                        final thread = chatBloc.threads[index];
+                        return InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () {
+                            AdsHelper.showAds(dismiss: () {
+                              context.navigateTo(
+                                RoutesName.chatDetail,
+                                arguments: thread,
+                              ).then((value) => chatBloc.add(const LoadThreads()));
+                            });
+                          },
+                          child: ThreadRow(thread: thread),
+                        );
+                      },
+                      childCount: chatBloc.threads.length,
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 50,
                     child: FirebaseChat.instance.threadLimit > chatBloc.threads.length
-                        ? Container()
-                        : const CupertinoActivityIndicator(radius: 12.0, color: CupertinoColors.inactiveGray)
+                        ? const SizedBox()
+                        : const Center(
+                      child: CupertinoActivityIndicator(
+                        radius: 14,
+                        color: Colors.pinkAccent,
+                      ),
+                    ),
+                  ),
                 ),
-              )
-            ],
-          )
-      )
+              ],
+            ),
+            Positioned(
+              bottom: 16,
+              right: 16,
+              child: FloatingActionButton(
+                backgroundColor: AppColors.pinkTextColor,
+                onPressed: () {
+                  context.navigateTo(RoutesName.newChat)
+                      .then((res) => chatBloc.add(const LoadThreads()));
+                },
+                child: const Icon(Icons.add_comment, color: Colors.white),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 

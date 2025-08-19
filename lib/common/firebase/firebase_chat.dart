@@ -29,28 +29,21 @@ class FirebaseChat {
     return newThread;
   }
 
-  Future<void> addNewThread(String title) async {
+  Future<void> addNewThread(String content) async {
     CollectionReference chat = firestore.collection('chat');
-    List<String> deviceInfo = await FirebaseUser.instance.getDeviceDetails();
+    Map<String, dynamic> deviceInfo = await FirebaseUser.instance.getFullDeviceInfo();
 
     await chat.add({
         'createTime': FieldValue.serverTimestamp(),
         'threadId': FieldValue.serverTimestamp().toString(),
-        'title': title,
+        'content': content,
         'updateTime': FieldValue.serverTimestamp(),
-        'deviceId': deviceInfo[2],
-        'deviceName': deviceInfo[1],
-        'os': deviceInfo.firstOrNull,
+        'uuid': deviceInfo[2],
+        'os': deviceInfo['os'],
         'commentsCount': 0,
     }).then((value) async {
       await editThreadId(value.id);
     }).catchError((error) => print("Failed to add user: $error"));
-  }
-
-  Future<void> editThread(String threadId, String newTitle) async {
-    CollectionReference chat = firestore.collection('chat');
-    List<String> deviceInfo = await FirebaseUser.instance.getDeviceDetails();
-    var docSnapshot = await chat.where('author', isEqualTo: deviceInfo[1]).get();
   }
 
   Future<void> editThreadId(String threadId) async {
@@ -78,14 +71,13 @@ class FirebaseChat {
 
   Future<void> addNewComment(ThreadModel thread, String content) async {
     CollectionReference chat = firestore.collection('chat');
-    List<String> deviceInfo = await FirebaseUser.instance.getDeviceDetails();
+    Map<String, dynamic> deviceInfo = await FirebaseUser.instance.getFullDeviceInfo();
     var comment = await chat.doc(thread.threadId).collection('comments');
     await comment.add({
       'commentId': FieldValue.serverTimestamp().toString(),
       'threadId': thread.threadId,
-      'os': deviceInfo.firstOrNull,
-      'deviceName': deviceInfo[1],
-      'deviceId': deviceInfo[2],
+      'os': deviceInfo['os'],
+      'uuid': deviceInfo['uuid'],
       'content': content,
       'updateTime': FieldValue.serverTimestamp(),
       'createTime': FieldValue.serverTimestamp()

@@ -10,6 +10,7 @@ import 'package:women_diary/home/phase_model.dart';
 import 'package:women_diary/home/pretty_cycle_painter.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
+import 'package:women_diary/schedule/new_schedule.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -176,10 +177,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                           emoji: "✍️",
                           background: Colors.pink.shade100,
                           foreground: Colors.white,
-                          onTap: () => _showQuickActionSheet(
-                            context,
-                            type: 'action',
-                          ),
+                          onTap: () => context.goTo(RoutesName.newAction),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -190,10 +188,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                           background: Colors.white,
                           foreground: Colors.pink,
                           border: BorderSide(color: Colors.pink.shade200),
-                          onTap: () => _showQuickActionSheet(
-                            context,
-                            type: 'schedule',
-                          ),
+                          onTap: () => context.goTo(RoutesName.newSchedule),
                         ),
                       ),
                     ],

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 import 'package:women_diary/database/local_storage_service.dart';
 import 'dart:ui' as ui;
@@ -16,25 +15,28 @@ class FirebaseUser {
 
   Future<void> addUser() async {
     CollectionReference users = firestore.collection('user');
-    List<String> deviceInfo = await getDeviceDetails();
+    Map<String, dynamic> deviceInfo = await getFullDeviceInfo();
     var docSnapshot = await users.doc(deviceInfo[2]).get();
     var cycleLength = LocalStorageService.getCycleLength();
     var averageCycleLength = LocalStorageService.getAverageCycleLength();
     var menstruationLength = LocalStorageService.getMenstruationLength();
     var averageMenstruationLength = LocalStorageService.getAverageMenstruationLength();
-    final locale = ui.PlatformDispatcher.instance.locale;
 
     if (!docSnapshot.exists) {
-      users.doc(deviceInfo[2]).set({
-        'os': deviceInfo.firstOrNull,
-        'deviceName': deviceInfo[1],
+      users.doc(deviceInfo['uuid']).set({
+        'uuid': deviceInfo['uuid'],
+        'os': deviceInfo['os'],
         'cycle': cycleLength,
         'menstruation': menstruationLength,
         'averageCycle': averageCycleLength,
         'averageMenstruation': averageMenstruationLength,
-        'deviceId': deviceInfo[2],
-        'language': locale.languageCode,
-        'region': locale.countryCode,
+        'region': deviceInfo['region'],
+        'language': deviceInfo['language'],
+        'appVersion': deviceInfo['appVersion'],
+        'wifiIP': deviceInfo['wifiIP'],
+        'wifiSSID': deviceInfo['wifiSSID'],
+        'model': deviceInfo['model'],
+        'totalDiskSize': deviceInfo['totalDiskSize'],
         'firstTime': FieldValue.serverTimestamp()
       }).then((value) => print("User Added"))
           .catchError((error) => print("Failed to add user: $error"));
@@ -45,40 +47,11 @@ class FirebaseUser {
 
   Future<void> updateLastTime() async {
     CollectionReference users = firestore.collection('user');
-    List<String> deviceInfo = await getDeviceDetails();
-    users.doc(deviceInfo[2])
-        .update({'lastTime' : FieldValue.serverTimestamp(), 'os': deviceInfo.firstOrNull})
+    Map<String, dynamic> deviceInfo = await getFullDeviceInfo();
+    users.doc(deviceInfo['uuid'])
+        .update({'lastTime' : FieldValue.serverTimestamp(), 'os': deviceInfo['os']})
         .then((_) => print('Success'))
         .catchError((error) => print('Failed: $error'));
-  }
-
-
-  Future<List<String>> getDeviceDetails() async {
-    String os = Platform.operatingSystem;
-    String deviceName = '';
-    String osVersion = '';
-    String identifier = LocalStorageService.getUuid();
-    final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-
-    try {
-      if (Platform.isAndroid) {
-        final build = await deviceInfoPlugin.androidInfo;
-        deviceName = build.model;
-        osVersion = build.version.release;
-        if (identifier.isEmpty) {
-          identifier = await Uuid().v6();
-          LocalStorageService.updateUuid(identifier);
-        }
-      } else if (Platform.isIOS) {
-        final data = await deviceInfoPlugin.iosInfo;
-        deviceName = data.modelName; // Tên thiết bị, ví dụ "iPhone"
-        osVersion = data.systemVersion; // Phiên bản iOS, ví dụ "16.5"
-        identifier = data.identifierForVendor ?? ''; // UUID ổn định
-      }
-    } on PlatformException {
-      print('Failed to get platform version');
-    }
-    return ['$os $osVersion', deviceName, identifier];
   }
 
   Future<Map<String, dynamic>> getFullDeviceInfo() async {

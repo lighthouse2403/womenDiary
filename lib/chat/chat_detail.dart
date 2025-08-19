@@ -57,7 +57,7 @@ class _ChatState extends BaseStatefulState<ChatDetail> {
   @override
   PreferredSizeWidget? buildAppBar() {
     return BaseAppBar(
-      title: widget.thread.title,
+      title: widget.thread.content,
     );
   }
 

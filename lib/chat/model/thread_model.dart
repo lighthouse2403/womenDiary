@@ -4,8 +4,8 @@ class ThreadModel {
   String threadId = '';
   String deviceId = '';
   String? deviceName = '';
-  String title = '';
-  int? commentsCount = 0;
+  String content = '';
+  int commentsCount = 0;
 
   Timestamp createTime = Timestamp(0, 0);
   Timestamp updateTime = Timestamp(0, 0);
@@ -15,7 +15,7 @@ class ThreadModel {
     required this.threadId,
     required this.deviceId,
     required this.deviceName,
-    required this.title,
+    required this.content,
     required this.createTime,
     required this.updateTime,
   });
@@ -23,7 +23,7 @@ class ThreadModel {
   ThreadModel.fromJson(Map<String, dynamic> json) {
     threadId = json['threadId'];
     deviceId = json['deviceId'];
-    title = json['title'];
+    content = json['content'];
     createTime = json['createTime'];
     updateTime = json['updateTime'];
     deviceName = json['deviceName'];
