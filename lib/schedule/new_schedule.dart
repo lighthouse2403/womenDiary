@@ -32,7 +32,7 @@ class _CreateScheduleView extends StatelessWidget {
       listener: (context, state) async {
         await showDialog(
           context: context,
-          builder: (_) => AlertDialog(
+          builder: (dialogCtx) => AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             backgroundColor: Colors.pink.shade50,
             title: Row(
@@ -46,7 +46,8 @@ class _CreateScheduleView extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.of(dialogCtx).pop();
+                  context.pop();
                 },
                 child: const Text("OK").text16().pinkColor(),
               ),
