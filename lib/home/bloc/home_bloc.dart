@@ -11,7 +11,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   List<CycleModel> menstruationList = [];
 
   HomeBloc() : super(const HomeState()) {
-    on<LoadRedDateEvent>(_loadPeriods);
     on<LoadCycleEvent>(_onLoadLocalData);
   }
 
@@ -49,51 +48,55 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     ));
   }
 
-  Future<void> _loadPeriods(LoadRedDateEvent event, Emitter<HomeState> emit) async {
-    try {
-      menstruationList = await DatabaseHandler.getAllCycle();
-    } catch (error) {
-    }
-  }
-
   Future<List<PhaseModel>> _buildPhases(int cycleLength, int menstruationLength) async {
-    final int ovulationDay = cycleLength - 14; // VD: ngày 14
-    final int fertileStart = ovulationDay - 5; // VD: ngày 9
-    final int fertileEnd = ovulationDay + 1;   // VD: ngày 15
+    final int ovulationDay = cycleLength - 14;
+    final int fertileStart = ovulationDay - 5;
+    final int fertileEnd = ovulationDay + 1;
     final int afterFertileStart = fertileEnd + 1;
 
-    final List<PhaseModel> phases = [];
-
-    phases.add(
-      PhaseModel("🩸", menstruationLength, Colors.pink.shade200, 1),
+    // 🩸 Menstruation
+    PhaseModel mensPhase = PhaseModel(
+        "🩸",
+        menstruationLength,
+        Colors.pink.shade400,
+        1
     );
 
+    // 🍃 Safe Early
     final int safeEarlyStart = menstruationLength + 1;
     final int safeEarlyLength = fertileStart - safeEarlyStart;
-    if (safeEarlyLength > 0) {
-      phases.add(
-        PhaseModel("🌱", safeEarlyLength, Colors.green.shade200, safeEarlyStart),
-      );
-    }
-
-    // 🌼 Giai đoạn nguy hiểm (rụng trứng)
-    final int fertileLength = fertileEnd - fertileStart + 1; // luôn = 7
-    phases.add(
-      PhaseModel("🌼", fertileLength, Colors.yellow.shade300, fertileStart),
+    PhaseModel safeEarlyPhase = PhaseModel(
+        "🍃",
+        safeEarlyLength,
+        Colors.teal.shade200,
+        safeEarlyStart
     );
 
-    // 🌙 Giai đoạn an toàn cuối kỳ
+    // 🌸 Fertile
+    final int fertileLength = fertileEnd - fertileStart + 1;
+    PhaseModel fertilePhase = PhaseModel(
+        "🌸",
+        fertileLength,
+        Colors.amber.shade400,
+        fertileStart
+    );
+
+    // 🌙 Safe Late
     final int safeLateLength = cycleLength - fertileEnd;
-    if (safeLateLength > 0) {
-      phases.add(
-        PhaseModel("🌙", safeLateLength, Colors.green.shade200, afterFertileStart),
-      );
-    }
+    PhaseModel safeLatePhase = PhaseModel(
+        "🌙",
+        safeLateLength,
+        Colors.purple.shade200,
+        afterFertileStart
+    );
+
+    final List<PhaseModel> phases = [
+      mensPhase,
+      safeEarlyPhase,
+      fertilePhase,
+      safeLatePhase
+    ];
 
     return phases;
-  }
-
-  void handleMenstruationData() async {
-
   }
 }

@@ -101,17 +101,54 @@ class PrettyCyclePainter extends CustomPainter {
         }
 
         // Biểu tượng rụng trứng
+        // Biểu tượng rụng trứng (halo + pulse)
         if (isOvulation) {
+          final pulse = 1.0 + 0.15 * sin(rotation * 2 * pi); // dao động nhịp
+
+          // Vòng sáng (halo) nhấp nháy
+          canvas.drawCircle(
+            dotOffset,
+            dotRadius * 3.5 * pulse,
+            Paint()
+              ..color = Colors.pink.withAlpha(60)
+              ..style = PaintingStyle.fill,
+          );
+
+          // Dot trung tâm vàng
           final tp = TextPainter(
             text: const TextSpan(
-              text: '🥚',
-              style: TextStyle(fontSize: 16),
+              text: '✨',
+              style: TextStyle(
+                fontSize: 18,
+              ),
             ),
             textAlign: TextAlign.center,
             textDirection: TextDirection.ltr,
           );
           tp.layout();
           tp.paint(canvas, dotOffset - Offset(tp.width / 2, tp.height / 2));
+
+          // Vẽ tia sáng nhỏ xung quanh
+          final rays = 8;
+          for (int i = 0; i < rays; i++) {
+            final angle = (2 * pi / rays) * i;
+            final start = Offset(
+              dotOffset.dx + cos(angle) * (dotRadius * 2.3 * pulse),
+              dotOffset.dy + sin(angle) * (dotRadius * 2.3 * pulse),
+            );
+            final end = Offset(
+              dotOffset.dx + cos(angle) * (dotRadius * 3.2 * pulse),
+              dotOffset.dy + sin(angle) * (dotRadius * 3.2 * pulse),
+            );
+            canvas.drawLine(
+              start,
+              end,
+              Paint()
+                ..color = Colors.amber.withOpacity(0.7)
+                ..strokeWidth = 1.2
+                ..strokeCap = StrokeCap.round,
+            );
+          }
         }
 
         dayIndex++;

@@ -11,6 +11,7 @@ import 'package:women_diary/home/pretty_cycle_painter.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 import 'package:women_diary/schedule/new_schedule.dart';
+import 'package:women_diary/schedule/schedule_model.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -97,6 +98,13 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             final screenWidth = MediaQuery.of(context).size.width;
             final circleSize = screenWidth - 60.0;
 
+            bool isDisplayingSchedule = false;
+            ScheduleModel? nextSchedule;
+            if (state is LoadedScheduleState) {
+              isDisplayingSchedule = true;
+              nextSchedule = state.schedules.first;
+            }
+
             return SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(16, 50, 16, 24),
               child: Column(
@@ -157,7 +165,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                   Constants.vSpacer16,
 
                   // ============== LỊCH HẸN SẮP TỚI ==================
-                  _upcomingScheduleCard(DateTime.now().add(Duration(days: 1, hours: 8))),
+                  if (isDisplayingSchedule)
+                    _upcomingScheduleCard(nextSchedule),
                   Constants.vSpacer24,
 
                   // GHI NHANH
@@ -226,8 +235,9 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   }
 
   // =========== Upcoming Schedule Card =============
-  Widget _upcomingScheduleCard(DateTime schedule) {
-    final dateStr = DateFormat("dd/MM/yyyy – HH:mm").format(schedule);
+  Widget _upcomingScheduleCard(ScheduleModel? schedule) {
+    DateTime time = schedule?.time ?? DateTime.now();
+    final dateStr = DateFormat("dd/MM/yyyy – HH:mm").format(time);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
