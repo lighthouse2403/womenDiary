@@ -278,7 +278,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                   borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () {
-              // TODO: điều hướng sang trang chi tiết lịch hẹn
+              context.navigateTo(RoutesName.scheduleDetail, arguments: schedule ?? ScheduleModel.init());
             },
             child: const Text("Xem"),
           ),

@@ -130,7 +130,9 @@ class DatabaseHandler {
   static Future<List<ScheduleModel>> getAllSchedule() async {
     final db = await DatabaseHandler.db(scheduleTable);
     final List<Map<String, dynamic>> list = await db.query(scheduleTable);
-    return list.map((e) => ScheduleModel.fromDatabase(e)).toList();
+    List<ScheduleModel> schedules = list.map((e) => ScheduleModel.fromDatabase(e)).toList();
+    schedules.sort((a, b) => b.time.compareTo(a.time));
+    return schedules;
   }
 
   static Future<List<ScheduleModel>> getSchedules({int? startTime, int? endTime}) async {

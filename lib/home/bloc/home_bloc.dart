@@ -6,6 +6,7 @@ import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/phase_model.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
+import 'package:women_diary/schedule/schedule_model.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   List<CycleModel> menstruationList = [];
@@ -46,6 +47,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       daysUntilNext: daysUntilNext,
       periodList: [],
     ));
+
+    List<ScheduleModel> schedules = await DatabaseHandler.getAllSchedule();
+    emit(LoadedScheduleState(schedules));
   }
 
   Future<List<PhaseModel>> _buildPhases(int cycleLength, int menstruationLength) async {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
@@ -45,7 +46,7 @@ class _CreateScheduleView extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  Navigator.pop(context);
+                  context.pop();
                 },
                 child: const Text("OK").text16().pinkColor(),
               ),
