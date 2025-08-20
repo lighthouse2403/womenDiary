@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
@@ -46,7 +47,6 @@ class _CreateScheduleView extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  context.pop();
                 },
                 child: const Text("OK").text16().pinkColor(),
               ),
@@ -60,12 +60,10 @@ class _CreateScheduleView extends StatelessWidget {
 
   Widget _mainScaffold(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text("Tạo kế hoạch mới").text20().pinkColor().w600(),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.pink),
+      appBar: BaseAppBar(
+        hasBack: true,
+        title: "Tạo kế hoạch mới",
+        backgroundColor: AppColors.pinkTextColor,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -204,12 +202,19 @@ class _CreateScheduleView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text("Bật nhắc nhở").text16().w500(),
-                Switch(
-                  value: isReminderOn,
-                  activeColor: Colors.pink,
-                  onChanged: (value) {
-                    context.read<ScheduleBloc>().add(UpdateReminderEvent(value));
-                  },
+                Transform.scale(
+                  scale: 1.1,
+                  child: Switch(
+                    value: isReminderOn,
+                    activeColor: Colors.pink,
+                    activeTrackColor: Colors.pink.shade100,
+                    inactiveThumbColor: Colors.pink.shade100,
+                    inactiveTrackColor: Colors.pink.shade50,
+                    trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+                    onChanged: (value) {
+                      context.read<ScheduleBloc>().add(UpdateReminderEvent(value));
+                    },
+                  ),
                 )
               ],
             );

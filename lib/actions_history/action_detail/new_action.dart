@@ -6,6 +6,7 @@ import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/bloc/action_bloc.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
+import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
@@ -47,7 +48,6 @@ class _CreateActionView extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  context.pop();
                 },
                 child: const Text("OK").text16().pinkColor(),
               ),
@@ -62,11 +62,10 @@ class _CreateActionView extends StatelessWidget {
   Widget _mainScaffold(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text("Tạo hành động mới").text20().pinkColor().w600(),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.pink),
+      appBar: BaseAppBar(
+        title: "Tạo hành động mới",
+        backgroundColor: AppColors.pinkTextColor,
+        hasBack:true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

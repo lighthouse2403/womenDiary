@@ -186,7 +186,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                           emoji: "✍️",
                           background: Colors.pink.shade100,
                           foreground: Colors.white,
-                          onTap: () => context.goTo(RoutesName.newAction),
+                          onTap: () => context.navigateTo(RoutesName.newAction),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -197,7 +197,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                           background: Colors.white,
                           foreground: Colors.pink,
                           border: BorderSide(color: Colors.pink.shade200),
-                          onTap: () => context.goTo(RoutesName.newSchedule),
+                          onTap: () => context.navigateTo(RoutesName.newSchedule),
                         ),
                       ),
                     ],
@@ -460,7 +460,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           border: border != null ? Border.fromBorderSide(border) : null,
           boxShadow: [
             BoxShadow(
-              color: Colors.pink.shade200.withOpacity(0.25),
+              color: Colors.pink.shade200.withAlpha(60),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -561,64 +561,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           ),
         ],
       ),
-    );
-  }
-
-  void _showQuickActionSheet(BuildContext context, {required String type}) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 48,
-                  height: 5,
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.pink.shade100,
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-                Text(
-                  type == 'action' ? "Ghi nhanh Action" : "Ghi nhanh Schedule",
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                ListTile(
-                  leading: const Text("➕", style: TextStyle(fontSize: 20)),
-                  title: Text(type == 'action'
-                      ? "Tạo action mới"
-                      : "Tạo lịch hẹn mới"),
-                  onTap: () {
-                    Navigator.of(ctx).pop();
-                    // TODO: điều hướng sang màn hình tạo mới tương ứng
-                    // Navigator.pushNamed(context, RouteName.actionCreate);
-                    // Navigator.pushNamed(context, RouteName.scheduleCreate);
-                  },
-                ),
-                ListTile(
-                  leading: const Text("📝", style: TextStyle(fontSize: 20)),
-                  title:
-                  Text(type == 'action' ? "Chọn template" : "Chọn lịch nhanh"),
-                  onTap: () {
-                    Navigator.of(ctx).pop();
-                    // TODO: mở picker/template tuỳ ý
-                  },
-                ),
-                const SizedBox(height: 8),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

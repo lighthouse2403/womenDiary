@@ -155,6 +155,12 @@ class Routes {
             return _createPageFadeTransition(state: state, child: ChatDetail(thread: thread));
           },
         ),
+        GoRoute(
+          path: RoutesName.setting,
+          pageBuilder: (context, state) {
+            return _createPageFadeTransition(state: state, child: Setting());
+          },
+        ),
       ],
     );
   }
