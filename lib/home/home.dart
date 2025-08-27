@@ -10,7 +10,6 @@ import 'package:women_diary/home/phase_model.dart';
 import 'package:women_diary/home/pretty_cycle_painter.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
-import 'package:women_diary/schedule/new_schedule.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
 
 class Home extends StatelessWidget {
@@ -83,154 +82,127 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: Colors.pink.shade50,
       body: SafeArea(
-        child: BlocBuilder<HomeBloc, HomeState>(
-          builder: (context, state) {
-            final List<PhaseModel> phases =
-            state is LoadedCycleState ? state.phases : [];
-            final int currentDay =
-            state is LoadedCycleState ? state.currentDay : 0;
-            final int cycleLength =
-            state is LoadedCycleState ? state.cycleLength : 30;
-            final int daysUntilNext =
-            state is LoadedCycleState ? state.daysUntilNext : 30;
-            final int ovulationDay = cycleLength - 14;
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 50, 16, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Vòng tròn
+              _cycleProgress(),
+              Constants.vSpacer40,
+              _buildQuickStats(),
+              Constants.vSpacer16,
 
-            final screenWidth = MediaQuery.of(context).size.width;
-            final circleSize = screenWidth - 60.0;
+              // Alert card nếu gần kỳ
+              if (daysUntilNext <= 3)
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: _cycleAlertCard(context, daysUntilNext),
+                  ),
+                ),
+              Constants.vSpacer16,
 
-            bool isDisplayingSchedule = false;
-            ScheduleModel? nextSchedule;
-            if (state is LoadedScheduleState) {
-              isDisplayingSchedule = true;
-              nextSchedule = state.schedules.first;
-            }
-
-            return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 50, 16, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              // ============== LỊCH HẸN SẮP TỚI ==================
+              if (isDisplayingSchedule)
+                _upcomingScheduleCard(nextSchedule),
+              Constants.vSpacer24,
+              Text('Ghi nhanh').w700(),
+              Constants.vSpacer16,
+              Row(
                 children: [
-                  // Vòng tròn
-                  Center(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        CustomPaint(
-                          size: Size(circleSize, circleSize),
-                          painter: PrettyCyclePainter(
-                            currentDay: currentDay,
-                            totalDays: cycleLength,
-                            phases: phases,
-                            rotation: 0.6,
-                            ovulationDay: ovulationDay,
-                          ),
-                        ),
-                        ScaleTransition(
-                          scale: _pulseAnimation,
-                          child: GestureDetector(
-                            onTap: () {
-                              _pulseController.stop();
-                              _showCycleDialog(
-                                currentDay: currentDay,
-                                cycleLength: cycleLength,
-                                daysUntilNext: daysUntilNext,
-                              );
-                            },
-                            child: _cycleInformation(
-                              currentDay,
-                              cycleLength,
-                              daysUntilNext,
-                            ),
-                          ),
-                        ),
-                      ],
+                  Expanded(
+                    child: _quickActionCard(
+                      title: "Ghi Action",
+                      emoji: "✍️",
+                      background: Colors.pink.shade100,
+                      foreground: Colors.white,
+                      onTap: () => context.navigateTo(RoutesName.newAction),
                     ),
                   ),
-                  Constants.vSpacer40,
-                  _buildQuickStats(context,
-                      currentDay: currentDay,
-                      cycleLength: cycleLength,
-                      daysUntilNext: daysUntilNext),
-                  Constants.vSpacer16,
-
-                  // Alert card nếu gần kỳ
-                  if (daysUntilNext <= 3)
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: SlideTransition(
-                        position: _slideAnimation,
-                        child: _cycleAlertCard(context, daysUntilNext),
-                      ),
-                    ),
-                  Constants.vSpacer16,
-
-                  // ============== LỊCH HẸN SẮP TỚI ==================
-                  if (isDisplayingSchedule)
-                    _upcomingScheduleCard(nextSchedule),
-                  Constants.vSpacer24,
-
-                  // GHI NHANH
-                  Text(
-                    "Ghi nhanh",
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  Constants.vSpacer16,
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _quickActionCard(
-                          title: "Ghi Action",
-                          emoji: "✍️",
-                          background: Colors.pink.shade100,
-                          foreground: Colors.white,
-                          onTap: () => context.navigateTo(RoutesName.newAction),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _quickActionCard(
-                          title: "Ghi Schedule",
-                          emoji: "📌",
-                          background: Colors.white,
-                          foreground: Colors.pink,
-                          border: BorderSide(color: Colors.pink.shade200),
-                          onTap: () => context.navigateTo(RoutesName.newSchedule),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple.shade100,
-                        foregroundColor: Colors.purple.shade700,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      icon: const Icon(Icons.settings),
-                      label: const Text(
-                        "Thiết lập cá nhân",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                      onPressed: () {
-                        context.navigateTo(RoutesName.setting);
-                      },
+                  Constants.hSpacer12,
+                  Expanded(
+                    child: _quickActionCard(
+                      title: "Ghi Schedule",
+                      emoji: "📌",
+                      background: Colors.white,
+                      foreground: Colors.pink,
+                      border: BorderSide(color: Colors.pink.shade200),
+                      onTap: () => context.navigateTo(RoutesName.newSchedule),
                     ),
                   ),
                 ],
               ),
-            );
-          },
+              Constants.hSpacer12,
+              _setting()
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _cycleProgress() {
+    return BlocBuilder(
+      buildWhen: (pre, cur) => cur is LoadedCycleState,
+      builder: (context, state) {
+
+        final List<PhaseModel> phases =
+        state is LoadedCycleState ? state.phases : [];
+        final int currentDay =
+        state is LoadedCycleState ? state.currentDay : 0;
+        final int cycleLength =
+        state is LoadedCycleState ? state.cycleLength : 30;
+        final int daysUntilNext =
+        state is LoadedCycleState ? state.daysUntilNext : 30;
+        final int ovulationDay = cycleLength - 14;
+
+        final screenWidth = MediaQuery.of(context).size.width;
+        final circleSize = screenWidth - 60.0;
+
+        bool isDisplayingSchedule = false;
+        ScheduleModel? nextSchedule;
+        if (state is LoadedScheduleState) {
+          isDisplayingSchedule = true;
+          nextSchedule = state.schedules.first;
+        }
+        return Center(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              CustomPaint(
+                size: Size(circleSize, circleSize),
+                painter: PrettyCyclePainter(
+                  currentDay: currentDay,
+                  totalDays: cycleLength,
+                  phases: phases,
+                  rotation: 0.6,
+                  ovulationDay: ovulationDay,
+                ),
+              ),
+              ScaleTransition(
+                scale: _pulseAnimation,
+                child: GestureDetector(
+                  onTap: () {
+                    _pulseController.stop();
+                    _showCycleDialog(
+                      currentDay: currentDay,
+                      cycleLength: cycleLength,
+                      daysUntilNext: daysUntilNext,
+                    );
+                  },
+                  child: _cycleInformation(
+                    currentDay,
+                    cycleLength,
+                    daysUntilNext,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
     );
   }
 
@@ -351,58 +323,63 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildQuickStats(
-      BuildContext context, {
-        required int currentDay,
-        required int cycleLength,
-        required int daysUntilNext,
-      }) {
-    final now = DateTime.now();
-    final expectedEnd = now.add(Duration(days: daysUntilNext));
-    final endStr = DateFormat('dd/MM/yyyy').format(expectedEnd);
+  Widget _buildQuickStats() {
+    return BlocBuilder(
+      builder: (context, state) {
+        final int currentDay =
+        state is LoadedCycleState ? state.currentDay : 0;
+        final int cycleLength =
+        state is LoadedCycleState ? state.cycleLength : 30;
+        final int daysUntilNext =
+        state is LoadedCycleState ? state.daysUntilNext : 30;
 
-    // Nếu bạn có dữ liệu lịch sử trong state, hãy thay "—" bằng giá trị thực tế.
-    final shortest = "—";
-    final longest = "—";
-    final expectedLength = "$cycleLength ngày"; // tạm lấy theo kỳ hiện tại
-    final averageLength = "$cycleLength ngày"; // tạm lấy theo kỳ hiện tại
+        final now = DateTime.now();
+        final expectedEnd = now.add(Duration(days: daysUntilNext));
+        final endStr = DateFormat('dd/MM/yyyy').format(expectedEnd);
 
-    final tiles = <Widget>[
-      _statCard(
-        title: "📊 Trung bình chu kỳ",
-        value: averageLength,
-      ),
-      _statCard(
-        title: "📅 Ngày hiện tại",
-        value: "Ngày $currentDay",
-      ),
-      _statCard(
-        title: "🔮 Dự kiến kết thúc",
-        value: endStr,
-      ),
-      _statCard(
-        title: "⏱ Chu kỳ ngắn nhất",
-        value: shortest,
-      ),
-      _statCard(
-        title: "⏳ Chu kỳ dài nhất",
-        value: longest,
-      ),
-      _statCard(
-        title: "✨ Dự kiến độ dài kỳ này",
-        value: expectedLength,
-      ),
-    ];
+        // Nếu bạn có dữ liệu lịch sử trong state, hãy thay "—" bằng giá trị thực tế.
+        final shortest = "—";
+        final longest = "—";
+        final expectedLength = "$cycleLength ngày"; // tạm lấy theo kỳ hiện tại
+        final averageLength = "$cycleLength ngày"; // tạm lấy theo kỳ hiện tại
 
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: tiles
-          .map((e) => SizedBox(
-        width: (MediaQuery.of(context).size.width - 16 * 2 - 12) / 2,
-        child: e,
-      ))
-          .toList(),
+        final tiles = <Widget>[
+          _statCard(
+            title: "📊 Trung bình chu kỳ",
+            value: averageLength,
+          ),
+          _statCard(
+            title: "📅 Ngày hiện tại",
+            value: "Ngày $currentDay",
+          ),
+          _statCard(
+            title: "🔮 Dự kiến kết thúc",
+            value: endStr,
+          ),
+          _statCard(
+            title: "⏱ Chu kỳ ngắn nhất",
+            value: shortest,
+          ),
+          _statCard(
+            title: "⏳ Chu kỳ dài nhất",
+            value: longest,
+          ),
+          _statCard(
+            title: "✨ Dự kiến độ dài kỳ này",
+            value: expectedLength,
+          ),
+        ];
+        return Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: tiles
+              .map((e) => SizedBox(
+            width: (MediaQuery.of(context).size.width - 16 * 2 - 12) / 2,
+            child: e,
+          ))
+              .toList(),
+        );
+      },
     );
   }
 
@@ -497,7 +474,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.pink.shade100.withOpacity(0.3),
+            color: Colors.pink.shade100.withAlpha(80),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -507,23 +484,14 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Row(
-            children: const [
+            children: [
               Icon(Icons.calendar_today, color: Colors.pink, size: 20),
               SizedBox(width: 8),
-              Text(
-                "Sắp đến chu kỳ mới",
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.pink),
-              ),
+              Text('Sắp đến chu kỳ mới').w700().pinkColor().text16(),
             ],
           ),
           const SizedBox(height: 8),
-          const Text(
-            "Hãy xác nhận để theo dõi chu kỳ chính xác hơn.",
-            style: TextStyle(fontSize: 14, color: Colors.black87),
-          ),
+          Text('Hãy xác nhận để theo dõi chu kỳ chính xác hơn.',).text14().black87Color(),
           const SizedBox(height: 12),
           hasStarted
               ? ElevatedButton.icon(
@@ -560,6 +528,30 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _setting() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.purple.shade100,
+          foregroundColor: Colors.purple.shade700,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+        icon: const Icon(Icons.settings),
+        label: const Text(
+          "Thiết lập cá nhân",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        onPressed: () {
+          context.navigateTo(RoutesName.setting);
+        },
       ),
     );
   }

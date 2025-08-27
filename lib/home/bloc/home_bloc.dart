@@ -38,6 +38,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ? nextPhase.startDay - currentDay
         : (cycleLength - currentDay + nextPhase.startDay);
 
+    print('cycle length: ${cycleLength}');
+    print('menstruationLength length: ${menstruationLength}');
+    print('currentDay: ${currentDay}');
+
+    List<ScheduleModel> schedules = await DatabaseHandler.getAllSchedule();
+    emit(LoadedScheduleState(schedules));
+
     emit(LoadedCycleState(
       currentDay: currentDay,
       cycleLength: cycleLength,
@@ -48,8 +55,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       periodList: [],
     ));
 
-    List<ScheduleModel> schedules = await DatabaseHandler.getAllSchedule();
-    emit(LoadedScheduleState(schedules));
+
   }
 
   Future<List<PhaseModel>> _buildPhases(int cycleLength, int menstruationLength) async {
