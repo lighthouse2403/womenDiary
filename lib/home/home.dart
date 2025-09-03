@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/home/app_card.dart';
 import 'package:women_diary/home/bloc/home_bloc.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
@@ -11,6 +12,20 @@ import 'package:women_diary/home/pretty_cycle_painter.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
+
+/// Extension để lấy dữ liệu an toàn từ state
+extension CycleStateX on HomeState {
+  int get currentDay =>
+      this is LoadedCycleState ? (this as LoadedCycleState).currentDay : 0;
+  int get cycleLength =>
+      this is LoadedCycleState ? (this as LoadedCycleState).cycleLength : 30;
+  int get daysUntilNext =>
+      this is LoadedCycleState ? (this as LoadedCycleState).daysUntilNext : 30;
+  List<PhaseModel> get phases =>
+      this is LoadedCycleState ? (this as LoadedCycleState).phases : [];
+  ScheduleModel? get nextSchedule =>
+      this is LoadedScheduleState ? (this as LoadedScheduleState).schedules.first : null;
+}
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -47,7 +62,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 1000),
     )..repeat(reverse: true);
 
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+    _pulseAnimation = Tween(begin: 1.0, end: 1.1).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
@@ -56,12 +71,12 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 600),
     );
 
-    _slideAnimation = Tween<Offset>(
+    _slideAnimation = Tween(
       begin: const Offset(0, 0.2),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _alertController, curve: Curves.easeOut));
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _fadeAnimation = Tween(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _alertController, curve: Curves.easeIn),
     );
 
@@ -79,6 +94,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Colors.pink.shade50,
       body: SafeArea(
@@ -87,55 +104,15 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Vòng tròn
-              _cycleProgress(),
+              _cycleProgress(screenWidth),
               Constants.vSpacer40,
               _buildQuickStats(),
-              Constants.vSpacer16,
-
-              // Alert card nếu gần kỳ
-              if (daysUntilNext <= 3)
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: _cycleAlertCard(context, daysUntilNext),
-                  ),
-                ),
-              Constants.vSpacer16,
-
-              // ============== LỊCH HẸN SẮP TỚI ==================
-              if (isDisplayingSchedule)
-                _upcomingScheduleCard(nextSchedule),
               Constants.vSpacer24,
-              Text('Ghi nhanh').w700(),
+              const Text('Ghi nhanh').w700(),
               Constants.vSpacer16,
-              Row(
-                children: [
-                  Expanded(
-                    child: _quickActionCard(
-                      title: "Ghi Action",
-                      emoji: "✍️",
-                      background: Colors.pink.shade100,
-                      foreground: Colors.white,
-                      onTap: () => context.navigateTo(RoutesName.newAction),
-                    ),
-                  ),
-                  Constants.hSpacer12,
-                  Expanded(
-                    child: _quickActionCard(
-                      title: "Ghi Schedule",
-                      emoji: "📌",
-                      background: Colors.white,
-                      foreground: Colors.pink,
-                      border: BorderSide(color: Colors.pink.shade200),
-                      onTap: () => context.navigateTo(RoutesName.newSchedule),
-                    ),
-                  ),
-                ],
-              ),
+              _shortCreate(),
               Constants.hSpacer12,
-              _setting()
+              _setting(),
             ],
           ),
         ),
@@ -143,30 +120,46 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     );
   }
 
-  Widget _cycleProgress() {
-    return BlocBuilder(
-      buildWhen: (pre, cur) => cur is LoadedCycleState,
+  Widget _shortCreate() {
+    return Row(
+      children: [
+        Expanded(
+          child: _quickActionCard(
+            title: "Ghi Action",
+            emoji: "✍️",
+            background: Colors.pink.shade100,
+            foreground: Colors.white,
+            onTap: () => context.navigateTo(RoutesName.newAction),
+          ),
+        ),
+        Constants.hSpacer12,
+        Expanded(
+          child: _quickActionCard(
+            title: "Ghi Schedule",
+            emoji: "📌",
+            background: Colors.white,
+            foreground: Colors.pink,
+            border: BorderSide(color: Colors.pink.shade200),
+            onTap: () => context.navigateTo(RoutesName.newSchedule),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _cycleProgress(double screenWidth) {
+    final circleSize = screenWidth - 60.0;
+
+    return BlocBuilder<HomeBloc, HomeState>(
+      buildWhen: (pre, cur) => cur is LoadedCycleState || cur is LoadedScheduleState,
       builder: (context, state) {
+        final currentDay = state.currentDay;
+        final cycleLength = state.cycleLength;
+        final daysUntilNext = state.daysUntilNext;
+        final phases = state.phases;
+        final ovulationDay = cycleLength - 14;
+        final nextSchedule = state.nextSchedule;
 
-        final List<PhaseModel> phases =
-        state is LoadedCycleState ? state.phases : [];
-        final int currentDay =
-        state is LoadedCycleState ? state.currentDay : 0;
-        final int cycleLength =
-        state is LoadedCycleState ? state.cycleLength : 30;
-        final int daysUntilNext =
-        state is LoadedCycleState ? state.daysUntilNext : 30;
-        final int ovulationDay = cycleLength - 14;
-
-        final screenWidth = MediaQuery.of(context).size.width;
-        final circleSize = screenWidth - 60.0;
-
-        bool isDisplayingSchedule = false;
-        ScheduleModel? nextSchedule;
-        if (state is LoadedScheduleState) {
-          isDisplayingSchedule = true;
-          nextSchedule = state.schedules.first;
-        }
         return Center(
           child: Stack(
             alignment: Alignment.center,
@@ -192,38 +185,38 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                       daysUntilNext: daysUntilNext,
                     );
                   },
-                  child: _cycleInformation(
-                    currentDay,
-                    cycleLength,
-                    daysUntilNext,
-                  ),
+                  child: _cycleInformation(currentDay, cycleLength, daysUntilNext),
                 ),
               ),
+              if (daysUntilNext <= 3)
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: _cycleAlertCard(context, daysUntilNext),
+                  ),
+                ),
+              if (nextSchedule != null) _upcomingScheduleCard(nextSchedule),
             ],
           ),
         );
-      }
+      },
     );
   }
 
-  // =========== Upcoming Schedule Card =============
-  Widget _upcomingScheduleCard(ScheduleModel? schedule) {
-    DateTime time = schedule?.time ?? DateTime.now();
-    final dateStr = DateFormat("dd/MM/yyyy – HH:mm").format(time);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.orange.shade50,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.orange.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.shade100.withOpacity(0.4),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          )
-        ],
-      ),
+  Widget _upcomingScheduleCard(ScheduleModel schedule) {
+    final dateStr = DateFormat("dd/MM/yyyy – HH:mm").format(schedule.time);
+
+    return AppCard(
+      color: Colors.orange.shade50,
+      border: Border.all(color: Colors.orange.shade200),
+      shadows: [
+        BoxShadow(
+          color: Colors.orange.shade100.withOpacity(0.4),
+          blurRadius: 8,
+          offset: const Offset(0, 4),
+        )
+      ],
       child: Row(
         children: [
           const Icon(Icons.alarm, color: Colors.deepOrange, size: 28),
@@ -233,12 +226,10 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text("Lịch hẹn sắp tới",
-                    style:
-                    TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
                 Text(dateStr,
-                    style: const TextStyle(
-                        fontSize: 14, color: Colors.black87)),
+                    style: const TextStyle(fontSize: 14, color: Colors.black87)),
               ],
             ),
           ),
@@ -247,10 +238,14 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
               backgroundColor: Colors.deepOrange,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             onPressed: () {
-              context.navigateTo(RoutesName.scheduleDetail, arguments: schedule ?? ScheduleModel.init());
+              context.navigateTo(
+                RoutesName.scheduleDetail,
+                arguments: schedule,
+              );
             },
             child: const Text("Xem"),
           ),
@@ -259,7 +254,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     );
   }
 
-  // ====== Minor option ======
   Widget _cycleInformation(int currentDay, int cycleLength, int daysUntilNext) {
     return Container(
       width: 180,
@@ -276,21 +270,20 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           const Text("Ngày hiện tại").text14().customColor(Colors.black54),
           Text("Ngày $currentDay",
               style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87)),
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              )),
           Constants.vSpacer4,
           Text("Chu kỳ $cycleLength ngày",
-              style:
-              const TextStyle(fontSize: 12, color: Colors.black45)),
+              style: const TextStyle(fontSize: 12, color: Colors.black45)),
           Constants.vSpacer6,
           const Text("Giai đoạn: 🌼").text12().black87Color(),
           Constants.vSpacer4,
           const Text("Tiếp theo: 🌙",
               style: TextStyle(fontSize: 12, color: Colors.deepOrange)),
           Text("Còn $daysUntilNext ngày",
-              style:
-              const TextStyle(fontSize: 12, color: Colors.orange)),
+              style: const TextStyle(fontSize: 12, color: Colors.orange)),
         ],
       ),
     );
@@ -324,80 +317,38 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   }
 
   Widget _buildQuickStats() {
-    return BlocBuilder(
-      builder: (context, state) {
-        final int currentDay =
-        state is LoadedCycleState ? state.currentDay : 0;
-        final int cycleLength =
-        state is LoadedCycleState ? state.cycleLength : 30;
-        final int daysUntilNext =
-        state is LoadedCycleState ? state.daysUntilNext : 30;
+    return BlocSelector<HomeBloc, HomeState, (int, int, int)>(
+      selector: (state) =>
+      (state.currentDay, state.cycleLength, state.daysUntilNext),
+      builder: (context, data) {
+        final (currentDay, cycleLength, daysUntilNext) = data;
 
-        final now = DateTime.now();
-        final expectedEnd = now.add(Duration(days: daysUntilNext));
+        final expectedEnd =
+        DateTime.now().add(Duration(days: daysUntilNext));
         final endStr = DateFormat('dd/MM/yyyy').format(expectedEnd);
 
-        // Nếu bạn có dữ liệu lịch sử trong state, hãy thay "—" bằng giá trị thực tế.
-        final shortest = "—";
-        final longest = "—";
-        final expectedLength = "$cycleLength ngày"; // tạm lấy theo kỳ hiện tại
-        final averageLength = "$cycleLength ngày"; // tạm lấy theo kỳ hiện tại
-
         final tiles = <Widget>[
-          _statCard(
-            title: "📊 Trung bình chu kỳ",
-            value: averageLength,
-          ),
-          _statCard(
-            title: "📅 Ngày hiện tại",
-            value: "Ngày $currentDay",
-          ),
-          _statCard(
-            title: "🔮 Dự kiến kết thúc",
-            value: endStr,
-          ),
-          _statCard(
-            title: "⏱ Chu kỳ ngắn nhất",
-            value: shortest,
-          ),
-          _statCard(
-            title: "⏳ Chu kỳ dài nhất",
-            value: longest,
-          ),
-          _statCard(
-            title: "✨ Dự kiến độ dài kỳ này",
-            value: expectedLength,
-          ),
+          _statCard(title: "📊 Trung bình chu kỳ", value: "$cycleLength ngày"),
+          _statCard(title: "📅 Ngày hiện tại", value: "Ngày $currentDay"),
+          _statCard(title: "🔮 Dự kiến kết thúc", value: endStr),
+          _statCard(title: "⏱ Chu kỳ ngắn nhất", value: "—"),
+          _statCard(title: "⏳ Chu kỳ dài nhất", value: "—"),
+          _statCard(title: "✨ Dự kiến độ dài kỳ này", value: "$cycleLength ngày"),
         ];
+
+        final width = (MediaQuery.of(context).size.width - 16 * 2 - 12) / 2;
+
         return Wrap(
           spacing: 12,
           runSpacing: 12,
-          children: tiles
-              .map((e) => SizedBox(
-            width: (MediaQuery.of(context).size.width - 16 * 2 - 12) / 2,
-            child: e,
-          ))
-              .toList(),
+          children: tiles.map((e) => SizedBox(width: width, child: e)).toList(),
         );
       },
     );
   }
 
   Widget _statCard({required String title, required String value}) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.pink.shade100.withOpacity(0.3),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-        border: Border.all(color: Colors.pink.shade50),
-      ),
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -429,20 +380,17 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        decoration: BoxDecoration(
-          color: background,
-          borderRadius: BorderRadius.circular(20),
-          border: border != null ? Border.fromBorderSide(border) : null,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.pink.shade200.withAlpha(60),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+      child: AppCard(
+        color: background,
+        borderRadius: BorderRadius.circular(20),
+        border: border != null ? Border.fromBorderSide(border) : null,
+        shadows: [
+          BoxShadow(
+            color: Colors.pink.shade200.withAlpha(60),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -465,40 +413,27 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   Widget _cycleAlertCard(BuildContext context, int daysUntilNext) {
     final hasStarted = daysUntilNext < 3;
 
-    return Container(
-      margin: const EdgeInsets.only(top: 8, bottom: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.pink.shade100),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.pink.shade100.withAlpha(80),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Row(
             children: [
-              Icon(Icons.calendar_today, color: Colors.pink, size: 20),
-              SizedBox(width: 8),
-              Text('Sắp đến chu kỳ mới').w700().pinkColor().text16(),
+              const Icon(Icons.calendar_today, color: Colors.pink, size: 20),
+              const SizedBox(width: 8),
+              const Text('Sắp đến chu kỳ mới').w700().pinkColor().text16(),
             ],
           ),
           const SizedBox(height: 8),
-          Text('Hãy xác nhận để theo dõi chu kỳ chính xác hơn.',).text14().black87Color(),
+          const Text('Hãy xác nhận để theo dõi chu kỳ chính xác hơn.')
+              .text14()
+              .black87Color(),
           const SizedBox(height: 12),
           hasStarted
               ? ElevatedButton.icon(
             icon: const Text("🧘‍♀️", style: TextStyle(fontSize: 18)),
             label: const Text("Kết thúc kỳ kinh"),
             style: ElevatedButton.styleFrom(
-              animationDuration: const Duration(milliseconds: 300),
               elevation: 4,
               backgroundColor: Colors.white,
               foregroundColor: Colors.pink,
@@ -507,15 +442,13 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
             ),
-            onPressed: () {
-              context.read<HomeBloc>().add(EndMenstruationEvent());
-            },
+            onPressed: () =>
+                context.read<HomeBloc>().add(EndMenstruationEvent()),
           )
               : ElevatedButton.icon(
             icon: const Text("🌸", style: TextStyle(fontSize: 18)),
             label: const Text("Bắt đầu chu kỳ mới"),
             style: ElevatedButton.styleFrom(
-              animationDuration: const Duration(milliseconds: 300),
               elevation: 4,
               backgroundColor: Colors.pinkAccent,
               foregroundColor: Colors.white,
@@ -523,9 +456,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
             ),
-            onPressed: () {
-              context.read<HomeBloc>().add(StartNewCycleEvent());
-            },
+            onPressed: () =>
+                context.read<HomeBloc>().add(StartNewCycleEvent()),
           ),
         ],
       ),
