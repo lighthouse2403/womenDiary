@@ -9,11 +9,10 @@ import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/pretty_cycle_painter.dart';
 import 'package:women_diary/home/quick_action.dart';
+import 'package:women_diary/home/quick_stats.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
-
-/// Extension để lấy dữ liệu an toàn từ state
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -255,22 +254,14 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text("Ngày hiện tại").text14().customColor(Colors.black54),
-          Text("Ngày $currentDay",
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              )),
+          Text("Ngày $currentDay").black87Color().w700().text24(),
           Constants.vSpacer4,
-          Text("Chu kỳ $cycleLength ngày",
-              style: const TextStyle(fontSize: 12, color: Colors.black45)),
+          Text("Chu kỳ $cycleLength ngày").black87Color().text12(),
           Constants.vSpacer6,
           const Text("Giai đoạn: 🌼").text12().black87Color(),
           Constants.vSpacer4,
-          const Text("Tiếp theo: 🌙",
-              style: TextStyle(fontSize: 12, color: Colors.deepOrange)),
-          Text("Còn $daysUntilNext ngày",
-              style: const TextStyle(fontSize: 12, color: Colors.orange)),
+          const Text("Tiếp theo: 🌙").text12().customColor(Colors.deepOrange),
+          Text("Còn $daysUntilNext ngày").text12().customColor(Colors.orange),
         ],
       ),
     );
@@ -310,49 +301,12 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       builder: (context, data) {
         final (currentDay, cycleLength, daysUntilNext) = data;
 
-        final expectedEnd =
-        DateTime.now().add(Duration(days: daysUntilNext));
-        final endStr = DateFormat('dd/MM/yyyy').format(expectedEnd);
-
-        final tiles = <Widget>[
-          _statCard(title: "📊 Trung bình chu kỳ", value: "$cycleLength ngày"),
-          _statCard(title: "📅 Ngày hiện tại", value: "Ngày $currentDay"),
-          _statCard(title: "🔮 Dự kiến kết thúc", value: endStr),
-          _statCard(title: "⏱ Chu kỳ ngắn nhất", value: "—"),
-          _statCard(title: "⏳ Chu kỳ dài nhất", value: "—"),
-          _statCard(title: "✨ Dự kiến độ dài kỳ này", value: "$cycleLength ngày"),
-        ];
-
-        final width = (MediaQuery.of(context).size.width - 16 * 2 - 12) / 2;
-
-        return Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: tiles.map((e) => SizedBox(width: width, child: e)).toList(),
+        return QuickStats(
+          currentDay: currentDay,
+          cycleLength: cycleLength,
+          daysUntilNext: daysUntilNext,
         );
       },
-    );
-  }
-
-  Widget _statCard({required String title, required String value}) {
-    return AppCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title,
-              style:
-              const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.pink,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
