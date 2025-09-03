@@ -39,3 +39,16 @@ class LoadedScheduleState extends HomeState {
   @override
   List<Object?> get props => [schedules.length];
 }
+
+extension CycleStateX on HomeState {
+  int get currentDay =>
+      this is LoadedCycleState ? (this as LoadedCycleState).currentDay : 0;
+  int get cycleLength =>
+      this is LoadedCycleState ? (this as LoadedCycleState).cycleLength : 30;
+  int get daysUntilNext =>
+      this is LoadedCycleState ? (this as LoadedCycleState).daysUntilNext : 30;
+  List<PhaseModel> get phases =>
+      this is LoadedCycleState ? (this as LoadedCycleState).phases : [];
+  ScheduleModel? get nextSchedule =>
+      this is LoadedScheduleState ? (this as LoadedScheduleState).schedules.first : null;
+}

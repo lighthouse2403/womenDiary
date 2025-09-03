@@ -7,25 +7,13 @@ import 'package:women_diary/home/app_card.dart';
 import 'package:women_diary/home/bloc/home_bloc.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
-import 'package:women_diary/home/phase_model.dart';
 import 'package:women_diary/home/pretty_cycle_painter.dart';
+import 'package:women_diary/home/quick_action.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
 
 /// Extension để lấy dữ liệu an toàn từ state
-extension CycleStateX on HomeState {
-  int get currentDay =>
-      this is LoadedCycleState ? (this as LoadedCycleState).currentDay : 0;
-  int get cycleLength =>
-      this is LoadedCycleState ? (this as LoadedCycleState).cycleLength : 30;
-  int get daysUntilNext =>
-      this is LoadedCycleState ? (this as LoadedCycleState).daysUntilNext : 30;
-  List<PhaseModel> get phases =>
-      this is LoadedCycleState ? (this as LoadedCycleState).phases : [];
-  ScheduleModel? get nextSchedule =>
-      this is LoadedScheduleState ? (this as LoadedScheduleState).schedules.first : null;
-}
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -110,7 +98,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
               Constants.vSpacer24,
               const Text('Ghi nhanh').w700(),
               Constants.vSpacer16,
-              _shortCreate(),
+              _quickActions(),
               Constants.hSpacer12,
               _setting(),
             ],
@@ -120,28 +108,29 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     );
   }
 
-  Widget _shortCreate() {
+  Widget _quickActions() {
     return Row(
       children: [
         Expanded(
-          child: _quickActionCard(
+          child: QuickAction(
             title: "Ghi Action",
             emoji: "✍️",
             background: Colors.pink.shade100,
             foreground: Colors.white,
+            border: BorderSide(color: Colors.transparent),
             onTap: () => context.navigateTo(RoutesName.newAction),
           ),
         ),
         Constants.hSpacer12,
         Expanded(
-          child: _quickActionCard(
-            title: "Ghi Schedule",
-            emoji: "📌",
-            background: Colors.white,
-            foreground: Colors.pink,
-            border: BorderSide(color: Colors.pink.shade200),
-            onTap: () => context.navigateTo(RoutesName.newSchedule),
-          ),
+          child: QuickAction(
+              title: "Ghi Schedule",
+              emoji: "📌",
+              background: Colors.white,
+              foreground: Colors.pink,
+              border: BorderSide(color: Colors.pink.shade200),
+              onTap: () => context.navigateTo(RoutesName.newSchedule)
+          )
         ),
       ],
     );
@@ -151,7 +140,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     final circleSize = screenWidth - 60.0;
 
     return BlocBuilder<HomeBloc, HomeState>(
-      buildWhen: (pre, cur) => cur is LoadedCycleState || cur is LoadedScheduleState,
+      buildWhen: (pre, cur) => cur is LoadedCycleState,
       builder: (context, state) {
         final currentDay = state.currentDay;
         final cycleLength = state.cycleLength;
@@ -212,7 +201,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       border: Border.all(color: Colors.orange.shade200),
       shadows: [
         BoxShadow(
-          color: Colors.orange.shade100.withOpacity(0.4),
+          color: Colors.orange.shade100.withAlpha(100),
           blurRadius: 8,
           offset: const Offset(0, 4),
         )
@@ -225,11 +214,9 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Lịch hẹn sắp tới",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                const Text("Lịch hẹn sắp tới").text15().w700(),
                 const SizedBox(height: 4),
-                Text(dateStr,
-                    style: const TextStyle(fontSize: 14, color: Colors.black87)),
+                Text(dateStr).black87Color().text14(),
               ],
             ),
           ),
@@ -369,47 +356,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     );
   }
 
-  Widget _quickActionCard({
-    required String title,
-    required String emoji,
-    required Color background,
-    required Color foreground,
-    BorderSide? border,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: onTap,
-      child: AppCard(
-        color: background,
-        borderRadius: BorderRadius.circular(20),
-        border: border != null ? Border.fromBorderSide(border) : null,
-        shadows: [
-          BoxShadow(
-            color: Colors.pink.shade200.withAlpha(60),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(emoji, style: const TextStyle(fontSize: 28)),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: foreground,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _cycleAlertCard(BuildContext context, int daysUntilNext) {
     final hasStarted = daysUntilNext < 3;
 
@@ -431,7 +377,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           const SizedBox(height: 12),
           hasStarted
               ? ElevatedButton.icon(
-            icon: const Text("🧘‍♀️", style: TextStyle(fontSize: 18)),
+            icon: const Text("🧘‍♀️").text18(),
             label: const Text("Kết thúc kỳ kinh"),
             style: ElevatedButton.styleFrom(
               elevation: 4,
@@ -446,7 +392,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                 context.read<HomeBloc>().add(EndMenstruationEvent()),
           )
               : ElevatedButton.icon(
-            icon: const Text("🌸", style: TextStyle(fontSize: 18)),
+            icon: const Text("🌸").text18(),
             label: const Text("Bắt đầu chu kỳ mới"),
             style: ElevatedButton.styleFrom(
               elevation: 4,
@@ -477,10 +423,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           padding: const EdgeInsets.symmetric(vertical: 14),
         ),
         icon: const Icon(Icons.settings),
-        label: const Text(
-          "Thiết lập cá nhân",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
+        label: const Text("Thiết lập cá nhân").text16().w700(),
         onPressed: () {
           context.navigateTo(RoutesName.setting);
         },
