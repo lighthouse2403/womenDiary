@@ -26,6 +26,8 @@ class _NewThreadState extends BaseStatefulState<NewThread> {
   @override
   PreferredSizeWidget? buildAppBar() {
     return BaseAppBar(
+      hasBack: true,
+      backgroundColor: AppColors.pinkTextColor,
       title: 'Thêm chủ đề',
     );
   }
