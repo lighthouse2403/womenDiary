@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
-import 'package:women_diary/home/app_card.dart';
+import 'package:women_diary/home/home_component/app_card.dart';
 
 class QuickStats extends StatelessWidget {
   final int currentDay;

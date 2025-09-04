@@ -14,6 +14,13 @@ class LoadCycleEvent extends HomeEvent {
   List<Object?> get props => [];
 }
 
+class LoadScheduleEvent extends HomeEvent {
+  LoadScheduleEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 class LoadRedDateEvent extends HomeEvent {
   const LoadRedDateEvent();
 
