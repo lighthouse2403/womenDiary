@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 import 'package:women_diary/home/phase_model.dart';
-import 'package:women_diary/home/pretty_cycle_painter.dart';
+import 'package:women_diary/home/cycle_progress/pretty_cycle_painter.dart';
 
 class AnimatedCycleView extends StatefulWidget {
   final List<PhaseModel> phases;

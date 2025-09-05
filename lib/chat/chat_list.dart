@@ -50,16 +50,6 @@ class _ChatState extends BaseStatefulState<Chat> {
     return BaseAppBar(
       backgroundColor: AppColors.pinkTextColor,
       title: '💞 Giao lưu',
-      actions: [
-        IconButton(
-          onPressed: () {
-            context.navigateTo(RoutesName.newChat)
-                .then((res) => chatBloc.add(const LoadThreads()));
-          },
-          icon: const Icon(Icons.edit_note, color: Colors.white),
-          tooltip: "Tạo câu hỏi",
-        )
-      ],
     );
   }
 

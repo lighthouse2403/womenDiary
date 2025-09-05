@@ -11,6 +11,7 @@ import 'package:women_diary/chat/bloc/chat_event.dart';
 import 'package:women_diary/chat/bloc/chat_state.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/base/base_statefull_widget.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/common/firebase/firebase_chat.dart';
 
@@ -57,6 +58,8 @@ class _ChatState extends BaseStatefulState<ChatDetail> {
   @override
   PreferredSizeWidget? buildAppBar() {
     return BaseAppBar(
+      hasBack: true,
+      backgroundColor: AppColors.pinkTextColor,
       title: widget.thread.content,
     );
   }

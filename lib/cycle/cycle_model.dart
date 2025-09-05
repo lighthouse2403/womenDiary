@@ -15,11 +15,12 @@ class CycleModel {
     this.cycleStartTime,
   );
 
-  CycleModel.init(DateTime cycleStartTime, DateTime cycleEndTime ) {
+  CycleModel.init(DateTime cycleStartTime, DateTime cycleEndTime, DateTime menstruation ) {
     id = '${DateTime.now().millisecondsSinceEpoch}';
     note = '';
     this.cycleStartTime = cycleStartTime;
     this.cycleEndTime = cycleEndTime;
+    this.menstruationEndTime = menstruation;
     createdTime = DateTime.now();
     updatedTime = DateTime.now();
   }

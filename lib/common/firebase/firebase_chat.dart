@@ -38,7 +38,7 @@ class FirebaseChat {
         'threadId': FieldValue.serverTimestamp().toString(),
         'content': content,
         'updateTime': FieldValue.serverTimestamp(),
-        'uuid': deviceInfo[2],
+        'uuid': deviceInfo['uuid'],
         'os': deviceInfo['os'],
         'commentsCount': 0,
     }).then((value) async {
@@ -64,7 +64,6 @@ class FirebaseChat {
     commentLimit += 100;
 
     QuerySnapshot chatSnapshot = await firestore.collection('chat').doc(threadId).collection('comments').limit(commentLimit).orderBy('updateTime', descending: true).get();
-    // Get data from docs and convert map to List
     final allData = chatSnapshot.docs.map((doc) => CommentModel.fromJson(doc.data() as Map<String, dynamic>)).toList();
     return allData;
   }
@@ -84,7 +83,7 @@ class FirebaseChat {
     }).then((value) async {
       print('comment count: ${thread.commentsCount}');
       await updateComment(thread.threadId, value.id, content);
-      await updateNumberOfComment(thread.threadId, (thread.commentsCount ?? 0) + 1);
+      await updateNumberOfComment(thread.threadId, (thread.commentsCount) + 1);
     }).catchError((error) => print("Failed to add user: $error"));
   }
 

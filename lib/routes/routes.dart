@@ -5,6 +5,7 @@ import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/bottom_tab_bar/bottom_tab_bar.dart';
 import 'package:women_diary/chat/chat_detail.dart';
 import 'package:women_diary/chat/chat_list.dart';
+import 'package:women_diary/chat/component/new_thread.dart';
 import 'package:women_diary/chat/model/thread_model.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/cycle/first_setup/cycle_setup.dart';
@@ -153,6 +154,12 @@ class Routes {
           pageBuilder: (context, state) {
             ThreadModel thread = state.extra as ThreadModel;
             return _createPageFadeTransition(state: state, child: ChatDetail(thread: thread));
+          },
+        ),
+        GoRoute(
+          path: RoutesName.newChat,
+          pageBuilder: (context, state) {
+            return _createPageFadeTransition(state: state, child: NewThread());
           },
         ),
         GoRoute(
