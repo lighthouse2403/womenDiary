@@ -60,8 +60,20 @@ class DatabaseHandler {
     final db = await DatabaseHandler.db(cycleTable);
     final List<Map<String, dynamic>> list = await db.query(cycleTable);
     List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
-    allCycle.sort((a, b) => b.cycleStartTime.compareTo(a.cycleStartTime));
-    return allCycle.firstOrNull;
+
+    if (allCycle.isEmpty) return null;
+
+    final now = DateTime.now();
+
+    // Lọc ra các cycle có thời gian <= hiện tại
+    final pastCycles = allCycle.where((e) => e.cycleStartTime.isBefore(now) ||
+        e.cycleStartTime.isAtSameMomentAs(now)).toList();
+    if (pastCycles.isEmpty) return null;
+
+    // Sắp xếp giảm dần để lấy cái gần hiện tại nhất
+    pastCycles.sort((a, b) => b.cycleStartTime.compareTo(a.cycleStartTime));
+
+    return pastCycles.first;
   }
 
   static Future<void> updateCycle(CycleModel existCycle) async {

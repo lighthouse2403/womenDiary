@@ -16,6 +16,28 @@ extension DateTimeExtension on DateTime {
     return _dateFormat(dateFormat);
   }
 
+  bool isToday() {
+    final now = DateTime.now();
+    return this.year == now.year &&
+        this.month == now.month &&
+        this.day == now.day;
+  }
+
+  bool isFuture() {
+    final now = DateTime.now();
+    // so sánh đến mức ngày thôi (bỏ qua giờ phút giây)
+    final today = DateTime(now.year, now.month, now.day);
+    final checkDate = DateTime(this.year, this.month, this.day);
+    return checkDate.isAfter(today);
+  }
+
+  bool isPast() {
+    final now = DateTime.now();
+    // so sánh đến mức ngày thôi (bỏ qua giờ phút giây)
+    final today = DateTime(now.year, now.month, now.day);
+    final checkDate = DateTime(this.year, this.month, this.day);
+    return checkDate.isBefore(today);
+  }
 
   String globalMonthFormat(String language) {
     return DateFormat('MMMM yyyy', language).format(this);

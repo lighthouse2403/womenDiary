@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
@@ -17,6 +18,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   void _onLoadLocalData(LoadCycleEvent event, Emitter<HomeState> emit) async {
     CycleModel? lastCycle = await DatabaseHandler.getLastCycle();
+    if ( lastCycle != null && lastCycle.cycleEndTime.isPast()) {
+      lastCycle.cycleEndTime = DateTime.now().add(Duration(days: 2));
+      await DatabaseHandler.updateCycle(lastCycle);
+    }
+
     int cycleLength = lastCycle != null
         ? lastCycle.cycleEndTime.difference(lastCycle.cycleStartTime).inDays + 1
         : await LocalStorageService.getCycleLength();
@@ -26,6 +32,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         : await LocalStorageService.getMenstruationLength();
 
     int currentDay = DateTime.now().difference(lastCycle?.cycleStartTime ?? DateTime.now()).inDays + 1;
+    print('currentDay: ${currentDay}');
 
     /// Show phase information
     final phases = await _buildPhases(cycleLength, menstruationLength);
@@ -37,6 +44,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final daysUntilNext = nextPhase.startDay > currentDay
         ? nextPhase.startDay - currentDay
         : (cycleLength - currentDay + nextPhase.startDay);
+
+    print('cycleLength: ${cycleLength}');
+    print('phases: ${phases.length}');
 
     emit(LoadedCycleState(
       currentDay: currentDay,
