@@ -47,10 +47,15 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
   }
 
   Future<void> _bootstrap() async {
+    if (_unlocked) {
+      await _checkUpdate();
+      return;
+    }
+
     final canProceed = await _checkBiometric();
     if (!canProceed) return;
 
-    await _checkUpdate(); // update _pendingUpdate + _pendingVersion
+    await _checkUpdate();
     await _unlockApp();
   }
 
