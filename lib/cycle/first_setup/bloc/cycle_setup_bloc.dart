@@ -33,7 +33,11 @@ class CycleSetupBloc extends Bloc<CycleSetupEvent, CycleSetupState> {
     LocalStorageService.updateCycleLength(cycleLength);
     LocalStorageService.updateMenstruationLength(menstruationLength);
 
-    CycleModel cycle = CycleModel(lastPeriodDate);
+    CycleModel cycle = CycleModel.init(
+        lastPeriodDate,
+        lastPeriodDate.add(Duration(days: cycleLength - 1)),
+        lastPeriodDate.add(Duration(days: menstruationLength - 1))
+    );
     DatabaseHandler.insertCycle(cycle);
     emit(SavedCycleInformationState());
   }

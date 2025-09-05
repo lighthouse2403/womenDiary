@@ -62,7 +62,11 @@ class _SettingViewState extends State<SettingView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.pink.shade50,
-      appBar: BaseAppBar(title: 'Cài đặt', backgroundColor: Colors.pink.shade200),
+      appBar: BaseAppBar(
+        hasBack: true,
+        title: 'Cài đặt',
+        backgroundColor: Colors.pink.shade200,
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),

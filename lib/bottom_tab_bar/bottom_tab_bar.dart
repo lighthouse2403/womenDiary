@@ -20,7 +20,7 @@ class MainBottomTabBarState extends State<MainBottomTabBar> {
   int selectedIndex = 0;
 
   List<String> routeNames = [RoutesName.home, RoutesName.cycleList, RoutesName.schedules, RoutesName.actionHistory, RoutesName.chat];
-  List<String> labels = ['Trang chủ','Lịch sử', 'Diễn đàn', 'Hoạt động', 'Cài đặt'];
+  List<String> labels = ['Trang chủ','Lịch sử', 'Kế hoạch', 'Hoạt động', 'Diễn đàn'];
   List<SvgGenImage> images = [Assets.icons.home, Assets.icons.history, Assets.icons.calendar, Assets.icons.actions, Assets.icons.chat];
 
   @override
