@@ -29,14 +29,13 @@ class CycleInformation extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text("Ngày hiện tại").text14().customColor(Colors.black54),
           Text("Ngày $currentDay").black87Color().w700().text24(),
           Constants.vSpacer4,
           Text("Chu kỳ $cycleLength ngày").black87Color().text12(),
           Constants.vSpacer6,
           Text("Giai đoạn: ${phase.emoji}").text12().black87Color(),
           Constants.vSpacer4,
-          Text("Còn $remainDays ngày").text12().customColor(Colors.orange),
+          Text("Còn lại $remainDays ngày").text12().customColor(Colors.orange),
         ],
       ),
     );

@@ -63,6 +63,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       currentDay: currentDay,
       cycleLength: cycleLength,
       averageCycleLength: averageCycleLength,
+      startDay: lastCycle?.cycleStartTime ?? DateTime.now(),
+      endDay: lastCycle?.cycleEndTime ?? DateTime.now(),
       ovalutionDay: ovalutionDay ?? DateTime.now(),
       remainDays: remainDays,
       longestCycle: longestLength,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/home/bloc/home_bloc.dart';
@@ -120,6 +121,8 @@ class _CycleProgressState extends State<CycleProgress>
                         _showCycleDialog(
                           currentDay: currentDay,
                           cycleLength: cycleLength,
+                          startDay: cycle.startDay,
+                          endDay: cycle.endDay,
                           remainDays: remainDays,
                           ovalutionDay: ovalutionDay,
                         );
@@ -144,6 +147,8 @@ class _CycleProgressState extends State<CycleProgress>
   void _showCycleDialog({
     required int currentDay,
     required int cycleLength,
+    required DateTime startDay,
+    required DateTime endDay,
     required DateTime ovalutionDay,
     required int remainDays,
   }) {
@@ -176,15 +181,18 @@ class _CycleProgressState extends State<CycleProgress>
                     color: Colors.pink,
                   ),
                 ),
-                const SizedBox(height: 16),
+                Constants.vSpacer20,
                 _buildInfoRow("Hôm nay", "Ngày $currentDay"),
-                const SizedBox(height: 8),
-                _buildInfoRow("Chu kỳ dự kiến", "$cycleLength ngày"),
-                const SizedBox(height: 8),
+                Constants.vSpacer8,
+                _buildInfoRow("Chu kỳ:", "$cycleLength ngày"),
+                _buildInfoRow("Ngày bắt đầu", "${startDay.globalDateFormat()}"),
+                Constants.vSpacer8,
+                _buildInfoRow("Ngày kết thúc", "${endDay.globalDateFormat()}"),
+                Constants.vSpacer8,
                 _buildInfoRow("Ngày rụng trứng", "${ovalutionDay.globalDateFormat()}"),
-                const SizedBox(height: 8),
+                Constants.vSpacer8,
                 _buildInfoRow("Kết thúc chu kỳ", "Trong $remainDays ngày"),
-                const SizedBox(height: 20),
+                Constants.vSpacer20,
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.pink,
@@ -213,7 +221,7 @@ class _CycleProgressState extends State<CycleProgress>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label).text15().w500(),
+        Text(label).text14().w400(),
         Text(value).pinkColor().text14().w500(),
       ],
     );

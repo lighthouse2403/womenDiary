@@ -74,19 +74,6 @@ class PrettyCyclePainter extends CustomPainter {
         final scale = isCurrent ? 1.5 + sin(rotation * 2 * pi) * 0.2 : 1.0;
         final dotRadius = isCurrent ? dotRadiusBase * 2.2 * scale : dotRadiusBase;
 
-        // Ripple effect cho ngày hiện tại
-        if (isCurrent) {
-          final rippleRadius = dotRadius * 2.8 + sin(rotation * 2 * pi) * 2.5;
-          canvas.drawCircle(
-            dotOffset,
-            rippleRadius,
-            Paint()
-              ..color = const Color.fromRGBO(255, 255, 255, 0.3)
-              ..style = PaintingStyle.stroke
-              ..strokeWidth = 1.5,
-          );
-        }
-
         // Dot chính
         canvas.drawCircle(dotOffset, dotRadius, Paint()..color = Colors.white);
 
