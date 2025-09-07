@@ -35,7 +35,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
   Future<void> _onLoadActions(LoadActionEvent event, Emitter<ActionState> emit) async {
     actions = await DatabaseHandler.getActions(
         startTime: startTime.millisecondsSinceEpoch,
-        endTime: endTime.millisecondsSinceEpoch,
+        endTime: DateTime.now().millisecondsSinceEpoch,
         type: type
     );
     emit(ActionLoadedState(actions: actions));
@@ -69,7 +69,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
     actions.removeWhere((action) => action.id == event.id);
     emit(ActionLoadedState(actions: actions));
   }
-  
+
   /// --------------------------- Action Detail --------------------------------
   void _onLoadActionDetail(InitActionDetailEvent event, Emitter<ActionState> emit) async {
     actionDetail = event.initialAction;

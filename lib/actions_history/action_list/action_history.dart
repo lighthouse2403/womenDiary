@@ -277,7 +277,10 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         color: Colors.pinkAccent.shade100,
         borderRadius: BorderRadius.circular(30),
-        onPressed: () => context.navigateTo(RoutesName.newAction).then((value) => context.read<ActionBloc>().add(const LoadActionEvent())),
+        onPressed: () => context.navigateTo(RoutesName.newAction).then((value) {
+          print('new action');
+          context.read<ActionBloc>().add(const LoadActionEvent());
+        }),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
