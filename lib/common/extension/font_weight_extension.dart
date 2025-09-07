@@ -46,7 +46,6 @@ extension FontWeightExtension on TextStyle? {
     );
   }
 
-
   TextStyle customWeight(FontWeight? weight) {
     return TextStyle(
         fontWeight: weight,

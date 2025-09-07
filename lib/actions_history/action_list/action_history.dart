@@ -246,16 +246,11 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(action.title)
-                      .text16()
-                      .w600()
-                      .customColor(Colors.black87),
+                  Text(action.title).text16().w600().black87Color(),
                   if (action.note.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0),
-                      child: Text(action.note)
-                          .text13()
-                          .customColor(Colors.grey.shade600),
+                      child: Text(action.note).text13().customColor(Colors.grey.shade600),
                     ),
                 ],
               ),
@@ -264,10 +259,8 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
             Row(
               children: [
                 const Icon(CupertinoIcons.time, size: 14, color: CupertinoColors.systemGrey),
-                const SizedBox(width: 4),
-                Text(actionTime)
-                    .text12()
-                    .customColor(Colors.grey.shade500),
+                Constants.hSpacer4,
+                Text(actionTime).text12().customColor(Colors.grey.shade500),
               ],
             )
           ],
@@ -284,16 +277,13 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         color: Colors.pinkAccent.shade100,
         borderRadius: BorderRadius.circular(30),
-        onPressed: () => context.navigateTo(RoutesName.newAction),
+        onPressed: () => context.navigateTo(RoutesName.newAction).then((value) => context.read<ActionBloc>().add(const LoadActionEvent())),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(CupertinoIcons.add, size: 20, color: Colors.white),
             Constants.hSpacer6,
-            const Text("Thêm bản ghi")
-                .text16()
-                .w600()
-                .customColor(Colors.white),
+            const Text("Thêm bản ghi").text16().w600().whiteColor(),
           ],
         ),
       ),

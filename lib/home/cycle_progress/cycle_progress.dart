@@ -125,6 +125,7 @@ class _CycleProgressState extends State<CycleProgress>
                           endDay: cycle.endDay,
                           remainDays: remainDays,
                           ovalutionDay: ovalutionDay,
+                          phase: currentPhase.emoji
                         );
                       },
                       child: CycleInformation(
@@ -151,6 +152,7 @@ class _CycleProgressState extends State<CycleProgress>
     required DateTime endDay,
     required DateTime ovalutionDay,
     required int remainDays,
+    required String phase,
   }) {
     showDialog(
       context: context,
@@ -171,43 +173,38 @@ class _CycleProgressState extends State<CycleProgress>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.local_florist, size: 48, color: Colors.pink),
-                const SizedBox(height: 12),
-                const Text(
-                  "🌸 Thông tin chu kỳ 🌸",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.pink,
-                  ),
-                ),
+                const Icon(Icons.local_florist, size: 36, color: Colors.pink),
+                Constants.vSpacer12,
+                Text("🌸  Thông tin chu kỳ  🌸").pinkColor().w600().text17(),
                 Constants.vSpacer20,
                 _buildInfoRow("Hôm nay", "Ngày $currentDay"),
-                Constants.vSpacer8,
+                Constants.vSpacer10,
+                _buildInfoRow("Giai đoạn", "$phase"),
+                Constants.vSpacer10,
                 _buildInfoRow("Chu kỳ:", "$cycleLength ngày"),
+                Constants.vSpacer10,
                 _buildInfoRow("Ngày bắt đầu", "${startDay.globalDateFormat()}"),
-                Constants.vSpacer8,
+                Constants.vSpacer10,
                 _buildInfoRow("Ngày kết thúc", "${endDay.globalDateFormat()}"),
-                Constants.vSpacer8,
+                Constants.vSpacer10,
                 _buildInfoRow("Ngày rụng trứng", "${ovalutionDay.globalDateFormat()}"),
-                Constants.vSpacer8,
-                _buildInfoRow("Kết thúc chu kỳ", "Trong $remainDays ngày"),
+                Constants.vSpacer10,
+                _buildInfoRow("Kết thúc", "$remainDays ngày nữa"),
                 Constants.vSpacer20,
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.pink,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 12),
                   ),
                   onPressed: () {
                     Navigator.of(dialogCtx).pop();
                     _pulseController.repeat();
                   },
-                  child: const Text("Đóng"
-                  ).w500().text14(),
+                  child: const Text("Đóng").w500().text14(),
                 ),
               ],
             ),
@@ -221,8 +218,8 @@ class _CycleProgressState extends State<CycleProgress>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label).text14().w400(),
-        Text(value).pinkColor().text14().w500(),
+        Text(label).text13().w400(),
+        Text(value).pinkColor().text14().w600(),
       ],
     );
   }
