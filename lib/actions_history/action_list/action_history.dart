@@ -19,20 +19,15 @@ class ActionHistory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ActionBloc()..add(LoadActionEvent()),
+      create: (_) => ActionBloc()..add(const LoadActionEvent()),
       child: const _ActionHistoryView(),
     );
   }
 }
 
-class _ActionHistoryView extends StatefulWidget {
+class _ActionHistoryView extends StatelessWidget {
   const _ActionHistoryView();
 
-  @override
-  State<_ActionHistoryView> createState() => _ActionHistoryViewState();
-}
-
-class _ActionHistoryViewState extends State<_ActionHistoryView> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -40,76 +35,49 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
         child: Stack(
           children: [
             Column(
-              children: [
-                _filterChips(),
-                Expanded(child: _buildList()),
+              children: const [
+                _FilterChips(),
+                Expanded(child: _ActionList()),
               ],
             ),
-            _addButton(context),
+            const _AddButton(),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _filterChips() {
-    return BlocBuilder<ActionBloc, ActionState>(
-      buildWhen: (pre, current) => current is ActionTypeUpdatedState,
-      builder: (context, state) {
-        ActionType? selectedType = state is ActionTypeUpdatedState ? state.type : null;
+/// ---------------- Filter Chips ----------------
+class _FilterChips extends StatelessWidget {
+  const _FilterChips();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<ActionBloc, ActionState, ActionType?>(
+      selector: (state) =>
+      state is ActionTypeUpdatedState ? state.type : null,
+      builder: (context, selectedType) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Wrap(
             spacing: 8,
             children: [
-              ChoiceChip(
-                label: const Text(
-                  "Tất cả",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
+              _chip(
+                context,
+                label: "Tất cả",
                 selected: selectedType == null,
-                selectedColor: Colors.pink.shade100,
-                backgroundColor: Colors.grey.shade100,
-                labelStyle: TextStyle(
-                  color: selectedType == null ? Colors.pink.shade700 : Colors.black87,
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  side: BorderSide(
-                    color: selectedType == null ? Colors.pink.shade200 : Colors.grey.shade300,
-                  ),
-                ),
-                visualDensity: VisualDensity.compact,
-                onSelected: (_) {
-                  context.read<ActionBloc>().add(UpdateActionTypeEvent(null));
-                },
+                onTap: () =>
+                    context.read<ActionBloc>().add(UpdateActionTypeEvent(null)),
               ),
-              ...ActionType.values.map(
-                    (type) => ChoiceChip(
-                  label: Text(
-                    type.display,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                  ),
-                  selected: selectedType == type,
-                  selectedColor: Colors.pink.shade100,
-                  backgroundColor: Colors.grey.shade100,
-                  labelStyle: TextStyle(
-                    color: selectedType == type ? Colors.pink.shade700 : Colors.black87,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(
-                      color: selectedType == type ? Colors.pink.shade200 : Colors.grey.shade300,
-                    ),
-                  ),
-                  visualDensity: VisualDensity.compact,
-                  onSelected: (_) {
-                    context.read<ActionBloc>().add(UpdateActionTypeEvent(type));
-                  },
-                ),
-              ),
+              ...ActionType.values.map((type) => _chip(
+                context,
+                label: type.display,
+                selected: selectedType == type,
+                onTap: () => context
+                    .read<ActionBloc>()
+                    .add(UpdateActionTypeEvent(type)),
+              )),
             ],
           ),
         );
@@ -117,35 +85,48 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
     );
   }
 
-  Widget _buildList() {
+  Widget _chip(BuildContext context,
+      {required String label,
+        required bool selected,
+        required VoidCallback onTap}) {
+    return ChoiceChip(
+      label: Text(label,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+      selected: selected,
+      selectedColor: Colors.pink.shade100,
+      backgroundColor: Colors.grey.shade100,
+      labelStyle: TextStyle(
+        color: selected ? Colors.pink.shade700 : Colors.black87,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: selected ? Colors.pink.shade200 : Colors.grey.shade300,
+        ),
+      ),
+      visualDensity: VisualDensity.compact,
+      onSelected: (_) => onTap(),
+    );
+  }
+}
+
+/// ---------------- Action List ----------------
+class _ActionList extends StatelessWidget {
+  const _ActionList();
+
+  @override
+  Widget build(BuildContext context) {
     return BlocBuilder<ActionBloc, ActionState>(
-      buildWhen: (pre, current) => current is ActionLoadedState,
+      buildWhen: (_, state) => state is ActionLoadedState,
       builder: (context, state) {
-        final List<ActionModel> actionList =
-        (state is ActionLoadedState) ? state.actions : [];
+        final actions =
+        (state is ActionLoadedState) ? state.actions : <ActionModel>[];
 
-        if (actionList.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(CupertinoIcons.book, size: 80, color: Colors.pinkAccent),
-                const SizedBox(height: 16),
-                Text("Chưa có bản ghi nào")
-                    .text18()
-                    .w600()
-                    .customColor(Colors.pink.shade600),
-                const SizedBox(height: 8),
-                Text("Nhấn nút bên dưới để thêm bản ghi đầu tiên của bạn ❤️")
-                    .text14()
-                    .customColor(Colors.grey),
-              ],
-            ),
-          );
-        }
+        if (actions.isEmpty) return const _EmptyState();
 
-        final Map<String, List<ActionModel>> groupedByDate = {};
-        for (var action in actionList) {
+        final groupedByDate = <String, List<ActionModel>>{};
+        for (final action in actions) {
           final date = DateFormat('dd/MM/yyyy').format(action.time);
           groupedByDate.putIfAbsent(date, () => []).add(action);
         }
@@ -156,8 +137,8 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _sectionHeader(entry.key),
-                ...entry.value.map((action) => _dismissibleCard(action, context)),
+                _SectionHeader(date: entry.key),
+                ...entry.value.map((a) => _ActionCard(action: a)),
                 const SizedBox(height: 20),
               ],
             );
@@ -166,18 +147,54 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
       },
     );
   }
+}
 
-  Widget _sectionHeader(String date) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Text("📅 $date")
-          .text16()
-          .w600()
-          .customColor(Colors.pink.shade600),
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(CupertinoIcons.book, size: 80, color: Colors.pinkAccent),
+          const SizedBox(height: 16),
+          Text("Chưa có bản ghi nào")
+              .text18()
+              .w600()
+              .customColor(Colors.pink.shade600),
+          const SizedBox(height: 8),
+          Text("Nhấn nút bên dưới để thêm bản ghi đầu tiên của bạn ❤️")
+              .text14()
+              .customColor(Colors.grey),
+        ],
+      ),
     );
   }
+}
 
-  Widget _dismissibleCard(ActionModel action, BuildContext context) {
+class _SectionHeader extends StatelessWidget {
+  final String date;
+  const _SectionHeader({required this.date});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child:
+      Text("📅 $date").text16().w600().customColor(Colors.pink.shade600),
+    );
+  }
+}
+
+/// ---------------- Action Card ----------------
+class _ActionCard extends StatelessWidget {
+  final ActionModel action;
+  const _ActionCard({required this.action});
+
+  @override
+  Widget build(BuildContext context) {
     return Slidable(
       key: ValueKey(action.id),
       endActionPane: ActionPane(
@@ -185,26 +202,7 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
         extentRatio: 0.25,
         children: [
           SlidableAction(
-            onPressed: (_) {
-              showCupertinoDialog<bool>(
-                context: context,
-                builder: (ctx) => CupertinoAlertDialog(
-                  title: const Text('Xoá bản ghi'),
-                  content: const Text('Bạn có chắc muốn xoá bản ghi này không?'),
-                  actions: [
-                    CupertinoDialogAction(
-                      child: const Text('Huỷ'),
-                      onPressed: () => Navigator.of(ctx).pop(false),
-                    ),
-                    CupertinoDialogAction(
-                      child: const Text('Xoá'),
-                      isDestructiveAction: true,
-                      onPressed: () => Navigator.of(ctx).pop(true),
-                    ),
-                  ],
-                ),
-              );
-            },
+            onPressed: (_) => _confirmDelete(context),
             backgroundColor: Colors.redAccent,
             foregroundColor: Colors.white,
             icon: Icons.delete_outline,
@@ -213,63 +211,124 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
           ),
         ],
       ),
-      child: _actionCard(action, context),
-    );
-  }
-
-  Widget _actionCard(ActionModel action, BuildContext context) {
-    String actionTime = DateFormat('HH:mm').format(action.time);
-    return GestureDetector(
-      onTap: () => context.navigateTo(RoutesName.actionDetail, arguments: action).then((value) {
-        context.read<ActionBloc>().add(const LoadActionEvent());
-      }),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 20),
-        decoration: BoxDecoration(
-          color: Colors.pink.shade50,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.pink.shade100.withAlpha(50),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
+      child: GestureDetector(
+        onTap: () => context
+            .navigateTo(RoutesName.actionDetail, arguments: action)
+            .then((_) => context.read<ActionBloc>().add(const LoadActionEvent())),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.pink.shade50, Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          ],
-        ),
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(action.emoji).text24(),
-            Constants.hSpacer12,
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(action.title).text16().w600().black87Color(),
-                  if (action.note.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4.0),
-                      child: Text(action.note).text13().customColor(Colors.grey.shade600),
-                    ),
-                ],
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.pink.shade100.withOpacity(0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-            ),
-            Constants.hSpacer10,
-            Row(
-              children: [
-                const Icon(CupertinoIcons.time, size: 14, color: CupertinoColors.systemGrey),
-                Constants.hSpacer4,
-                Text(actionTime).text12().customColor(Colors.grey.shade500),
-              ],
-            )
-          ],
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Emoji avatar
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.pink.shade100.withOpacity(0.4),
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Text(action.emoji, style: const TextStyle(fontSize: 24)),
+              ),
+              Constants.hSpacer12,
+
+              // Nội dung
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(action.title)
+                        .text16()
+                        .w600()
+                        .customColor(Colors.black87),
+                    if (action.note.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          action.note,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey.shade600,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
+              // Thời gian
+              Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.pink.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  DateFormat('HH:mm').format(action.time),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.pink.shade700,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _addButton(BuildContext context) {
+  void _confirmDelete(BuildContext context) {
+    showCupertinoDialog<bool>(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Xoá bản ghi'),
+        content: const Text('Bạn có chắc muốn xoá bản ghi này không?'),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('Huỷ'),
+            onPressed: () => Navigator.of(ctx).pop(false),
+          ),
+          CupertinoDialogAction(
+            child: const Text('Xoá'),
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.of(ctx).pop(true);
+              context.read<ActionBloc>().add(DeleteActionDetailEvent(action.id));
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// ---------------- Floating Add Button ----------------
+class _AddButton extends StatelessWidget {
+  const _AddButton();
+
+  @override
+  Widget build(BuildContext context) {
     return Positioned(
       bottom: 24,
       right: 24,
@@ -277,10 +336,9 @@ class _ActionHistoryViewState extends State<_ActionHistoryView> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         color: Colors.pinkAccent.shade100,
         borderRadius: BorderRadius.circular(30),
-        onPressed: () => context.navigateTo(RoutesName.newAction).then((value) {
-          print('new action');
-          context.read<ActionBloc>().add(const LoadActionEvent());
-        }),
+        onPressed: () => context
+            .navigateTo(RoutesName.newAction)
+            .then((_) => context.read<ActionBloc>().add(const LoadActionEvent())),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
