@@ -16,7 +16,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     emit(state.copyWith(isLoadingCycle: true, isLoadingSchedule: true));
 
-    final lastCycleFuture = DatabaseHandler.getLastCycle();
+    final lastCycleFuture = await DatabaseHandler.getLastCycle();
+    final longestCycle = await DatabaseHandler.getLongestCycle();
+    final shortestCycle = await DatabaseHandler.getShortestCycle();
+
     final schedulesFuture = DatabaseHandler.getAllSchedule();
 
     // --- Load cycle ---
@@ -25,11 +28,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ? lastCycle.cycleEndTime.difference(lastCycle.cycleStartTime).inDays + 1
         : await LocalStorageService.getCycleLength();
 
+    final longestLength = longestCycle != null
+        ? longestCycle.cycleEndTime.difference(longestCycle.cycleStartTime).inDays + 1
+        : await LocalStorageService.getCycleLength();
+
+    final shortestLength = shortestCycle != null
+        ? shortestCycle.cycleEndTime.difference(shortestCycle.cycleStartTime).inDays + 1
+        : await LocalStorageService.getCycleLength();
+
+    final averageCycleLength = await LocalStorageService.getAverageCycleLength();
+
     final menstruationLength = lastCycle != null
         ? lastCycle.menstruationEndTime
         .difference(lastCycle.cycleStartTime)
-        .inDays +
-        1
+        .inDays + 1
         : await LocalStorageService.getMenstruationLength();
 
     final currentDay =
@@ -45,18 +57,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       orElse: () => phases.first,
     );
 
-
-    final daysUntilNext = nextPhase.startDay > currentDay
-        ? nextPhase.startDay - currentDay
-        : (cycleLength - currentDay + nextPhase.startDay);
-
     final remainDays = cycleLength - currentDay;
 
     final cycleData = CycleData(
       currentDay: currentDay,
       cycleLength: cycleLength,
+      averageCycleLength: averageCycleLength,
       ovalutionDay: ovalutionDay ?? DateTime.now(),
       remainDays: remainDays,
+      longestCycle: longestLength,
+      shortestCycle: shortestLength,
       currentPhase: currentPhase,
       phases: phases,
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/home_component/app_card.dart';
@@ -14,13 +15,19 @@ class QuickStats extends StatelessWidget {
   Widget build(BuildContext context) {
 
     String cycleLength = '${cycleData?.cycleLength ?? '_'}';
+    String averageCycleLength = '${cycleData?.averageCycleLength ?? '_'}';
+    String currentDay = '${cycleData?.currentDay ?? '_'}';
+    String ovalutionDay = '${cycleData?.ovalutionDay.globalDateFormat() ?? '_'}';
+    String longestLength = '${cycleData?.longestCycle ?? '_'}';
+    String shortestLength = '${cycleData?.shortestCycle ?? '_'}';
 
     final tiles = <Widget>[
-      _statCard(title: "📊 Chu kỳ trung bình", value: "$cycleLength ngày"),
-      _statCard(title: "📅 Ngày hiện tại", value: "Ngày ${cycleData?.currentDay ?? '_'}"),
-      _statCard(title: "⏱ Chu kỳ ngắn nhất", value: "—"),
-      _statCard(title: "⏳ Chu kỳ dài nhất", value: "—"),
-      _statCard(title: "✨ Dự kiến độ dài kỳ này", value: "${cycleData.cycleLength} ngày"),
+      _statCard(title: "📊 Chu kỳ trung bình", value: "$averageCycleLength ngày"),
+      _statCard(title: "✨ Độ dài kỳ này", value: "$cycleLength ngày"),
+      _statCard(title: "📅 Ngày hiện tại", value: "Ngày $currentDay"),
+      _statCard(title: "📅 Ngày rụng trứng", value: "$ovalutionDay"),
+      _statCard(title: "⏱ Chu kỳ dài nhất", value: "$longestLength"),
+      _statCard(title: "⏳ Chu kỳ ngắn nhất", value: "$shortestLength"),
     ];
 
     final width = (MediaQuery.of(context).size.width - 16 * 2 - 12) / 2;

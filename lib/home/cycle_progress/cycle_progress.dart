@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:women_diary/common/extension/date_time_extension.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/home/bloc/home_bloc.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/cycle_progress/cycle_information.dart';
@@ -170,7 +171,7 @@ class _CycleProgressState extends State<CycleProgress>
                 const Text(
                   "🌸 Thông tin chu kỳ 🌸",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.pink,
                   ),
@@ -180,7 +181,7 @@ class _CycleProgressState extends State<CycleProgress>
                 const SizedBox(height: 8),
                 _buildInfoRow("Chu kỳ dự kiến", "$cycleLength ngày"),
                 const SizedBox(height: 8),
-                _buildInfoRow("Mốc tiếp theo", "Còn ${ovalutionDay.globalDateFormat()} ngày"),
+                _buildInfoRow("Ngày rụng trứng", "${ovalutionDay.globalDateFormat()}"),
                 const SizedBox(height: 8),
                 _buildInfoRow("Kết thúc chu kỳ", "Trong $remainDays ngày"),
                 const SizedBox(height: 20),
@@ -197,10 +198,8 @@ class _CycleProgressState extends State<CycleProgress>
                     Navigator.of(dialogCtx).pop();
                     _pulseController.repeat();
                   },
-                  child: const Text(
-                    "Đóng",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
+                  child: const Text("Đóng"
+                  ).w500().text14(),
                 ),
               ],
             ),
@@ -214,18 +213,8 @@ class _CycleProgressState extends State<CycleProgress>
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.pink,
-          ),
-        ),
+        Text(label).text15().w500(),
+        Text(value).pinkColor().text14().w500(),
       ],
     );
   }

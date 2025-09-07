@@ -5,9 +5,11 @@ import 'package:women_diary/schedule/schedule_model.dart';
 class CycleData extends Equatable {
   final int currentDay;
   final int cycleLength;
-  final int daysUntilNext;
-  final DateTime ovalutionDay;
+  final int averageCycleLength;
   final int remainDays;
+  final int longestCycle;
+  final int shortestCycle;
+  final DateTime ovalutionDay;
   final PhaseModel currentPhase;
 
   final List<PhaseModel> phases;
@@ -15,15 +17,17 @@ class CycleData extends Equatable {
   const CycleData({
     required this.currentDay,
     required this.cycleLength,
-    required this.daysUntilNext,
+    required this.averageCycleLength,
     required this.ovalutionDay,
     required this.remainDays,
+    required this.longestCycle,
+    required this.shortestCycle,
     required this.currentPhase,
     required this.phases,
   });
 
   @override
-  List<Object?> get props => [currentDay, cycleLength, daysUntilNext, ovalutionDay, remainDays, currentPhase, phases];
+  List<Object?> get props => [currentDay, cycleLength, averageCycleLength, ovalutionDay, remainDays, longestCycle, shortestCycle, currentPhase, phases];
 }
 
 class HomeState extends Equatable {

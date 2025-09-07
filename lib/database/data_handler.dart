@@ -52,9 +52,62 @@ class DatabaseHandler {
     final db = await DatabaseHandler.db(cycleTable);
     final List<Map<String, dynamic>> list = await db.query(cycleTable);
     List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
-    allCycle.sort((a, b) => a.cycleStartTime.compareTo(b.cycleStartTime));
+    allCycle.sort((a, b) => b.cycleStartTime.compareTo(a.cycleStartTime));
     return allCycle;
   }
+
+  static Future<CycleModel?> getLongestCycle() async {
+    final db = await DatabaseHandler.db(cycleTable);
+    final List<Map<String, dynamic>> list = await db.query(cycleTable);
+    List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
+
+    if (allCycle.isEmpty) return null;
+
+    final now = DateTime.now();
+
+    // Chỉ lấy chu kỳ đã xảy ra (start <= now)
+    final pastCycles = allCycle.where(
+          (e) => e.cycleStartTime.isBefore(now) || e.cycleStartTime.isAtSameMomentAs(now),
+    ).toList();
+
+    if (pastCycles.isEmpty) return null;
+
+    // Tìm chu kỳ dài nhất
+    pastCycles.sort((a, b) {
+      final lenA = a.cycleEndTime.difference(a.cycleStartTime).inDays;
+      final lenB = b.cycleEndTime.difference(b.cycleStartTime).inDays;
+      return lenB.compareTo(lenA); // sắp xếp giảm dần theo độ dài
+    });
+
+    return pastCycles.first;
+  }
+
+  static Future<CycleModel?> getShortestCycle() async {
+    final db = await DatabaseHandler.db(cycleTable);
+    final List<Map<String, dynamic>> list = await db.query(cycleTable);
+    List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
+
+    if (allCycle.isEmpty) return null;
+
+    final now = DateTime.now();
+
+    // Chỉ lấy chu kỳ đã xảy ra
+    final pastCycles = allCycle.where(
+          (e) => e.cycleStartTime.isBefore(now) || e.cycleStartTime.isAtSameMomentAs(now),
+    ).toList();
+
+    if (pastCycles.isEmpty) return null;
+
+    // Tìm chu kỳ ngắn nhất
+    pastCycles.sort((a, b) {
+      final lenA = a.cycleEndTime.difference(a.cycleStartTime).inDays;
+      final lenB = b.cycleEndTime.difference(b.cycleStartTime).inDays;
+      return lenA.compareTo(lenB); // sắp xếp tăng dần theo độ dài
+    });
+
+    return pastCycles.first;
+  }
+
 
   static Future<CycleModel?> getLastCycle() async {
     final db = await DatabaseHandler.db(cycleTable);
