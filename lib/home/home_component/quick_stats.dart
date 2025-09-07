@@ -26,8 +26,8 @@ class QuickStats extends StatelessWidget {
       _statCard(title: "✨ Độ dài kỳ này", value: "$cycleLength ngày"),
       _statCard(title: "📅 Ngày hiện tại", value: "Ngày $currentDay"),
       _statCard(title: "📅 Ngày rụng trứng", value: "$ovalutionDay"),
-      _statCard(title: "⏱ Chu kỳ dài nhất", value: "$longestLength"),
-      _statCard(title: "⏳ Chu kỳ ngắn nhất", value: "$shortestLength"),
+      _statCard(title: "⏱ Chu kỳ dài nhất", value: "$longestLength ngày"),
+      _statCard(title: "⏳ Chu kỳ ngắn nhất", value: "$shortestLength ngày"),
     ];
 
     final width = (MediaQuery.of(context).size.width - 16 * 2 - 12) / 2;

@@ -25,7 +25,7 @@ class PrettyCyclePainter extends CustomPainter {
     final arcRect = Rect.fromCircle(center: center, radius: radius);
     final dotRadiusBase = size.width * 0.009;
 
-    final paint = Paint()
+    final basePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;
@@ -33,14 +33,33 @@ class PrettyCyclePainter extends CustomPainter {
     double startAngle = -pi / 2;
     int dayIndex = 0;
 
+    // Vẽ các phase + border
     for (final phase in phases) {
       final sweep = 2 * pi * phase.days / totalDays;
-      paint.color = phase.color;
-      canvas.drawArc(arcRect, startAngle, sweep, false, paint);
+
+      // Phase chính
+      basePaint.color = phase.color;
+      canvas.drawArc(arcRect, startAngle, sweep, false, basePaint);
+
+      // 3. Glow pastel
+      canvas.drawArc(
+        arcRect,
+        startAngle,
+        sweep,
+        false,
+        Paint()
+          ..color = phase.color.withOpacity(0.3)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 6
+          ..maskFilter = const MaskFilter.blur(BlurStyle.outer, 5),
+      );
+
       startAngle += sweep;
     }
 
+    // Reset góc để vẽ dot từng ngày
     startAngle = -pi / 2;
+
     for (final phase in phases) {
       for (int j = 0; j < phase.days; j++) {
         final angle = startAngle + j * 2 * pi / totalDays + pi / totalDays;
@@ -71,17 +90,33 @@ class PrettyCyclePainter extends CustomPainter {
         // Dot chính
         canvas.drawCircle(dotOffset, dotRadius, Paint()..color = Colors.white);
 
-        // Border cho ngày hiện tại
         if (isCurrent) {
+          final rippleRadius = dotRadius * 2.8 + sin(rotation * 2 * pi) * 2.5;
+          // Ripple effect
           canvas.drawCircle(
             dotOffset,
-            dotRadius,
+            rippleRadius,
             Paint()
-              ..color = Colors.black
+              ..color = Colors.white.withAlpha(10)
               ..style = PaintingStyle.stroke
-              ..strokeWidth = 1.2,
+              ..strokeWidth = 6
+              ..maskFilter = const MaskFilter.blur(BlurStyle.outer, 6),
           );
 
+          // Glow nền trắng mềm
+          canvas.drawCircle(
+            dotOffset,
+            dotRadius * 2.6,
+            Paint()
+              ..color = Colors.white.withAlpha(150)
+              ..style = PaintingStyle.fill
+              ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
+          );
+        }
+
+        canvas.drawCircle(dotOffset, dotRadius, Paint()..color = Colors.white);
+
+        if (isCurrent) {
           final span = TextSpan(
             text: '${dayIndex + 1}',
             style: const TextStyle(
@@ -100,12 +135,11 @@ class PrettyCyclePainter extends CustomPainter {
           tp.paint(canvas, dotOffset - Offset(tp.width / 2, tp.height / 2));
         }
 
-        // Biểu tượng rụng trứng
-        // Biểu tượng rụng trứng (halo + pulse)
+        // Biểu tượng rụng trứng ✨
         if (isOvulation) {
-          final pulse = 1.0 + 0.15 * sin(rotation * 2 * pi); // dao động nhịp
+          final pulse = 1.0 + 0.15 * sin(rotation * 2 * pi);
 
-          // Vòng sáng (halo) nhấp nháy
+          // Halo pastel
           canvas.drawCircle(
             dotOffset,
             dotRadius * 3.5 * pulse,
@@ -114,7 +148,7 @@ class PrettyCyclePainter extends CustomPainter {
               ..style = PaintingStyle.fill,
           );
 
-          // Dot trung tâm vàng
+          // Icon ✨
           final tp = TextPainter(
             text: const TextSpan(
               text: '✨',
@@ -128,7 +162,7 @@ class PrettyCyclePainter extends CustomPainter {
           tp.layout();
           tp.paint(canvas, dotOffset - Offset(tp.width / 2, tp.height / 2));
 
-          // Vẽ tia sáng nhỏ xung quanh
+          // Tia sáng
           final rays = 8;
           for (int i = 0; i < rays; i++) {
             final angle = (2 * pi / rays) * i;

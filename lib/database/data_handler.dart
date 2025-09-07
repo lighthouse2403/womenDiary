@@ -108,6 +108,50 @@ class DatabaseHandler {
     return pastCycles.first;
   }
 
+  static Future<CycleModel?> getCycleByDate(DateTime actionDate) async {
+    final db = await DatabaseHandler.db(cycleTable);
+    final List<Map<String, dynamic>> list = await db.query(cycleTable);
+    List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
+
+    if (allCycle.isEmpty) return null;
+
+    // Tìm chu kỳ chứa actionDate
+    for (final cycle in allCycle) {
+      if ((actionDate.isAtSameMomentAs(cycle.cycleStartTime) ||
+          actionDate.isAfter(cycle.cycleStartTime)) &&
+          (actionDate.isAtSameMomentAs(cycle.cycleEndTime) ||
+              actionDate.isBefore(cycle.cycleEndTime))) {
+        return cycle;
+      }
+    }
+    return null; // nếu không tìm thấy chu kỳ nào chứa ngày này
+  }
+
+  static Future<int> getAverageCycleLength() async {
+    final db = await DatabaseHandler.db(cycleTable);
+    final List<Map<String, dynamic>> list = await db.query(cycleTable);
+    List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
+
+    if (allCycle.isEmpty) return 30;
+
+    final now = DateTime.now();
+
+    // Chỉ lấy các cycle trong quá khứ hoặc đang diễn ra
+    final pastCycles = allCycle.where(
+          (e) => e.cycleStartTime.isBefore(now) || e.cycleStartTime.isAtSameMomentAs(now),
+    ).toList();
+
+    if (pastCycles.isEmpty) return 30;
+
+    // Tính độ dài chu kỳ cho từng cycle
+    final lengths = pastCycles.map((e) {
+      return e.cycleEndTime.difference(e.cycleStartTime).inDays + 1;
+    }).toList();
+
+    // Tính trung bình
+    final avg = lengths.reduce((a, b) => a + b) / lengths.length;
+    return avg.floor();
+  }
 
   static Future<CycleModel?> getLastCycle() async {
     final db = await DatabaseHandler.db(cycleTable);

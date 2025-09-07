@@ -36,7 +36,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ? shortestCycle.cycleEndTime.difference(shortestCycle.cycleStartTime).inDays + 1
         : await LocalStorageService.getCycleLength();
 
-    final averageCycleLength = await LocalStorageService.getAverageCycleLength();
+    final averageCycleLength = await DatabaseHandler.getAverageCycleLength();
 
     final menstruationLength = lastCycle != null
         ? lastCycle.menstruationEndTime
