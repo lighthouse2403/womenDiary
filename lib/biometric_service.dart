@@ -5,14 +5,19 @@ class BiometricService {
 
   Future<bool> authenticate() async {
     try {
-      final isAvailable = await _auth.canCheckBiometrics;
-      if (!isAvailable) return true; // Nếu không có biometric → cho qua
+      final canCheck = await _auth.canCheckBiometrics;
+      final isSupported = await _auth.isDeviceSupported();
+
+      if (!isSupported || !canCheck) {
+        return true;
+      }
 
       final didAuthenticate = await _auth.authenticate(
         localizedReason: 'Xác thực để tiếp tục sử dụng ứng dụng',
         options: const AuthenticationOptions(
-          biometricOnly: true,
+          biometricOnly: false,
           stickyAuth: true,
+          useErrorDialogs: true,
         ),
       );
       return didAuthenticate;

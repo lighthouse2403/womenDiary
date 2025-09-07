@@ -6,17 +6,24 @@ class CycleData extends Equatable {
   final int currentDay;
   final int cycleLength;
   final int daysUntilNext;
+  final DateTime ovalutionDay;
+  final int remainDays;
+  final PhaseModel currentPhase;
+
   final List<PhaseModel> phases;
 
   const CycleData({
     required this.currentDay,
     required this.cycleLength,
     required this.daysUntilNext,
+    required this.ovalutionDay,
+    required this.remainDays,
+    required this.currentPhase,
     required this.phases,
   });
 
   @override
-  List<Object?> get props => [currentDay, cycleLength, daysUntilNext, phases];
+  List<Object?> get props => [currentDay, cycleLength, daysUntilNext, ovalutionDay, remainDays, currentPhase, phases];
 }
 
 class HomeState extends Equatable {
@@ -51,7 +58,7 @@ class HomeState extends Equatable {
 
   int get currentDay => cycle?.currentDay ?? 0;
   int get cycleLength => cycle?.cycleLength ?? 30;
-  int get daysUntilNext => cycle?.daysUntilNext ?? 30;
+  DateTime get ovalutionDay => cycle?.ovalutionDay ?? DateTime.now();
 
   @override
   List<Object?> get props => [cycle, schedules, isLoadingCycle, isLoadingSchedule];

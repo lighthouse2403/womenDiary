@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/home/bloc/home_bloc.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/cycle_progress/cycle_information.dart';
@@ -73,13 +74,14 @@ class _CycleProgressState extends State<CycleProgress>
 
         final currentDay = cycle.currentDay;
         final cycleLength = cycle.cycleLength;
-        final daysUntilNext = cycle.daysUntilNext;
+        final ovalutionDay = cycle.ovalutionDay;
+        final remainDays = cycle.remainDays;
         final phases = cycle.phases;
+        final currentPhase = cycle.currentPhase;
         final ovulationDay = cycleLength - 14;
 
         final screenWidth = MediaQuery.of(context).size.width;
         final circleSize = screenWidth - 60.0;
-        final remainDays = cycleLength - currentDay;
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -117,13 +119,15 @@ class _CycleProgressState extends State<CycleProgress>
                         _showCycleDialog(
                           currentDay: currentDay,
                           cycleLength: cycleLength,
-                          daysUntilNext: daysUntilNext,
+                          remainDays: remainDays,
+                          ovalutionDay: ovalutionDay,
                         );
                       },
                       child: CycleInformation(
                         currentDay: currentDay,
                         cycleLength: cycleLength,
-                        daysUntilNext: daysUntilNext,
+                        remainDays: remainDays,
+                        phase: currentPhase,
                       ),
                     ),
                   ),
@@ -139,27 +143,91 @@ class _CycleProgressState extends State<CycleProgress>
   void _showCycleDialog({
     required int currentDay,
     required int cycleLength,
-    required int daysUntilNext,
+    required DateTime ovalutionDay,
+    required int remainDays,
   }) {
     showDialog(
       context: context,
-      builder: (dialogCtx) => AlertDialog(
-        title: const Text("Thông tin giai đoạn"),
-        content: Text(
-          "Hôm nay là ngày $currentDay\n"
-              "Chu kỳ dự kiến: $cycleLength ngày\n"
-              "Còn $daysUntilNext ngày tới mốc tiếp theo.",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(dialogCtx).pop();
-              _pulseController.repeat();
-            },
-            child: const Text("Đóng"),
-          )
-        ],
-      ),
+      builder: (dialogCtx) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              gradient: LinearGradient(
+                colors: [Colors.pink.shade50, Colors.purple.shade50],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.local_florist, size: 48, color: Colors.pink),
+                const SizedBox(height: 12),
+                const Text(
+                  "🌸 Thông tin chu kỳ 🌸",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.pink,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildInfoRow("Hôm nay", "Ngày $currentDay"),
+                const SizedBox(height: 8),
+                _buildInfoRow("Chu kỳ dự kiến", "$cycleLength ngày"),
+                const SizedBox(height: 8),
+                _buildInfoRow("Mốc tiếp theo", "Còn ${ovalutionDay.globalDateFormat()} ngày"),
+                const SizedBox(height: 8),
+                _buildInfoRow("Kết thúc chu kỳ", "Trong $remainDays ngày"),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pink,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  ),
+                  onPressed: () {
+                    Navigator.of(dialogCtx).pop();
+                    _pulseController.repeat();
+                  },
+                  child: const Text(
+                    "Đóng",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.pink,
+          ),
+        ),
+      ],
+    );
+  }
+
 }

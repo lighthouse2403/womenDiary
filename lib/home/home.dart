@@ -73,15 +73,11 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   }
 
   Widget _buildQuickStats() {
-    return BlocSelector<HomeBloc, HomeState, (int, int, int)>(
-      selector: (state) =>
-      (state.currentDay, state.cycleLength, state.daysUntilNext),
+    return BlocSelector<HomeBloc, HomeState, CycleData?>(
+      selector: (state) => (state.cycle),
       builder: (context, data) {
-        final (currentDay, cycleLength, daysUntilNext) = data;
         return QuickStats(
-          currentDay: currentDay,
-          cycleLength: cycleLength,
-          daysUntilNext: daysUntilNext,
+          cycleData: data
         );
       },
     );

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/home/phase_model.dart';
 
 class CycleInformation extends StatelessWidget {
-
   final int currentDay;
   final int cycleLength;
-  final int daysUntilNext;
-
+  final int remainDays;
+  final PhaseModel phase;
   CycleInformation({
     required this.currentDay,
     required this.cycleLength,
-    required this.daysUntilNext,
-
+    required this.remainDays,
+    required this.phase,
   });
 
   @override
@@ -34,10 +34,9 @@ class CycleInformation extends StatelessWidget {
           Constants.vSpacer4,
           Text("Chu kỳ $cycleLength ngày").black87Color().text12(),
           Constants.vSpacer6,
-          const Text("Giai đoạn: 🌼").text12().black87Color(),
+          Text("Giai đoạn: ${phase.emoji}").text12().black87Color(),
           Constants.vSpacer4,
-          const Text("Tiếp theo: 🌙").text12().customColor(Colors.deepOrange),
-          Text("Còn $daysUntilNext ngày").text12().customColor(Colors.orange),
+          Text("Còn $remainDays ngày").text12().customColor(Colors.orange),
         ],
       ),
     );

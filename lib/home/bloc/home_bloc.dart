@@ -37,24 +37,27 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             1;
 
     final phases = await _buildPhases(cycleLength, menstruationLength);
-
-    final currentPhase = phases.firstWhere(
-          (p) => currentDay >= p.startDay && currentDay < p.startDay + p.days,
-    );
+    final currentPhase = _findCurrentPhase(phases, currentDay, cycleLength);
+    DateTime? ovalutionDay = lastCycle?.cycleEndTime.subtract(Duration(days: 14));
 
     final nextPhase = phases.firstWhere(
           (p) => p.startDay > currentDay,
       orElse: () => phases.first,
     );
 
+
     final daysUntilNext = nextPhase.startDay > currentDay
         ? nextPhase.startDay - currentDay
         : (cycleLength - currentDay + nextPhase.startDay);
 
+    final remainDays = cycleLength - currentDay;
+
     final cycleData = CycleData(
       currentDay: currentDay,
       cycleLength: cycleLength,
-      daysUntilNext: daysUntilNext,
+      ovalutionDay: ovalutionDay ?? DateTime.now(),
+      remainDays: remainDays,
+      currentPhase: currentPhase,
       phases: phases,
     );
 
@@ -87,5 +90,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       PhaseModel(
           "🌙", cycleLength - fertileEnd, Colors.purple.shade200, afterFertileStart),
     ];
+  }
+
+  PhaseModel _findCurrentPhase(List<PhaseModel> phases, int currentDay, int cycleLength) {
+    for (final phase in phases) {
+      final start = phase.startDay;
+      final end = start + phase.days - 1;
+      if (currentDay >= start && currentDay <= end) {
+        return phase;
+      }
+    }
+
+    // Nếu currentDay vượt quá (cuối chu kỳ) thì wrap về phase đầu tiên
+    return phases.last;
   }
 }
