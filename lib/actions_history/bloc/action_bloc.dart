@@ -3,6 +3,7 @@ import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
 import 'package:women_diary/actions_history/action_model.dart';
+import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/database/data_handler.dart';
 
 class ActionBloc extends Bloc<ActionEvent, ActionState> {
@@ -11,6 +12,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
   DateTime startTime = DateTime.now().subtract(Duration(days: 90));
   DateTime endTime = DateTime.now();
   ActionType? type;
+  List<CycleModel> cycleList = [];
 
   /// Action detail
   ActionModel actionDetail = ActionModel.init('', DateTime.now(), '', '');
@@ -33,6 +35,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
   }
 
   Future<void> _onLoadActions(LoadActionEvent event, Emitter<ActionState> emit) async {
+    cycleList = await DatabaseHandler.getAllCycle();
     actions = await DatabaseHandler.getActions(
         startTime: startTime.millisecondsSinceEpoch,
         endTime: DateTime.now().millisecondsSinceEpoch,

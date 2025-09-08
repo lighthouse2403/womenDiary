@@ -17,7 +17,7 @@ class NewAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ActionBloc(),
+      create: (_) => ActionBloc()..add(DetectCycleEvent()),
       child: const _CreateActionView(),
     );
   }
@@ -32,7 +32,6 @@ class _CreateActionView extends StatelessWidget {
       listenWhen: (prev, curr) => curr is ActionSavedSuccessfullyState,
       listener: (context, state) async {
         await showDialog(
-
           context: context,
           builder: (dialogCtx) => AlertDialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -44,7 +43,10 @@ class _CreateActionView extends StatelessWidget {
                 const Text("Thành công!").text18().pinkColor(),
               ],
             ),
-            content: const Text("Hành động của bạn đã được lưu.").text16().w500().greyColor(),
+            content: const Text("Hành động của bạn đã được lưu.")
+                .text16()
+                .w500()
+                .greyColor(),
             actions: [
               TextButton(
                 onPressed: () {
@@ -66,28 +68,49 @@ class _CreateActionView extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: BaseAppBar(
         title: "Tạo hành động mới",
-        backgroundColor: AppColors.pinkTextColor,
-        hasBack:true,
+        backgroundColor: Colors.pink.shade300,
+        hasBack: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _timePicker(),
+            _buildCard(child: _timePicker()),
+            _cycleInfo(),
+            Constants.vSpacer16,
+            _buildCard(child: _emoji()),
+            Constants.vSpacer16,
+            _buildCard(child: _actionType()),
+            Constants.vSpacer16,
+            _buildCard(child: _titleInput(context)),
+            Constants.vSpacer16,
+            _buildCard(child: _noteInput(context)),
             Constants.vSpacer24,
-            _emoji(),
-            Constants.vSpacer24,
-            _actionType(),
-            Constants.vSpacer24,
-            _titleInput(context),
-            Constants.vSpacer24,
-            _noteInput(context),
-            Constants.vSpacer40,
             _saveButton(context),
           ],
         ),
       ),
+    );
+  }
+
+  /// Card wrapper cho từng section
+  Widget _buildCard({required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.pink.shade50,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.pink.shade100.withAlpha(75),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: child,
     );
   }
 
@@ -111,11 +134,19 @@ class _CreateActionView extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 decoration: BoxDecoration(
-                  color: AppColors.pinkBackgroundColor,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.pink.shade100),
                 ),
-                child: Text(DateFormat('dd/MM/yyyy – HH:mm').format(time)).text16().w500(),
+                child: Row(
+                  children: [
+                    const Icon(Icons.access_time, color: Colors.pink),
+                    Constants.hSpacer8,
+                    Text(DateFormat('dd/MM/yyyy – HH:mm').format(time))
+                        .text16()
+                        .w500(),
+                  ],
+                ),
               ),
             );
           },
@@ -147,7 +178,75 @@ class _CreateActionView extends StatelessWidget {
       pickedTime.minute,
     );
 
-    context.read<ActionBloc>().add(UpdateTimeEvent(result));
+    final bloc = context.read<ActionBloc>();
+    bloc.add(UpdateTimeEvent(result));
+
+    // 🔍 kiểm tra cycle
+    final cycles = bloc.cycleList; // danh sách cycle trong bloc/repo
+    final matched = cycles.firstWhere(
+          (c) => result.isAfter(c.cycleStartTime) && result.isBefore(c.cycleEndTime),
+      orElse: () => null,
+    );
+    bloc.add(DetectCycleEvent(matched));
+  }
+
+  Widget _cycleInfo() {
+    return BlocBuilder<ActionBloc, ActionState>(
+      buildWhen: (_, curr) => curr is CycleUpdatedState,
+      builder: (context, state) {
+        final cycle = state is CycleUpdatedState ? state.cycle : null;
+        if (cycle == null) return const SizedBox.shrink();
+
+        return Container(
+          width: double.infinity,
+          margin: const EdgeInsets.only(top: 12),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.pink.shade100, Colors.purple.shade100],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.pink.shade100.withOpacity(0.4),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.local_florist, color: Colors.pink, size: 32),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Chu kỳ liên quan",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.pink.shade700,
+                        )),
+                    const SizedBox(height: 4),
+                    Text(
+                      "${cycle.name} (${DateFormat('dd/MM').format(cycle.startDate)} - ${DateFormat('dd/MM').format(cycle.endDate)})",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Widget _emoji() {
@@ -167,12 +266,15 @@ class _CreateActionView extends StatelessWidget {
               children: emojis.map((emoji) {
                 final isSelected = selectedEmoji == emoji;
                 return GestureDetector(
-                  onTap: () => context.read<ActionBloc>().add(UpdateEmojiEvent(emoji)),
+                  onTap: () =>
+                      context.read<ActionBloc>().add(UpdateEmojiEvent(emoji)),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: isSelected ? Colors.pink.shade100 : AppColors.pinkBackgroundColor,
+                      color: isSelected
+                          ? Colors.pink.shade100
+                          : AppColors.pinkBackgroundColor,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isSelected ? Colors.pink : Colors.transparent,
@@ -196,15 +298,16 @@ class _CreateActionView extends StatelessWidget {
       children: [
         _section("Tiêu đề"),
         TextField(
-          onChanged: (text) => context.read<ActionBloc>().add(UpdateTitleEvent(text)),
+          onChanged: (text) =>
+              context.read<ActionBloc>().add(UpdateTitleEvent(text)),
           decoration: InputDecoration(
             hintText: "Nhập tiêu đề ngắn gọn...",
-            fillColor: AppColors.pinkBackgroundColor,
+            fillColor: Colors.white,
             filled: true,
             contentPadding: const EdgeInsets.all(16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide.none,
+              borderSide: BorderSide(color: Colors.pink.shade100),
             ),
           ),
         ),
@@ -219,15 +322,16 @@ class _CreateActionView extends StatelessWidget {
         _section("Ghi chú"),
         TextField(
           maxLines: 3,
-          onChanged: (text) => context.read<ActionBloc>().add(UpdateNoteEvent(text)),
+          onChanged: (text) =>
+              context.read<ActionBloc>().add(UpdateNoteEvent(text)),
           decoration: InputDecoration(
             hintText: "Nhập ghi chú nhẹ nhàng...",
-            fillColor: AppColors.pinkBackgroundColor,
+            fillColor: Colors.white,
             filled: true,
             contentPadding: const EdgeInsets.all(16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide.none,
+              borderSide: BorderSide(color: Colors.pink.shade100),
             ),
           ),
         ),
@@ -254,8 +358,9 @@ class _CreateActionView extends StatelessWidget {
                 return ChoiceChip(
                   label: Text(type.display),
                   selected: isSelected,
-                  onSelected: (_) => context.read<ActionBloc>().add(
-                      UpdateActionTypeEvent(isSelected ? null : type)),
+                  onSelected: (_) => context
+                      .read<ActionBloc>()
+                      .add(UpdateActionTypeEvent(isSelected ? null : type)),
                   checkmarkColor: Colors.pinkAccent,
                   selectedColor: Colors.pink.shade100,
                   backgroundColor: AppColors.pinkBackgroundColor,
@@ -280,18 +385,31 @@ class _CreateActionView extends StatelessWidget {
 
         return SizedBox(
           width: double.infinity,
-          child: ElevatedButton(
-            onPressed: isEnabled
-                ? () { context.read<ActionBloc>().add(CreateActionDetailEvent()); }
-                : null,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isEnabled ? Colors.pink : Colors.pink.shade100,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isEnabled
+                    ? [Colors.pink, Colors.orangeAccent]
+                    : [Colors.pink.shade100, Colors.pink.shade100],
               ),
+              borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text("Lưu lại").text16().w600().whiteColor(),
+            child: ElevatedButton(
+              onPressed: isEnabled
+                  ? () {
+                context.read<ActionBloc>().add(CreateActionDetailEvent());
+              }
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Text("Lưu lại").text16().w600().whiteColor(),
+            ),
           ),
         );
       },
