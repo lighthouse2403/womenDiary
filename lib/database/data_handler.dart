@@ -26,7 +26,7 @@ class DatabaseHandler {
   static Future<void> createTables(sql.Database database) async {
     await database.execute("CREATE TABLE $cycleTable(id TEXT PRIMARY KEY, cycleStartTime INTEGER, cycleEndTime INTEGER, menstruationEndTime INTEGER, note TEXT, createdTime INTEGER, updatedTime INTEGER)");
     await database.execute("CREATE TABLE $scheduleTable(id TEXT PRIMARY KEY, time INTEGER, title TEXT, note TEXT, createdTime INTEGER, updatedTime INTEGER, isReminderOn INTEGER)");
-    await database.execute("CREATE TABLE $actionTable(id TEXT PRIMARY KEY, type INTEGER, time INTEGER, emoji TEXT, note TEXT, title TEXT, createdTime INTEGER, updatedTime INTEGER)");
+    await database.execute("CREATE TABLE $actionTable(id TEXT PRIMARY KEY, type INTEGER, time INTEGER, cycleId TEXT, emoji TEXT, note TEXT, title TEXT, createdTime INTEGER, updatedTime INTEGER)");
   }
 
   static Future<void> clearData() async {
@@ -400,6 +400,19 @@ class DatabaseHandler {
       orderBy: 'time DESC',
     );
     print('list ${list}');
+
+    return list.map((e) => ActionModel.fromDatabase(e)).toList();
+  }
+
+  static Future<List<ActionModel>> getActionsByCycle(String cycleId) async {
+    final db = await DatabaseHandler.db(actionTable);
+
+    final List<Map<String, dynamic>> list = await db.query(
+      actionTable,
+      where: "cycleId = ?",
+      whereArgs: [cycleId],
+      orderBy: 'time DESC',
+    );
 
     return list.map((e) => ActionModel.fromDatabase(e)).toList();
   }

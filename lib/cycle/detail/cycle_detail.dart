@@ -199,27 +199,25 @@ class CycleDetail extends StatelessWidget {
   Widget _progressPhase(double progress, double width, Color color, String text, bool isFirst, bool isLast) {
     double visible = (progress <= 0) ? 0 : (progress < width ? progress : width);
     return Expanded(
-      flex: (width * 1000).round(),
-      child: FractionallySizedBox(
-        widthFactor: visible / width,
-        alignment: Alignment.centerLeft,
-        child: Container(
-          alignment: Alignment.center,
-          height: 26,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.horizontal(
-              left: isFirst ? const Radius.circular(16) : Radius.zero,
-              right: isLast ? const Radius.circular(16) : Radius.zero,
-            ),
+      flex: (visible * 1000).round(), // dùng visible thay vì width
+      child: Container(
+        alignment: Alignment.center,
+        height: 26,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.horizontal(
+            left: isFirst ? const Radius.circular(16) : Radius.zero,
+            right: isLast ? const Radius.circular(16) : Radius.zero,
           ),
-          child: Text(text,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
-            textAlign: TextAlign.center,
-          ),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
+          textAlign: TextAlign.center,
         ),
       ),
     );
+
   }
 
   Widget _legendItem(Color color, String text) {
