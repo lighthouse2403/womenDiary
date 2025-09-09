@@ -12,7 +12,7 @@ extension DateTimeExtension on DateTime {
   }
 
   String globalDateTimeFormat() {
-    String dateFormat = 'HH:mm:ss dd-MM-yyyy';
+    String dateFormat = 'HH:mm dd-MM-yyyy';
     return _dateFormat(dateFormat);
   }
 

@@ -100,8 +100,8 @@ class _BabyAgeState extends State<BabyAgeWidget> {
       children: [
         Expanded(
           child: CustomButton(
-            titleColor: Colors.white.withOpacity(0.6),
-            backgroundColor: Constants.secondaryTextColor().withOpacity(0.5),
+            titleColor: Colors.white.withAlpha(150),
+            backgroundColor: Constants.secondaryTextColor().withAlpha(130),
             title: 'Huỷ',
             onTappedAction: () {
               Navigator.pop(context);

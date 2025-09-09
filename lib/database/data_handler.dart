@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart' hide Action;
 import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
+import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart' as sql;
@@ -56,12 +57,20 @@ class DatabaseHandler {
     return allCycle;
   }
 
-  static Future<CycleModel?> getLongestCycle() async {
+  static Future<CycleModel> getLongestCycle() async {
     final db = await DatabaseHandler.db(cycleTable);
     final List<Map<String, dynamic>> list = await db.query(cycleTable);
     List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
+    int cycleDefaultLength = LocalStorageService.getCycleLength();
+    int menstruationDefaultLength = LocalStorageService.getCycleLength();
 
-    if (allCycle.isEmpty) return null;
+    if (allCycle.isEmpty) {
+      return CycleModel.init(
+          DateTime.now(),
+          DateTime.now().add(Duration(days: cycleDefaultLength)),
+          DateTime.now().add(Duration(days: menstruationDefaultLength))
+      );
+    };
 
     final now = DateTime.now();
 
@@ -70,7 +79,13 @@ class DatabaseHandler {
           (e) => e.cycleStartTime.isBefore(now) || e.cycleStartTime.isAtSameMomentAs(now),
     ).toList();
 
-    if (pastCycles.isEmpty) return null;
+    if (pastCycles.isEmpty) {
+      return CycleModel.init(
+          DateTime.now(),
+          DateTime.now().add(Duration(days: cycleDefaultLength)),
+          DateTime.now().add(Duration(days: menstruationDefaultLength))
+      );
+    };
 
     // Tìm chu kỳ dài nhất
     pastCycles.sort((a, b) {
@@ -82,13 +97,20 @@ class DatabaseHandler {
     return pastCycles.first;
   }
 
-  static Future<CycleModel?> getShortestCycle() async {
+  static Future<CycleModel> getShortestCycle() async {
     final db = await DatabaseHandler.db(cycleTable);
     final List<Map<String, dynamic>> list = await db.query(cycleTable);
     List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
+    int cycleDefaultLength = LocalStorageService.getCycleLength();
+    int menstruationDefaultLength = LocalStorageService.getCycleLength();
 
-    if (allCycle.isEmpty) return null;
-
+    if (allCycle.isEmpty) {
+      return CycleModel.init(
+          DateTime.now(),
+          DateTime.now().add(Duration(days: cycleDefaultLength)),
+          DateTime.now().add(Duration(days: menstruationDefaultLength))
+      );
+    };
     final now = DateTime.now();
 
     // Chỉ lấy chu kỳ đã xảy ra
@@ -96,7 +118,14 @@ class DatabaseHandler {
           (e) => e.cycleStartTime.isBefore(now) || e.cycleStartTime.isAtSameMomentAs(now),
     ).toList();
 
-    if (pastCycles.isEmpty) return null;
+
+    if (pastCycles.isEmpty) {
+      return CycleModel.init(
+          DateTime.now(),
+          DateTime.now().add(Duration(days: cycleDefaultLength)),
+          DateTime.now().add(Duration(days: menstruationDefaultLength))
+      );
+    };
 
     // Tìm chu kỳ ngắn nhất
     pastCycles.sort((a, b) {
@@ -113,14 +142,19 @@ class DatabaseHandler {
     final List<Map<String, dynamic>> list = await db.query(cycleTable);
     List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
 
+    print('length: ${allCycle.length}');
     if (allCycle.isEmpty) return null;
 
     // Tìm chu kỳ chứa actionDate
     for (final cycle in allCycle) {
+      print('${cycle.cycleStartTime} -- ${cycle.cycleEndTime}');
+      print('$actionDate');
+
       if ((actionDate.isAtSameMomentAs(cycle.cycleStartTime) ||
           actionDate.isAfter(cycle.cycleStartTime)) &&
           (actionDate.isAtSameMomentAs(cycle.cycleEndTime) ||
               actionDate.isBefore(cycle.cycleEndTime))) {
+
         return cycle;
       }
     }
@@ -153,21 +187,33 @@ class DatabaseHandler {
     return avg.floor();
   }
 
-  static Future<CycleModel?> getLastCycle() async {
+  static Future<CycleModel> getLastCycle() async {
     final db = await DatabaseHandler.db(cycleTable);
     final List<Map<String, dynamic>> list = await db.query(cycleTable);
     List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
 
-    if (allCycle.isEmpty) return null;
+    int cycleDefaultLength = LocalStorageService.getCycleLength();
+    int menstruationDefaultLength = LocalStorageService.getCycleLength();
+    if (allCycle.isEmpty) {
+      return CycleModel.init(
+          DateTime.now(),
+          DateTime.now().add(Duration(days: cycleDefaultLength)),
+          DateTime.now().add(Duration(days: menstruationDefaultLength))
+      );
+    }
 
     final now = DateTime.now();
 
-    // Lọc ra các cycle có thời gian <= hiện tại
     final pastCycles = allCycle.where((e) => e.cycleStartTime.isBefore(now) ||
         e.cycleStartTime.isAtSameMomentAs(now)).toList();
-    if (pastCycles.isEmpty) return null;
+    if (pastCycles.isEmpty) {
+      return CycleModel.init(
+          DateTime.now(),
+          DateTime.now().add(Duration(days: 30)),
+          DateTime.now().add(Duration(days: 6))
+      );
+    }
 
-    // Sắp xếp giảm dần để lấy cái gần hiện tại nhất
     pastCycles.sort((a, b) => b.cycleStartTime.compareTo(a.cycleStartTime));
 
     return pastCycles.first;

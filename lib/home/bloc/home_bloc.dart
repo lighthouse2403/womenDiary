@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:women_diary/database/data_handler.dart';
-import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/phase_model.dart';
@@ -24,33 +23,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     // --- Load cycle ---
     final lastCycle = await lastCycleFuture;
-    final cycleLength = lastCycle != null
-        ? lastCycle.cycleEndTime.difference(lastCycle.cycleStartTime).inDays + 1
-        : await LocalStorageService.getCycleLength();
-
-    final longestLength = longestCycle != null
-        ? longestCycle.cycleEndTime.difference(longestCycle.cycleStartTime).inDays + 1
-        : await LocalStorageService.getCycleLength();
-
-    final shortestLength = shortestCycle != null
-        ? shortestCycle.cycleEndTime.difference(shortestCycle.cycleStartTime).inDays + 1
-        : await LocalStorageService.getCycleLength();
-
+    DateTime lastCycleEndTime = lastCycle.cycleEndTime;
+    if (lastCycleEndTime.isBefore(DateTime.now())) {
+      lastCycle.cycleEndTime = DateTime.now().add(Duration(days: 1));
+      DatabaseHandler.updateCycle(lastCycle);
+    }
+    final cycleLength = lastCycle.cycleEndTime.difference(lastCycle.cycleStartTime).inDays + 1;
+    final longestLength = longestCycle.cycleEndTime.difference(longestCycle.cycleStartTime).inDays + 1;
+    final shortestLength = shortestCycle.cycleEndTime.difference(shortestCycle.cycleStartTime).inDays + 1;
     final averageCycleLength = await DatabaseHandler.getAverageCycleLength();
 
-    final menstruationLength = lastCycle != null
-        ? lastCycle.menstruationEndTime
-        .difference(lastCycle.cycleStartTime)
-        .inDays + 1
-        : await LocalStorageService.getMenstruationLength();
+    final menstruationLength = lastCycle.menstruationEndTime.difference(lastCycle.cycleStartTime).inDays + 1;
 
-    final currentDay =
-        DateTime.now().difference(lastCycle?.cycleStartTime ?? DateTime.now()).inDays +
-            1;
+    final currentDay = DateTime.now().difference(lastCycle.cycleStartTime).inDays;
 
     final phases = await _buildPhases(cycleLength, menstruationLength);
     final currentPhase = _findCurrentPhase(phases, currentDay, cycleLength);
-    DateTime? ovalutionDay = lastCycle?.cycleEndTime.subtract(Duration(days: 14));
+    DateTime? ovalutionDay = lastCycle.cycleEndTime.subtract(Duration(days: 14));
 
     final nextPhase = phases.firstWhere(
           (p) => p.startDay > currentDay,
@@ -63,9 +52,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       currentDay: currentDay,
       cycleLength: cycleLength,
       averageCycleLength: averageCycleLength,
-      startDay: lastCycle?.cycleStartTime ?? DateTime.now(),
-      endDay: lastCycle?.cycleEndTime ?? DateTime.now(),
-      ovalutionDay: ovalutionDay ?? DateTime.now(),
+      startDay: lastCycle.cycleStartTime ,
+      endDay: lastCycle.cycleEndTime,
+      ovalutionDay: ovalutionDay,
       remainDays: remainDays,
       longestCycle: longestLength,
       shortestCycle: shortestLength,

@@ -9,6 +9,7 @@ import 'package:women_diary/actions_history/bloc/action_state.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 
 class NewAction extends StatelessWidget {
@@ -142,9 +143,7 @@ class _CreateActionView extends StatelessWidget {
                   children: [
                     const Icon(Icons.access_time, color: Colors.pink),
                     Constants.hSpacer8,
-                    Text(DateFormat('dd/MM/yyyy – HH:mm').format(time))
-                        .text16()
-                        .w500(),
+                    Text(time.globalDateTimeFormat()).text16().w500(),
                   ],
                 ),
               ),
@@ -203,7 +202,7 @@ class _CreateActionView extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.pink.shade100.withOpacity(0.4),
+                color: Colors.pink.shade100.withAlpha(100),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -217,21 +216,10 @@ class _CreateActionView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Chu kỳ liên quan",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.pink.shade700,
-                        )),
+                    Text("Chu kỳ liên quan").w600().text16().customColor(Colors.pink.shade700),
                     const SizedBox(height: 4),
-                    Text(
-                      "${DateFormat('dd/MM').format(cycle.cycleStartTime)} - ${DateFormat('dd/MM').format(cycle.cycleEndTime)}",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    ),
+                    Text("${cycle.cycleStartTime.globalDateFormat()} - ${cycle.cycleEndTime.globalDateFormat()}"
+                    ).text14().w500().black87Color(),
                   ],
                 ),
               )
