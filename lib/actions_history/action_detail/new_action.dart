@@ -17,7 +17,7 @@ class NewAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ActionBloc()..add(DetectCycleEvent()),
+      create: (_) => ActionBloc()..add(DetectCycleEvent(DateTime.now())),
       child: const _CreateActionView(),
     );
   }
@@ -180,21 +180,14 @@ class _CreateActionView extends StatelessWidget {
 
     final bloc = context.read<ActionBloc>();
     bloc.add(UpdateTimeEvent(result));
-
-    // 🔍 kiểm tra cycle
-    final cycles = bloc.cycleList; // danh sách cycle trong bloc/repo
-    final matched = cycles.firstWhere(
-          (c) => result.isAfter(c.cycleStartTime) && result.isBefore(c.cycleEndTime),
-      orElse: () => null,
-    );
-    bloc.add(DetectCycleEvent(matched));
+    bloc.add(DetectCycleEvent(result));
   }
 
   Widget _cycleInfo() {
     return BlocBuilder<ActionBloc, ActionState>(
-      buildWhen: (_, curr) => curr is CycleUpdatedState,
+      buildWhen: (_, curr) => curr is CycleDetectedState,
       builder: (context, state) {
-        final cycle = state is CycleUpdatedState ? state.cycle : null;
+        final cycle = state is CycleDetectedState ? state.cycle : null;
         if (cycle == null) return const SizedBox.shrink();
 
         return Container(
@@ -232,7 +225,7 @@ class _CreateActionView extends StatelessWidget {
                         )),
                     const SizedBox(height: 4),
                     Text(
-                      "${cycle.name} (${DateFormat('dd/MM').format(cycle.startDate)} - ${DateFormat('dd/MM').format(cycle.endDate)})",
+                      "${DateFormat('dd/MM').format(cycle.cycleStartTime)} - ${DateFormat('dd/MM').format(cycle.cycleEndTime)}",
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,

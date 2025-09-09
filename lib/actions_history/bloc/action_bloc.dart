@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
@@ -16,6 +17,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
 
   /// Action detail
   ActionModel actionDetail = ActionModel.init('', DateTime.now(), '', '');
+  CycleModel cycle = CycleModel(DateTime.now());
 
   ActionBloc() : super(ActionHistoryLoading()) {
     on<LoadActionEvent>(_onLoadActions);
@@ -24,6 +26,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
 
     /// Action detail
     on<InitActionDetailEvent>(_onLoadActionDetail);
+    on<DetectCycleEvent>(_onDetectCycle);
     on<UpdateEmojiEvent>(_onUpdateEmoji);
     on<UpdateTimeEvent>(_onUpdateTime);
     on<UpdateTitleEvent>(_onUpdateTitle);
@@ -53,6 +56,11 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
     );
     emit(ActionTypeUpdatedState(type: event.actionType));
     emit(ActionLoadedState(actions: actions));
+  }
+
+  void _onDetectCycle(DetectCycleEvent event, Emitter<ActionState> emit) async {
+    cycle = await DatabaseHandler.getCycleByDate(event.actionTime) ?? cycle;
+    emit(CycleDetectedState(cycle));
   }
 
   void _onUpdateDateRange(UpdateDateRangeEvent event, Emitter<ActionState> emit) async {
