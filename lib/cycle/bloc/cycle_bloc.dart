@@ -69,6 +69,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
       actions = await DatabaseHandler.getActionsByCycle(event.cycle.id);
       print('action list: ${actions.map((e) => e.toJson())}');
       emit(LoadedCycleDetailState(cycleDetail));
+      emit(LoadedActionsState(actions));
     } catch (error) {
       // Có thể emit state lỗi ở đây
     }

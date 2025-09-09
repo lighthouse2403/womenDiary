@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
@@ -19,7 +20,8 @@ class CycleDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => CycleBloc()..add(LoadCycleDetailEvent(cycle)),
+      create: (_) => CycleBloc()
+        ..add(LoadCycleDetailEvent(cycle)),
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: BaseAppBar(
@@ -32,7 +34,6 @@ class CycleDetail extends StatelessWidget {
                 return IconButton(
                   onPressed: () {
                     context.read<CycleBloc>().add(UpdateCycleEvent());
-                    context.pop();
                   },
                   icon: const Icon(Icons.save, color: Colors.white),
                 );
@@ -43,7 +44,6 @@ class CycleDetail extends StatelessWidget {
         body: BlocListener<CycleBloc, CycleState>(
           listener: (context, state) {
             if (state is CycleSavedSuccessfullyState) {
-              // Hiển thị thông báo
               showDialog(
                 context: context,
                 barrierDismissible: false,
@@ -54,8 +54,8 @@ class CycleDetail extends StatelessWidget {
                     actions: [
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context); // đóng dialog
-                          context.pop(); // quay về màn hình trước
+                          Navigator.pop(context);
+                          context.pop();
                         },
                         child: const Text('OK'),
                       ),
@@ -67,17 +67,29 @@ class CycleDetail extends StatelessWidget {
           },
           child: BlocBuilder<CycleBloc, CycleState>(
             builder: (context, state) {
-              CycleModel cycle = state is LoadedCycleDetailState
-                  ? state.cycle
-                  : CycleModel(DateTime.now());
+              final CycleModel currentCycle =
+              state is LoadedCycleDetailState ? state.cycle : cycle;
+
               return ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  _cycleInformation(cycle),
+                  _cycleInformation(currentCycle),
                   const SizedBox(height: 20),
-                  _timeLine(cycle),
+                  _timeLine(currentCycle),
                   const Divider(height: 30),
-                  _note(context, cycle),
+                  _note(context, currentCycle),
+                  const SizedBox(height: 20),
+                  BlocBuilder<CycleBloc, CycleState>(
+                    buildWhen: (prev, curr) => curr is LoadedActionsState,
+                    builder: (context, state) {
+                      if (state is LoadedActionsState) {
+                        return _actionList(currentCycle, state.actions);
+                      }
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    },
+                  ),
                 ],
               );
             },
@@ -87,6 +99,7 @@ class CycleDetail extends StatelessWidget {
     );
   }
 
+  /// --- Thông tin chu kỳ
   Widget buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -119,6 +132,7 @@ class CycleDetail extends StatelessWidget {
     );
   }
 
+  /// --- Ghi chú
   Widget _note(BuildContext context, CycleModel cycle) {
     final controller = TextEditingController(text: cycle.note);
     return Column(
@@ -145,11 +159,16 @@ class CycleDetail extends StatelessWidget {
     );
   }
 
+  /// --- Timeline chu kỳ
   Widget _timeLine(CycleModel cycle) {
-    int cycleDays = cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
-    int menstruationDays = cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
-    final ovulationDate = cycle.cycleEndTime.subtract(const Duration(days: 14));
-    final ovulationIndex = ovulationDate.difference(cycle.cycleStartTime).inDays + 1;
+    int cycleDays =
+        cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
+    int menstruationDays =
+        cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
+    final ovulationDate =
+    cycle.cycleEndTime.subtract(const Duration(days: 14));
+    final ovulationIndex =
+        ovulationDate.difference(cycle.cycleStartTime).inDays + 1;
     final follicularDays = ovulationIndex - menstruationDays;
     final lutealDays = cycleDays - ovulationIndex;
     double mensWidth = menstruationDays / cycleDays;
@@ -171,16 +190,27 @@ class CycleDetail extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               child: Row(
                 children: [
-                  _progressPhase(progress, mensWidth, Colors.pink.shade300, '💗 $menstruationDays', true, false),
-                  _progressPhase(progress - mensWidth, follicularWidth, Colors.pink.shade100, '🌱 $follicularDays', false, false),
-                  _progressPhase(progress - mensWidth - follicularWidth, ovulationWidth, Colors.amber.shade300, '🌸', false, false),
-                  _progressPhase(progress - mensWidth - follicularWidth - ovulationWidth, lutealWidth, Colors.purple.shade100, '💜 $lutealDays', false, true),
+                  _progressPhase(progress, mensWidth, Colors.pink.shade300,
+                      '💗 $menstruationDays', true, false),
+                  _progressPhase(progress - mensWidth, follicularWidth,
+                      Colors.pink.shade100, '🌱 $follicularDays', false, false),
+                  _progressPhase(progress - mensWidth - follicularWidth,
+                      ovulationWidth, Colors.amber.shade300, '🌸', false, false),
+                  _progressPhase(
+                      progress -
+                          mensWidth -
+                          follicularWidth -
+                          ovulationWidth,
+                      lutealWidth,
+                      Colors.purple.shade100,
+                      '💜 $lutealDays',
+                      false,
+                      true),
                 ],
               ),
             );
           },
         ),
-
         const SizedBox(height: 12),
         Wrap(
           spacing: 14,
@@ -196,10 +226,12 @@ class CycleDetail extends StatelessWidget {
     );
   }
 
-  Widget _progressPhase(double progress, double width, Color color, String text, bool isFirst, bool isLast) {
-    double visible = (progress <= 0) ? 0 : (progress < width ? progress : width);
+  Widget _progressPhase(double progress, double width, Color color, String text,
+      bool isFirst, bool isLast) {
+    double visible =
+    (progress <= 0) ? 0 : (progress < width ? progress : width);
     return Expanded(
-      flex: (visible * 1000).round(), // dùng visible thay vì width
+      flex: (visible * 1000).round(),
       child: Container(
         alignment: Alignment.center,
         height: 26,
@@ -212,12 +244,12 @@ class CycleDetail extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
+          style: const TextStyle(
+              fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
           textAlign: TextAlign.center,
         ),
       ),
     );
-
   }
 
   Widget _legendItem(Color color, String text) {
@@ -238,6 +270,134 @@ class CycleDetail extends StatelessWidget {
     );
   }
 
+  /// --- Danh sách hành động
+  Widget _actionList(CycleModel cycle, List<ActionModel> actions) {
+    if (actions.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("Hành động").text16().w700(),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Text("Chưa có hành động nào trong chu kỳ này")
+                .text14()
+                .greyColor(),
+          ),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Hành động").text16().w700(),
+        const SizedBox(height: 8),
+        ...actions.map((a) => _actionItem(cycle, a)),
+      ],
+    );
+  }
+
+
+  Widget _actionItem(CycleModel cycle, ActionModel action) {
+    final dayOfCycle =
+        action.time.difference(cycle.cycleStartTime).inDays + 1;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.pink.shade100.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // emoji / icon
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: Colors.pink.shade50,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              action.emoji ?? "🌸",
+              style: const TextStyle(fontSize: 24),
+            ),
+          ),
+          const SizedBox(width: 14),
+
+          // thông tin
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Tiêu đề
+                Text(
+                  action.title ?? "Không có tiêu đề",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.pink.shade700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+
+                // Ngày trong chu kỳ + thời gian
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "Ngày $dayOfCycle của chu kỳ",
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.pink.shade400,
+                        ),
+                      ),
+                      TextSpan(
+                        text:
+                        " • ${DateFormat("dd/MM/yyyy HH:mm").format(action.time)}",
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Note
+                if (action.note != null && action.note!.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    action.note!,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
 }
-

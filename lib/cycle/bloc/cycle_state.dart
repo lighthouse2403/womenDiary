@@ -1,3 +1,4 @@
+import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:equatable/equatable.dart';
 
@@ -21,6 +22,14 @@ class LoadedCycleDetailState extends CycleState {
 
   @override
   List<Object?> get props => [cycle];
+}
+
+class LoadedActionsState extends CycleState {
+  final List<ActionModel> actions;
+  const LoadedActionsState(this.actions);
+
+  @override
+  List<Object?> get props => [actions];
 }
 
 class CycleSavedSuccessfullyState extends CycleState {

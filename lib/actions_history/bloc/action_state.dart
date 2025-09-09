@@ -110,3 +110,10 @@ class ActionSavedSuccessfullyState extends ActionState {
   @override
   List<Object?> get props => [];
 }
+
+class ActionDeletedState extends ActionState {
+  const ActionDeletedState();
+
+  @override
+  List<Object?> get props => [];
+}
