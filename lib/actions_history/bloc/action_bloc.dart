@@ -60,6 +60,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
 
   void _onDetectCycle(DetectCycleEvent event, Emitter<ActionState> emit) async {
     cycle = await DatabaseHandler.getCycleByDate(event.actionTime) ?? cycle;
+    actionDetail.cycleId = cycle.id;
     emit(CycleDetectedState(cycle));
   }
 
