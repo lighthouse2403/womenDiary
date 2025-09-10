@@ -5,11 +5,15 @@ import 'package:intl/intl.dart';
 import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/cycle/bloc/cycle_bloc.dart';
 import 'package:women_diary/cycle/bloc/cycle_event.dart';
 import 'package:women_diary/cycle/bloc/cycle_state.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
+import 'package:women_diary/home/phase_model.dart';
+import 'package:women_diary/routes/route_name.dart';
+import 'package:women_diary/routes/routes.dart';
 
 class CycleDetail extends StatelessWidget {
   final CycleModel cycle;
@@ -83,7 +87,7 @@ class CycleDetail extends StatelessWidget {
                     buildWhen: (prev, curr) => curr is LoadedActionsState,
                     builder: (context, state) {
                       if (state is LoadedActionsState) {
-                        return _actionList(currentCycle, state.actions);
+                        return _actionTimeline(currentCycle, state.actions);
                       }
                       return const Center(
                         child: CircularProgressIndicator(),
@@ -271,7 +275,8 @@ class CycleDetail extends StatelessWidget {
   }
 
   /// --- Danh sách hành động
-  Widget _actionList(CycleModel cycle, List<ActionModel> actions) {
+  /// --- Danh sách hành động (dạng timeline)
+  Widget _actionTimeline(CycleModel cycle, List<ActionModel> actions) {
     if (actions.isEmpty) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,111 +298,177 @@ class CycleDetail extends StatelessWidget {
       );
     }
 
+    // sort từ mới -> cũ
+    final sorted = [...actions]..sort((a, b) => b.time.compareTo(a.time));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text("Hành động").text16().w700(),
         const SizedBox(height: 8),
-        ...actions.map((a) => _actionItem(cycle, a)),
+        ListView.builder(
+          itemCount: sorted.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            return _timelineItem(
+              context,
+              cycle,
+              sorted[index],
+              index,
+              index == sorted.length - 1,
+            );
+          },
+        ),
       ],
     );
   }
 
+  Widget _timelineItem(
+      BuildContext context,
+      CycleModel cycle,
+      ActionModel action,
+      int index,
+      bool isLast
+      ) {
+    final dayOfCycle = action.time.difference(cycle.cycleStartTime).inDays + 1;
+    final cycleLength =
+        cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
+    final menstruationLength =
+        cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
 
-  Widget _actionItem(CycleModel cycle, ActionModel action) {
-    final dayOfCycle =
-        action.time.difference(cycle.cycleStartTime).inDays + 1;
+    final phases = _buildPhases(cycleLength, menstruationLength);
+    final currentPhase = _findCurrentPhase(phases, dayOfCycle, cycleLength);
+    final phaseColor = currentPhase.color;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.pink.shade100.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // emoji / icon
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              color: Colors.pink.shade50,
-              borderRadius: BorderRadius.circular(12),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          children: [
+            Container(
+              width: 2,
+              height: 20,
+              color: index == 0 ? Colors.transparent : Colors.grey.shade300,
             ),
-            alignment: Alignment.center,
-            child: Text(
-              action.emoji ?? "🌸",
-              style: const TextStyle(fontSize: 24),
+            Container(
+              width: 16,
+              height: 16,
+              decoration: BoxDecoration(
+                color: phaseColor,
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                action.emoji ?? "🌸",
+                style: const TextStyle(fontSize: 10),
+              ),
             ),
-          ),
-          const SizedBox(width: 14),
+            Container(
+              width: 2,
+              height: isLast ? 20 : 60,
+              color: isLast ? Colors.transparent : Colors.grey.shade300,
+            ),
+          ],
+        ),
+        const SizedBox(width: 12),
 
-          // thông tin
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Tiêu đề
-                Text(
-                  action.title ?? "Không có tiêu đề",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.pink.shade700,
-                  ),
-                ),
-                const SizedBox(height: 4),
-
-                // Ngày trong chu kỳ + thời gian
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "Ngày $dayOfCycle của chu kỳ",
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.pink.shade400,
-                        ),
-                      ),
-                      TextSpan(
-                        text:
-                        " • ${DateFormat("dd/MM/yyyy HH:mm").format(action.time)}",
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Note
-                if (action.note != null && action.note!.isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    action.note!,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black87,
-                    ),
+        // --- bubble content ---
+        Expanded(
+          child: GestureDetector(
+            onTap: () => context.navigateTo(RoutesName.actionDetail, arguments: action),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 24),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: phaseColor.withOpacity(0.15),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
                   ),
                 ],
-              ],
+                border: Border(left: BorderSide(color: phaseColor, width: 3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Phase + Ngày
+                  Container(
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: phaseColor.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      "${currentPhase.emoji} Ngày $dayOfCycle",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: phaseColor,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  Text(
+                    action.title ?? "Không có tiêu đề",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: phaseColor,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    DateFormat("dd/MM/yyyy HH:mm").format(action.time),
+                    style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+
+                  if (action.note.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(action.note, style: const TextStyle(fontSize: 14)),
+                  ],
+                ],
+              ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
+  List<PhaseModel> _buildPhases(
+      int cycleLength, int menstruationLength) {
+    final int ovulationDay = cycleLength - 14;
+    final int fertileStart = ovulationDay - 5;
+    final int fertileEnd = ovulationDay + 1;
+    final int afterFertileStart = fertileEnd + 1;
+
+    return [
+      PhaseModel("🩸", menstruationLength, Colors.pink.shade400, 1),
+      PhaseModel("🍃", fertileStart - (menstruationLength + 1),
+          Colors.teal.shade200, menstruationLength + 1),
+      PhaseModel("🌸", fertileEnd - fertileStart + 1, Colors.amber.shade400,
+          fertileStart),
+      PhaseModel(
+          "🌙", cycleLength - fertileEnd, Colors.purple.shade200, afterFertileStart),
+    ];
+  }
+
+  PhaseModel _findCurrentPhase(List<PhaseModel> phases, int currentDay, int cycleLength) {
+    for (final phase in phases) {
+      final start = phase.startDay;
+      final end = start + phase.days - 1;
+      if (currentDay >= start && currentDay <= end) {
+        return phase;
+      }
+    }
+
+    // Nếu currentDay vượt quá (cuối chu kỳ) thì wrap về phase đầu tiên
+    return phases.last;
+  }
 }
