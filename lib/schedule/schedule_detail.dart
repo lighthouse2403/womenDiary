@@ -242,7 +242,7 @@ class _ScheduleDetailViewState extends State<_ScheduleDetailView> {
                   value: isReminderOn,
                   activeColor: Colors.pink,
                   onChanged: (value) {
-                    context.read<ScheduleBloc>().add(UpdateReminderEvent(value));
+                    context.read<ScheduleBloc>().add(UpdateReminderEvent(value, widget.schedule));
                   },
                 )
               ],

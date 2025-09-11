@@ -114,6 +114,9 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
   void _onUpdateReminder(UpdateReminderEvent event, Emitter<ScheduleState> emit) async {
     scheduleDetail.isReminderOn = event.isReminderOn;
+    if (event.schedule != null) {
+      DatabaseHandler.updateSchedule(event.schedule!);
+    }
     emit(ReminderUpdatedState(event.isReminderOn));
   }
 }

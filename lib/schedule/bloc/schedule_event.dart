@@ -96,8 +96,9 @@ class UpdateNoteEvent extends ScheduleEvent {
 
 class UpdateReminderEvent extends ScheduleEvent {
   final bool isReminderOn;
-  const UpdateReminderEvent(this.isReminderOn);
+  final ScheduleModel? schedule;
+  const UpdateReminderEvent(this.isReminderOn, this.schedule);
 
   @override
-  List<Object?> get props => [isReminderOn];
+  List<Object?> get props => [isReminderOn, this.schedule];
 }
