@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:math' as Math;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:uuid/uuid.dart';
+import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/database/local_storage_service.dart';
 import 'dart:ui' as ui;
 import 'package:package_info_plus/package_info_plus.dart';
@@ -17,10 +19,9 @@ class FirebaseUser {
     CollectionReference users = firestore.collection('user');
     Map<String, dynamic> deviceInfo = await getFullDeviceInfo();
     var docSnapshot = await users.doc(deviceInfo[2]).get();
-    var cycleLength = LocalStorageService.getCycleLength();
-    var averageCycleLength = LocalStorageService.getAverageCycleLength();
-    var menstruationLength = LocalStorageService.getMenstruationLength();
-    var averageMenstruationLength = LocalStorageService.getAverageMenstruationLength();
+    final cycleLength = await LocalStorageService.getCycleLength();
+    final averageCycleLength = await DatabaseHandler.getAverageCycleLength();
+    var menstruationLength = await LocalStorageService.getMenstruationLength();
 
     if (!docSnapshot.exists) {
       users.doc(deviceInfo['uuid']).set({
@@ -29,14 +30,20 @@ class FirebaseUser {
         'cycle': cycleLength,
         'menstruation': menstruationLength,
         'averageCycle': averageCycleLength,
-        'averageMenstruation': averageMenstruationLength,
         'region': deviceInfo['region'],
         'language': deviceInfo['language'],
         'appVersion': deviceInfo['appVersion'],
         'wifiIP': deviceInfo['wifiIP'],
-        'wifiSSID': deviceInfo['wifiSSID'],
-        'model': deviceInfo['model'],
+        'deviceName': deviceInfo['deviceName'],
+        'modelCode': deviceInfo['modelCode'],
+        'modelName': deviceInfo['modelName'],
         'totalDiskSize': deviceInfo['totalDiskSize'],
+        'freeDiskSize': deviceInfo['freeDiskSize'],
+        'goal': deviceInfo['goal'],
+        'screenWidth': deviceInfo['screenWidth'],
+        'screenHeight': deviceInfo['screenHeight'],
+        'screenScale': deviceInfo['screenScale'],
+        'aspectRatio': deviceInfo['aspectRatio'],
         'firstTime': FieldValue.serverTimestamp()
       }).then((value) => print("User Added"))
           .catchError((error) => print("Failed to add user: $error"));
@@ -59,25 +66,28 @@ class FirebaseUser {
     final networkInfo = NetworkInfo();
     final locale = ui.PlatformDispatcher.instance.locale;
     final packageInfo = await PackageInfo.fromPlatform();
+    var goal = await LocalStorageService.getGoal();
+
     String identifier = LocalStorageService.getUuid();
-    String? ssid;
+    final screen = ui.PlatformDispatcher.instance.views.first;
+
     String? ip;
 
     try {
-      ssid = await networkInfo.getWifiName();
       ip = await networkInfo.getWifiIP();
-    } catch (_) {
-      ssid = null;
-      ip = null;
-    }
+    } catch (_) {}
 
     Map<String, dynamic> deviceData = {
       'os': '${Platform.operatingSystem} ${Platform.operatingSystemVersion}',
       'language': locale.languageCode,
       'region': locale.countryCode,
       'appVersion': '${packageInfo.version} (${packageInfo.buildNumber})',
-      'wifiSSID': ssid,
       'wifiIP': ip,
+      'screenWidth': screen.physicalSize.width / screen.devicePixelRatio,
+      'screenHeight': screen.physicalSize.height / screen.devicePixelRatio,
+      'screenScale': screen.devicePixelRatio,
+      'aspectRatio': (screen.physicalSize.width / screen.physicalSize.height),
+      'goal': goal.valueString
     };
 
     if (Platform.isAndroid) {
@@ -88,9 +98,10 @@ class FirebaseUser {
       final androidInfo = await deviceInfoPlugin.androidInfo;
       deviceData.addAll({
         'uuid': identifier,
-        'model': androidInfo.model,
-        'totalDiskSize': androidInfo.totalDiskSize,
-        'freeDiskSize': androidInfo.freeDiskSize,
+        'deviceName': androidInfo.device, // hardware codename
+        'modelCode': androidInfo.model, // ví dụ Pixel 7 Pro
+        'totalDiskSize': _formatBytes(androidInfo.totalDiskSize),
+        'freeDiskSize': _formatBytes(androidInfo.freeDiskSize),
         'manufacturer': androidInfo.manufacturer,
         'sdkInt': androidInfo.version.sdkInt,
       });
@@ -98,12 +109,22 @@ class FirebaseUser {
       final iosInfo = await deviceInfoPlugin.iosInfo;
       deviceData.addAll({
         'uuid': iosInfo.identifierForVendor,
-        'model': iosInfo.modelName,
-        'totalDiskSize': iosInfo.totalDiskSize,
-        'freeDiskSize': iosInfo.freeDiskSize,
+        'deviceName': iosInfo.name,
+        'modelCode': iosInfo.utsname.machine, // ví dụ iPhone12,1
+        'totalDiskSize': _formatBytes(iosInfo.totalDiskSize),
+        'freeDiskSize': _formatBytes(iosInfo.freeDiskSize),
+        'modelName': iosInfo.modelName,
       });
     }
 
     return deviceData;
+  }
+
+  String _formatBytes(int bytes, [int decimals = 2]) {
+    if (bytes <= 0) return "0 B";
+    const suffixes = ["B", "KB", "MB", "GB", "TB"];
+    final i = (Math.log(bytes) / Math.log(1024)).floor();
+    final size = (bytes / Math.pow(1024, i)).toStringAsFixed(decimals);
+    return "$size ${suffixes[i]}";
   }
 }
