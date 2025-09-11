@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
@@ -12,9 +11,6 @@ import 'package:women_diary/cycle/bloc/cycle_event.dart';
 import 'package:women_diary/cycle/bloc/cycle_state.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/cycle/detail/action_time_line.dart';
-import 'package:women_diary/home/phase_model.dart';
-import 'package:women_diary/routes/route_name.dart';
-import 'package:women_diary/routes/routes.dart';
 
 class CycleDetail extends StatelessWidget {
   final CycleModel cycle;
@@ -79,11 +75,11 @@ class CycleDetail extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 children: [
                   _cycleInformation(currentCycle),
-                  const SizedBox(height: 20),
+                  Constants.vSpacer20,
                   _timeLine(currentCycle),
-                  const Divider(height: 30),
+                  Constants.vSpacer20,
                   _note(context, currentCycle),
-                  const SizedBox(height: 20),
+                  Constants.vSpacer20,
                   BlocBuilder<CycleBloc, CycleState>(
                     buildWhen: (prev, curr) => curr is LoadedActionsState,
                     builder: (context, state) {
@@ -118,17 +114,18 @@ class CycleDetail extends StatelessWidget {
   }
 
   Widget _cycleInformation(CycleModel cycle) {
-    final cycleDays =
-        cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
-    final menstruationDays =
-        cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
-    final ovulationDate =
-    cycle.cycleEndTime.subtract(const Duration(days: 14));
+    DateTime cycleStartTime = cycle.cycleStartTime;
+    DateTime cycleEndTime = cycle.cycleEndTime;
+    DateTime menstruationEndTime = cycle.menstruationEndTime;
+
+    final cycleDays = cycleEndTime.difference(cycleStartTime).inDays + 1;
+    final menstruationDays = menstruationEndTime.difference(cycleStartTime).inDays + 1;
+    final ovulationDate = cycleEndTime.subtract(const Duration(days: 14));
 
     return Column(
       children: [
-        buildInfoRow('Bắt đầu', dateFormat.format(cycle.cycleStartTime)),
-        buildInfoRow('Kết thúc', dateFormat.format(cycle.cycleEndTime)),
+        buildInfoRow('Bắt đầu', dateFormat.format(cycleStartTime)),
+        buildInfoRow('Kết thúc', dateFormat.format(cycleEndTime)),
         const Divider(height: 24),
         buildInfoRow('Số ngày chu kỳ', '$cycleDays ngày'),
         buildInfoRow('Số ngày kinh nguyệt', '$menstruationDays ngày'),
@@ -269,8 +266,8 @@ class CycleDetail extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
           ),
         ),
-        const SizedBox(width: 6),
-        Text(text, style: const TextStyle(fontSize: 13)),
+        Constants.hSpacer6,
+        Text(text).text13(),
       ],
     );
   }

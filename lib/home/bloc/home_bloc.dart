@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
@@ -75,22 +74,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     ));
   }
 
-  Future<List<PhaseModel>> _buildPhases(
-      int cycleLength, int menstruationLength) async {
-    final int ovulationDay = cycleLength - 14;
-    final int fertileStart = ovulationDay - 5;
-    final int fertileEnd = ovulationDay + 1;
-    final int afterFertileStart = fertileEnd + 1;
-
-    return [
-      PhaseModel("🩸", menstruationLength, Colors.pink.shade400, 1),
-      PhaseModel("🍃", fertileStart - (menstruationLength + 1),
-          Colors.teal.shade200, menstruationLength + 1),
-      PhaseModel("🌸", fertileEnd - fertileStart + 1, Colors.amber.shade400,
-          fertileStart),
-      PhaseModel(
-          "🌙", cycleLength - fertileEnd, Colors.purple.shade200, afterFertileStart),
-    ];
+  Future<List<PhaseModel>> _buildPhases(int cycle, int menstruation) async {
+    return PhaseFactory.createPhases(
+        cycleLength: cycle,
+        menstruationLength: menstruation
+    );
   }
 
   PhaseModel _findCurrentPhase(List<PhaseModel> phases, int currentDay, int cycleLength) {

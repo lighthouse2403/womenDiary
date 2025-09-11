@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:women_diary/actions_history/action_model.dart';
+import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/home/phase_model.dart';
@@ -75,7 +76,10 @@ class ActionTimeline extends StatelessWidget {
     final menstruationLength =
         cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
 
-    final phases = _buildPhases(cycleLength, menstruationLength);
+    final phases = PhaseFactory.createPhases(
+        cycleLength: cycleLength,
+        menstruationLength: menstruationLength
+    );
     final currentPhase = _findCurrentPhase(phases, dayOfCycle, cycleLength);
     final phaseColor = currentPhase.color;
 
@@ -97,10 +101,7 @@ class ActionTimeline extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
-              child: Text(
-                action.emoji ?? "🌸",
-                style: const TextStyle(fontSize: 10),
-              ),
+              child: Text(action.emoji).text10(),
             ),
             Container(
               width: 2,
@@ -109,9 +110,8 @@ class ActionTimeline extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(width: 12),
+        Constants.hSpacer10,
 
-        // --- bubble content ---
         Expanded(
           child: GestureDetector(
             onTap: () => context.navigateTo(RoutesName.actionDetail, arguments: action),
@@ -123,7 +123,7 @@ class ActionTimeline extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: phaseColor.withOpacity(0.15),
+                    color: phaseColor.withAlpha(40),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -138,33 +138,20 @@ class ActionTimeline extends StatelessWidget {
                     padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: phaseColor.withOpacity(0.15),
+                      color: phaseColor.withAlpha(40),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(
-                      "${currentPhase.emoji} Ngày $dayOfCycle",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: phaseColor,
-                      ),
-                    ),
+                    child: Text("${currentPhase.emoji} Ngày $dayOfCycle")
+                        .w600()
+                        .text12()
+                        .customColor(phaseColor),
                   ),
-                  const SizedBox(height: 8),
-
-                  Text(
-                    action.title ?? "Không có tiêu đề",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: phaseColor,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
+                  Constants.vSpacer8,
+                  Text(action.title).w600().text16().customColor(phaseColor),
+                  Constants.vSpacer8,
                   Text(
                     DateFormat("dd/MM/yyyy HH:mm").format(action.time),
-                    style: const TextStyle(fontSize: 13, color: Colors.grey),
-                  ),
+                  ).greyColor().text13(),
 
                   if (action.note.isNotEmpty) ...[
                     const SizedBox(height: 8),
@@ -177,23 +164,6 @@ class ActionTimeline extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  List<PhaseModel> _buildPhases(int cycleLength, int menstruationLength) {
-    final int ovulationDay = cycleLength - 14;
-    final int fertileStart = ovulationDay - 5;
-    final int fertileEnd = ovulationDay + 1;
-    final int afterFertileStart = fertileEnd + 1;
-
-    return [
-      PhaseModel("🩸", menstruationLength, Colors.pink.shade400, 1),
-      PhaseModel("🍃", fertileStart - (menstruationLength + 1),
-          Colors.teal.shade200, menstruationLength + 1),
-      PhaseModel("🌸", fertileEnd - fertileStart + 1, Colors.amber.shade400,
-          fertileStart),
-      PhaseModel(
-          "🌙", cycleLength - fertileEnd, Colors.purple.shade200, afterFertileStart),
-    ];
   }
 
   PhaseModel _findCurrentPhase(List<PhaseModel> phases, int currentDay, int cycleLength) {
