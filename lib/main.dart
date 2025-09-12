@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:women_diary/common/firebase/firebase_option.dart';
 import 'package:women_diary/common/firebase/firebase_user.dart';
 import 'package:women_diary/common/notification_service.dart';
@@ -27,8 +28,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Feminine Picker Demo',
       debugShowCheckedModeBanner: false,
-      home: const AppStarter(), // <-- AppStarter giờ chỉ là screen
+      theme: ThemeData(primarySwatch: Colors.pink),
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('vi'), // Tiếng Việt
+        Locale('ja'), // Japanese
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      home: const AppStarter(),
     );
   }
 }
