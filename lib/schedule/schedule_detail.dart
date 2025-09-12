@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/common/widgets/date_picker/custom_date_picker.dart';
 import 'package:women_diary/schedule/bloc/schedule_bloc.dart';
 import 'package:women_diary/schedule/bloc/schedule_event.dart';
 import 'package:women_diary/schedule/bloc/schedule_state.dart';
@@ -153,95 +154,24 @@ class _ScheduleDetailViewState extends State<_ScheduleDetailView> {
   }
 
   Future<void> _pickDateTime(BuildContext context, DateTime initial) async {
-    final pickedDate = await _showFeminineDatePicker(
+    final pickedDate = await showFeminineDateTimePicker(
       context: context,
-      initialDate: initial,
+      initialDate: DateTime.now(),
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now().add(Duration(days:365 )),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (pickedDate == null) return;
-
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(initial),
-    );
-    if (pickedTime == null) return;
 
     final result = DateTime(
       pickedDate.year,
       pickedDate.month,
       pickedDate.day,
-      pickedTime.hour,
-      pickedTime.minute,
+      pickedDate.hour,
+      pickedDate.minute,
     );
 
     context.read<ScheduleBloc>().add(UpdateTimeEvent(result));
   }
-
-  Future<DateTime?> _showFeminineDatePicker({
-    required BuildContext context,
-    required DateTime initialDate,
-    required DateTime firstDate,
-    required DateTime lastDate,
-  }) {
-    return showGeneralDialog<DateTime>(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: "Date Picker",
-      barrierColor: Colors.black54, // nền tối mờ
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return const SizedBox.shrink(); // sẽ build trong transitionBuilder
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        final curvedValue =
-        Curves.easeInOut.transform(animation.value); // smooth animation
-        return Transform.scale(
-          scale: curvedValue,
-          child: Opacity(
-            opacity: animation.value,
-            child: Theme(
-              data: Theme.of(context).copyWith(
-                colorScheme: ColorScheme.light(
-                  primary: Colors.pink.shade300,
-                  onPrimary: Colors.white,
-                  onSurface: Colors.pink.shade900,
-                ),
-                datePickerTheme: DatePickerThemeData(
-                  backgroundColor: Colors.pink.shade50,
-                  headerBackgroundColor: Colors.pink.shade200,
-                  dayForegroundColor: WidgetStateProperty.resolveWith((states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return Colors.white; // màu chữ khi chọn
-                    }
-                    return Colors.pink.shade800;
-                  }),
-                  dayOverlayColor: WidgetStateProperty.all(Colors.pink.shade100),
-                  dayBackgroundColor: WidgetStateProperty.resolveWith((states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return Colors.pink.shade300; // background khi chọn ngày
-                    }
-                    return Colors.transparent;
-                  }),
-                ),
-                timePickerTheme: TimePickerThemeData(
-                  backgroundColor: Colors.pink.shade50,
-                  dialBackgroundColor: Colors.pink.shade100,
-                  dialHandColor: Colors.pink.shade400,
-                  dialTextColor: Colors.pink.shade900,
-                  entryModeIconColor: Colors.pink.shade300,
-                  hourMinuteTextColor: Colors.pink.shade900,
-                  hourMinuteColor: Colors.pink.shade100,
-                ),
-              ),
-              child: child,
-            ),
-          ),
-        );
-      },
-    );
-  }
-
 
   Widget _titleInput(BuildContext context) {
     return Column(
