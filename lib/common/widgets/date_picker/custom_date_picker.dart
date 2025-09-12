@@ -81,7 +81,7 @@ Future<DateTime?> showFeminineDateTimePicker({
 }
 
 /// -------------------- Date Picker Dialog --------------------
-class _FeminineDatePickerDialog extends StatelessWidget {
+class _FeminineDatePickerDialog extends StatefulWidget {
   final DateTime initialDate;
   final DateTime firstDate;
   final DateTime lastDate;
@@ -95,9 +95,22 @@ class _FeminineDatePickerDialog extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    DateTime selectedDate = initialDate;
+  State<_FeminineDatePickerDialog> createState() =>
+      _FeminineDatePickerDialogState();
+}
 
+class _FeminineDatePickerDialogState
+    extends State<_FeminineDatePickerDialog> {
+  late DateTime selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedDate = widget.initialDate;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Container(
@@ -114,7 +127,7 @@ class _FeminineDatePickerDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              DateFormat.yMMMM().format(initialDate),
+              DateFormat.yMMMM().format(selectedDate),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -129,10 +142,10 @@ class _FeminineDatePickerDialog extends StatelessWidget {
                   dayBackgroundColor:
                   WidgetStateProperty.resolveWith<Color?>((states) {
                     if (states.contains(WidgetState.selected)) {
-                      return Colors.pink.shade300; // nền khi chọn
+                      return Colors.pink.shade400; // ngày được chọn
                     }
-                    if (states.contains(WidgetState.hovered)) {
-                      return Colors.pink.shade100; // hover
+                    if (states.contains(WidgetState.focused)) {
+                      return Colors.pink.shade100;
                     }
                     return null;
                   }),
@@ -143,6 +156,10 @@ class _FeminineDatePickerDialog extends StatelessWidget {
                     }
                     return Colors.black87;
                   }),
+                  todayBackgroundColor:
+                  WidgetStateProperty.all(Colors.pink.shade100), // hôm nay
+                  todayForegroundColor:
+                  WidgetStateProperty.all(Colors.pink.shade800),
                   dayShape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -155,24 +172,29 @@ class _FeminineDatePickerDialog extends StatelessWidget {
                 ),
               ),
               child: CalendarDatePicker(
-                initialDate: initialDate,
-                firstDate: firstDate,
-                lastDate: lastDate,
-                onDateChanged: (d) => selectedDate = d,
+                initialDate: widget.initialDate,
+                firstDate: widget.firstDate,
+                lastDate: widget.lastDate,
+                currentDate: DateTime.now(),
+                onDateChanged: (d) {
+                  setState(() => selectedDate = d);
+                },
               ),
             ),
             const SizedBox(height: 12),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.pink.shade300,
+                backgroundColor: Colors.pink.shade400,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              onPressed: () => onDateSelected(selectedDate),
+              onPressed: () => widget.onDateSelected(selectedDate),
               icon: const Icon(Icons.favorite, color: Colors.white),
-              label: const Text("Chọn ngày này 💕",
-                  style: TextStyle(color: Colors.white)),
+              label: const Text(
+                "Chọn ngày này 💕",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -180,7 +202,6 @@ class _FeminineDatePickerDialog extends StatelessWidget {
     );
   }
 }
-
 
 /// -------------------- Time Picker Dialog --------------------
 class _FeminineTimePickerDialog extends StatefulWidget {
