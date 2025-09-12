@@ -157,7 +157,7 @@ class _ScheduleDetailViewState extends State<_ScheduleDetailView> {
       context: context,
       initialDate: initial,
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now(),
+      lastDate: DateTime.now().add(Duration(days:365 )),
     );
     if (pickedDate == null) return;
 

@@ -23,6 +23,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     on<UpdateTimeEvent>(_onUpdateTime);
     on<UpdateTitleEvent>(_onUpdateTitle);
     on<UpdateReminderEvent>(_onUpdateReminder);
+    on<UpdateReminderOnListEvent>(_onUpdateReminderOnList);
     on<UpdateNoteEvent>(_onUpdateNote);
     on<UpdateScheduleDetailEvent>(_onUpdateScheduleDetail);
     on<CreateScheduleDetailEvent>(_onCreateScheduleDetail);
@@ -115,8 +116,15 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   void _onUpdateReminder(UpdateReminderEvent event, Emitter<ScheduleState> emit) async {
     scheduleDetail.isReminderOn = event.isReminderOn;
     if (event.schedule != null) {
-      DatabaseHandler.updateSchedule(event.schedule!);
+      await DatabaseHandler.updateSchedule(event.schedule!);
     }
     emit(ReminderUpdatedState(event.isReminderOn));
+  }
+
+  void _onUpdateReminderOnList(UpdateReminderOnListEvent event, Emitter<ScheduleState> emit) async {
+    scheduleList.firstWhere((shedule) => shedule.id == event.schedule.id).isReminderOn = !event.schedule.isReminderOn;
+
+    await DatabaseHandler.updateSchedule(scheduleList.firstWhere((shedule) => shedule.id == event.schedule.id));
+    emit(ScheduleLoadedState(scheduleList));
   }
 }

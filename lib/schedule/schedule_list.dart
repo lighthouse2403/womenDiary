@@ -289,8 +289,9 @@ class _ScheduleCard extends StatelessWidget {
               value: schedule.isReminderOn,
               activeTrackColor: Colors.pinkAccent,
               onChanged: (val) {
+                print('updated reminder: $val');
                 context.read<ScheduleBloc>().add(
-                  UpdateReminderEvent(val, schedule),
+                  UpdateReminderOnListEvent(schedule),
                 );
               },
             ),

@@ -124,7 +124,7 @@ class _CreateScheduleView extends StatelessWidget {
       context: context,
       initialDate: initial,
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (pickedDate == null) return;
 

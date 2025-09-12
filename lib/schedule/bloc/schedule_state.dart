@@ -13,7 +13,7 @@ class ScheduleLoadedState extends ScheduleState {
 
   final List<ScheduleModel> scheduleList;
   @override
-  List<Object?> get props => [scheduleList.length];
+  List<Object?> get props => [scheduleList.length, scheduleList.map((e) => e.isReminderOn)];
 }
 
 /// Action detail

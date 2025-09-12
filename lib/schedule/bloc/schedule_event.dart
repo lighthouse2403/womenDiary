@@ -102,3 +102,11 @@ class UpdateReminderEvent extends ScheduleEvent {
   @override
   List<Object?> get props => [isReminderOn, this.schedule];
 }
+
+class UpdateReminderOnListEvent extends ScheduleEvent {
+  final ScheduleModel schedule;
+  const UpdateReminderOnListEvent(this.schedule);
+
+  @override
+  List<Object?> get props => [schedule.id, schedule.isReminderOn];
+}
