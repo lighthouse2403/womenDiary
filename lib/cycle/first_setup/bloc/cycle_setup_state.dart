@@ -11,7 +11,7 @@ class UpdatedCycleLengthState extends CycleSetupState {
 
   final int cycleLength;
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [cycleLength, DateTime.now()];
 }
 
 class UpdatedMenstruationLengthState extends CycleSetupState {
@@ -19,7 +19,7 @@ class UpdatedMenstruationLengthState extends CycleSetupState {
 
   final int menstruationLength;
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [menstruationLength, DateTime.now()];
 }
 
 class UpdatedLastPeriodDateState extends CycleSetupState {

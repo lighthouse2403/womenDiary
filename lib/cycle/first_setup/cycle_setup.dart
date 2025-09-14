@@ -76,29 +76,97 @@ class _CycleSetupContent extends StatelessWidget {
 class _CycleLengthSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<CycleSetupBloc, CycleSetupState, int>(
-      selector: (state) =>
-      state is UpdatedCycleLengthState ? state.cycleLength : 30,
-      builder: (context, cycleLength) {
+    return BlocBuilder<CycleSetupBloc, CycleSetupState>(
+      buildWhen: (pre,cur) => cur is UpdatedCycleLengthState,
+      builder: (context, state) {
+        int cycleLength = state is UpdatedCycleLengthState ? state.cycleLength : 30;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Độ dài chu kỳ (ngày):").text14(),
-            Slider(
-              value: cycleLength.toDouble(),
-              min: 24,
-              max: 120,
-              divisions: 96,
-              label: "$cycleLength",
-              activeColor: Colors.pinkAccent,
-              onChanged: (value) {
-                context
-                    .read<CycleSetupBloc>()
-                    .add(CycleLengthChangedEvent(value.toInt()));
-              },
+            const Text("Độ dài chu kỳ (ngày):")
+                .text14()
+                .w600()
+                .pinkColor(),
+            const SizedBox(height: 12),
+
+            // slider chiếm full chiều ngang
+            SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 6,
+                thumbShape:
+                const RoundSliderThumbShape(enabledThumbRadius: 12),
+                overlayShape:
+                const RoundSliderOverlayShape(overlayRadius: 20),
+                activeTrackColor: Colors.pinkAccent,
+                inactiveTrackColor: Colors.pink.shade100,
+                thumbColor: Colors.pink,
+                overlayColor: Colors.pink.withOpacity(0.2),
+              ),
+              child: Slider(
+                value: cycleLength.toDouble(),
+                min: 24,
+                max: 120,
+                divisions: 96,
+                onChanged: (value) {
+                  context
+                      .read<CycleSetupBloc>()
+                      .add(CycleLengthChangedEvent(value.toInt()));
+                },
+              ),
             ),
-            Center(
-              child: Text("$cycleLength ngày").w600().text16(),
+
+            const SizedBox(height: 8),
+
+            // dòng kết quả + nút tăng giảm
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _CircleIconButton(
+                  icon: Icons.remove,
+                  onTap: () {
+                    if (cycleLength > 24) {
+                      context
+                          .read<CycleSetupBloc>()
+                          .add(CycleLengthChangedEvent(cycleLength - 1));
+                    }
+                  },
+                ),
+                const SizedBox(width: 16),
+                Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.pink.shade50,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.pink.shade100.withOpacity(0.5),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
+                      )
+                    ],
+                  ),
+                  child: Text(
+                    "$cycleLength ngày 🌸",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.pink,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                _CircleIconButton(
+                  icon: Icons.add,
+                  onTap: () {
+                    if (cycleLength < 120) {
+                      context
+                          .read<CycleSetupBloc>()
+                          .add(CycleLengthChangedEvent(cycleLength + 1));
+                    }
+                  },
+                ),
+              ],
             ),
           ],
         );
@@ -107,13 +175,49 @@ class _CycleLengthSlider extends StatelessWidget {
   }
 }
 
+/// Nút tròn gradient xinh cho +/-
+class _CircleIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _CircleIconButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(30),
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.pink.shade300, Colors.purple.shade200],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.pink.shade100.withOpacity(0.6),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
+      ),
+    );
+  }
+}
+
 class _MenstruationLengthSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<CycleSetupBloc, CycleSetupState, int>(
-      selector: (state) =>
-      state is UpdatedMenstruationLengthState ? state.menstruationLength : 6,
-      builder: (context, menstruationLength) {
+    return BlocBuilder<CycleSetupBloc, CycleSetupState>(
+      buildWhen: (pre,cur) => cur is UpdatedMenstruationLengthState,
+      builder: (context, state) {
+        int menstruationLength = state is UpdatedMenstruationLengthState ? state.menstruationLength : 6;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

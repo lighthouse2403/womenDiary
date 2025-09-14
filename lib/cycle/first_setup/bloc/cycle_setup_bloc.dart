@@ -19,10 +19,12 @@ class CycleSetupBloc extends Bloc<CycleSetupEvent, CycleSetupState> {
 
   void _onChangingCycleLength(CycleLengthChangedEvent event, Emitter<CycleSetupState> emit) {
     cycleLength = event.cycleLength;
+    emit(UpdatedCycleLengthState(cycleLength));
   }
 
   void _onChangingMenstruationLength(MenstruationLengthChangedEvent event, Emitter<CycleSetupState> emit) {
     menstruationLength = event.menstruationLength;
+    emit(UpdatedMenstruationLengthState(menstruationLength));
   }
 
   void _onChangingLastPeriodDate(LastPeriodDateChangedEvent event, Emitter<CycleSetupState> emit) {
