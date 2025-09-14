@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:intl/intl.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 
 Future<DateTime?> showFeminineDateTimePicker({
   required BuildContext context,
@@ -28,17 +28,24 @@ Future<DateTime?> showFeminineDateTimePicker({
           opacity: animation.value,
           child: Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(28),
             ),
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Colors.pink.shade50, Colors.purple.shade50],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.pink.shade100.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  )
+                ],
               ),
               child: StatefulBuilder(
                 builder: (context, setState) {
@@ -46,13 +53,8 @@ Future<DateTime?> showFeminineDateTimePicker({
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        "Chọn ngày & giờ 🌸",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.pink.shade700,
-                        ),
-                      ),
+                        "Chọn ngày & giờ 🌸"
+                      ).w600().text24().customColor(Colors.purple.shade700),
                       const SizedBox(height: 12),
                       // Calendar
                       TableCalendar(
@@ -61,22 +63,37 @@ Future<DateTime?> showFeminineDateTimePicker({
                         firstDay: firstDate,
                         lastDay: lastDate,
                         currentDay: DateTime.now(),
-                        selectedDayPredicate: (day) =>
-                            isSameDay(day, selectedDate),
+                        selectedDayPredicate: (day) => isSameDay(day, selectedDate),
                         onDaySelected: (day, _) {
                           setState(() => selectedDate = day);
                         },
+
+                        // 👇 Thêm 2 dòng này để fix chiều cao
+                        calendarFormat: CalendarFormat.month,
+                        sixWeekMonthsEnforced: true,
+
                         calendarStyle: CalendarStyle(
                           todayDecoration: BoxDecoration(
-                            color: Colors.pink.shade100,
+                            gradient: LinearGradient(
+                              colors: [Colors.pink.shade200, Colors.purple.shade200],
+                            ),
                             shape: BoxShape.circle,
                           ),
                           selectedDecoration: BoxDecoration(
-                            color: Colors.pink.shade400,
+                            gradient: LinearGradient(
+                              colors: [Colors.pink.shade400, Colors.purple.shade300],
+                            ),
                             shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.purple.shade100,
+                                blurRadius: 6,
+                                offset: const Offset(0, 3),
+                              )
+                            ],
                           ),
-                          todayTextStyle: TextStyle(
-                            color: Colors.pink.shade900,
+                          todayTextStyle: const TextStyle(
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                           selectedTextStyle: const TextStyle(
@@ -92,12 +109,27 @@ Future<DateTime?> showFeminineDateTimePicker({
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
+                          leftChevronIcon:
+                          Icon(Icons.chevron_left, color: Colors.pink.shade400),
+                          rightChevronIcon:
+                          Icon(Icons.chevron_right, color: Colors.pink.shade400),
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
                       // Time Picker
-                      SizedBox(
+                      Container(
                         height: 150,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.pink.shade100,
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            )
+                          ],
+                        ),
                         child: CupertinoDatePicker(
                           mode: CupertinoDatePickerMode.time,
                           initialDateTime: DateTime(
@@ -115,15 +147,10 @@ Future<DateTime?> showFeminineDateTimePicker({
                           },
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.pink.shade400,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        onPressed: () {
+                      const SizedBox(height: 20),
+                      // Confirm button
+                      InkWell(
+                        onTap: () {
                           Navigator.pop(
                             context,
                             DateTime(
@@ -135,12 +162,38 @@ Future<DateTime?> showFeminineDateTimePicker({
                             ),
                           );
                         },
-                        icon: const Icon(Icons.favorite, color: Colors.white),
-                        label: const Text(
-                          "Xác nhận 💕",
-                          style: TextStyle(color: Colors.white),
+                        borderRadius: BorderRadius.circular(24),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.pink.shade400, Colors.purple.shade400],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.pink.shade200.withOpacity(0.5),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.favorite, color: Colors.white),
+                              const SizedBox(width: 8),
+                              Text("Xác nhận 💕")
+                                  .w600()
+                                  .whiteColor()
+                                  .text16(),
+                            ],
+                          ),
                         ),
-                      ),
+                      )
                     ],
                   );
                 },
