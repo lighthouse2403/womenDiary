@@ -6,6 +6,14 @@ enum UserGoal {
 
   final int value;
   const UserGoal(this.value);
+  String get valueString {
+    switch (this) {
+      case UserGoal.avoidPregnancy:
+        return 'Avoid pregnancy';
+      case UserGoal.tryingToConceive:
+        return 'Trying baby';
+    }
+  }
 
   static UserGoal fromInt(int value) {
     return UserGoal.values.firstWhere(

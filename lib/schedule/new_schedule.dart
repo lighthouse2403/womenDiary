@@ -124,7 +124,7 @@ class _CreateScheduleView extends StatelessWidget {
       context: context,
       initialDate: initial,
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (pickedDate == null) return;
 
@@ -213,7 +213,7 @@ class _CreateScheduleView extends StatelessWidget {
                     inactiveTrackColor: Colors.pink.shade50,
                     trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
                     onChanged: (value) {
-                      context.read<ScheduleBloc>().add(UpdateReminderEvent(value));
+                      context.read<ScheduleBloc>().add(UpdateReminderEvent(value, null));
                     },
                   ),
                 )

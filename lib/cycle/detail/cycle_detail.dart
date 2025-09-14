@@ -4,11 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/cycle/bloc/cycle_bloc.dart';
 import 'package:women_diary/cycle/bloc/cycle_event.dart';
 import 'package:women_diary/cycle/bloc/cycle_state.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
+import 'package:women_diary/cycle/detail/action_time_line.dart';
 
 class CycleDetail extends StatelessWidget {
   final CycleModel cycle;
@@ -19,7 +21,8 @@ class CycleDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => CycleBloc()..add(LoadCycleDetailEvent(cycle)),
+      create: (_) => CycleBloc()
+        ..add(LoadCycleDetailEvent(cycle)),
       child: Scaffold(
         backgroundColor: AppColors.background,
         appBar: BaseAppBar(
@@ -32,7 +35,6 @@ class CycleDetail extends StatelessWidget {
                 return IconButton(
                   onPressed: () {
                     context.read<CycleBloc>().add(UpdateCycleEvent());
-                    context.pop();
                   },
                   icon: const Icon(Icons.save, color: Colors.white),
                 );
@@ -43,7 +45,6 @@ class CycleDetail extends StatelessWidget {
         body: BlocListener<CycleBloc, CycleState>(
           listener: (context, state) {
             if (state is CycleSavedSuccessfullyState) {
-              // Hiển thị thông báo
               showDialog(
                 context: context,
                 barrierDismissible: false,
@@ -54,8 +55,8 @@ class CycleDetail extends StatelessWidget {
                     actions: [
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context); // đóng dialog
-                          context.pop(); // quay về màn hình trước
+                          Navigator.pop(context);
+                          context.pop();
                         },
                         child: const Text('OK'),
                       ),
@@ -67,17 +68,29 @@ class CycleDetail extends StatelessWidget {
           },
           child: BlocBuilder<CycleBloc, CycleState>(
             builder: (context, state) {
-              CycleModel cycle = state is LoadedCycleDetailState
-                  ? state.cycle
-                  : CycleModel(DateTime.now());
+              final CycleModel currentCycle =
+              state is LoadedCycleDetailState ? state.cycle : cycle;
+
               return ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  _cycleInformation(cycle),
-                  const SizedBox(height: 20),
-                  _timeLine(cycle),
-                  const Divider(height: 30),
-                  _note(context, cycle),
+                  _cycleInformation(currentCycle),
+                  Constants.vSpacer20,
+                  _timeLine(currentCycle),
+                  Constants.vSpacer20,
+                  _note(context, currentCycle),
+                  Constants.vSpacer20,
+                  BlocBuilder<CycleBloc, CycleState>(
+                    buildWhen: (prev, curr) => curr is LoadedActionsState,
+                    builder: (context, state) {
+                      if (state is LoadedActionsState) {
+                        return ActionTimeline(cycle: cycle, actions: state.actions);
+                      }
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    },
+                  ),
                 ],
               );
             },
@@ -87,6 +100,7 @@ class CycleDetail extends StatelessWidget {
     );
   }
 
+  /// --- Thông tin chu kỳ
   Widget buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -100,17 +114,18 @@ class CycleDetail extends StatelessWidget {
   }
 
   Widget _cycleInformation(CycleModel cycle) {
-    final cycleDays =
-        cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
-    final menstruationDays =
-        cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
-    final ovulationDate =
-    cycle.cycleEndTime.subtract(const Duration(days: 14));
+    DateTime cycleStartTime = cycle.cycleStartTime;
+    DateTime cycleEndTime = cycle.cycleEndTime;
+    DateTime menstruationEndTime = cycle.menstruationEndTime;
+
+    final cycleDays = cycleEndTime.difference(cycleStartTime).inDays + 1;
+    final menstruationDays = menstruationEndTime.difference(cycleStartTime).inDays + 1;
+    final ovulationDate = cycleEndTime.subtract(const Duration(days: 14));
 
     return Column(
       children: [
-        buildInfoRow('Bắt đầu', dateFormat.format(cycle.cycleStartTime)),
-        buildInfoRow('Kết thúc', dateFormat.format(cycle.cycleEndTime)),
+        buildInfoRow('Bắt đầu', dateFormat.format(cycleStartTime)),
+        buildInfoRow('Kết thúc', dateFormat.format(cycleEndTime)),
         const Divider(height: 24),
         buildInfoRow('Số ngày chu kỳ', '$cycleDays ngày'),
         buildInfoRow('Số ngày kinh nguyệt', '$menstruationDays ngày'),
@@ -119,6 +134,7 @@ class CycleDetail extends StatelessWidget {
     );
   }
 
+  /// --- Ghi chú
   Widget _note(BuildContext context, CycleModel cycle) {
     final controller = TextEditingController(text: cycle.note);
     return Column(
@@ -145,11 +161,16 @@ class CycleDetail extends StatelessWidget {
     );
   }
 
+  /// --- Timeline chu kỳ
   Widget _timeLine(CycleModel cycle) {
-    int cycleDays = cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
-    int menstruationDays = cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
-    final ovulationDate = cycle.cycleEndTime.subtract(const Duration(days: 14));
-    final ovulationIndex = ovulationDate.difference(cycle.cycleStartTime).inDays + 1;
+    int cycleDays =
+        cycle.cycleEndTime.difference(cycle.cycleStartTime).inDays + 1;
+    int menstruationDays =
+        cycle.menstruationEndTime.difference(cycle.cycleStartTime).inDays + 1;
+    final ovulationDate =
+    cycle.cycleEndTime.subtract(const Duration(days: 14));
+    final ovulationIndex =
+        ovulationDate.difference(cycle.cycleStartTime).inDays + 1;
     final follicularDays = ovulationIndex - menstruationDays;
     final lutealDays = cycleDays - ovulationIndex;
     double mensWidth = menstruationDays / cycleDays;
@@ -171,16 +192,27 @@ class CycleDetail extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               child: Row(
                 children: [
-                  _progressPhase(progress, mensWidth, Colors.pink.shade300, '💗 $menstruationDays', true, false),
-                  _progressPhase(progress - mensWidth, follicularWidth, Colors.pink.shade100, '🌱 $follicularDays', false, false),
-                  _progressPhase(progress - mensWidth - follicularWidth, ovulationWidth, Colors.amber.shade300, '🌸', false, false),
-                  _progressPhase(progress - mensWidth - follicularWidth - ovulationWidth, lutealWidth, Colors.purple.shade100, '💜 $lutealDays', false, true),
+                  _progressPhase(progress, mensWidth, Colors.pink.shade300,
+                      '💗 $menstruationDays', true, false),
+                  _progressPhase(progress - mensWidth, follicularWidth,
+                      Colors.pink.shade100, '🌱 $follicularDays', false, false),
+                  _progressPhase(progress - mensWidth - follicularWidth,
+                      ovulationWidth, Colors.amber.shade300, '🌸', false, false),
+                  _progressPhase(
+                      progress -
+                          mensWidth -
+                          follicularWidth -
+                          ovulationWidth,
+                      lutealWidth,
+                      Colors.purple.shade100,
+                      '💜 $lutealDays',
+                      false,
+                      true),
                 ],
               ),
             );
           },
         ),
-
         const SizedBox(height: 12),
         Wrap(
           spacing: 14,
@@ -196,27 +228,27 @@ class CycleDetail extends StatelessWidget {
     );
   }
 
-  Widget _progressPhase(double progress, double width, Color color, String text, bool isFirst, bool isLast) {
-    double visible = (progress <= 0) ? 0 : (progress < width ? progress : width);
+  Widget _progressPhase(double progress, double width, Color color, String text,
+      bool isFirst, bool isLast) {
+    double visible =
+    (progress <= 0) ? 0 : (progress < width ? progress : width);
     return Expanded(
-      flex: (width * 1000).round(),
-      child: FractionallySizedBox(
-        widthFactor: visible / width,
-        alignment: Alignment.centerLeft,
-        child: Container(
-          alignment: Alignment.center,
-          height: 26,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.horizontal(
-              left: isFirst ? const Radius.circular(16) : Radius.zero,
-              right: isLast ? const Radius.circular(16) : Radius.zero,
-            ),
+      flex: (visible * 1000).round(),
+      child: Container(
+        alignment: Alignment.center,
+        height: 26,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.horizontal(
+            left: isFirst ? const Radius.circular(16) : Radius.zero,
+            right: isLast ? const Radius.circular(16) : Radius.zero,
           ),
-          child: Text(text,
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
-            textAlign: TextAlign.center,
-          ),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+              fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
+          textAlign: TextAlign.center,
         ),
       ),
     );
@@ -234,12 +266,9 @@ class CycleDetail extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
           ),
         ),
-        const SizedBox(width: 6),
-        Text(text, style: const TextStyle(fontSize: 13)),
+        Constants.hSpacer6,
+        Text(text).text13(),
       ],
     );
   }
-
-
 }
-

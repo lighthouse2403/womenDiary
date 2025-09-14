@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/bloc/action_bloc.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
@@ -9,6 +8,7 @@ import 'package:women_diary/actions_history/bloc/action_state.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 
 class NewAction extends StatelessWidget {
@@ -17,7 +17,7 @@ class NewAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ActionBloc()..add(DetectCycleEvent()),
+      create: (_) => ActionBloc()..add(DetectCycleEvent(DateTime.now())),
       child: const _CreateActionView(),
     );
   }
@@ -142,9 +142,7 @@ class _CreateActionView extends StatelessWidget {
                   children: [
                     const Icon(Icons.access_time, color: Colors.pink),
                     Constants.hSpacer8,
-                    Text(DateFormat('dd/MM/yyyy – HH:mm').format(time))
-                        .text16()
-                        .w500(),
+                    Text(time.globalDateTimeFormat()).text16().w500(),
                   ],
                 ),
               ),
@@ -180,21 +178,14 @@ class _CreateActionView extends StatelessWidget {
 
     final bloc = context.read<ActionBloc>();
     bloc.add(UpdateTimeEvent(result));
-
-    // 🔍 kiểm tra cycle
-    final cycles = bloc.cycleList; // danh sách cycle trong bloc/repo
-    final matched = cycles.firstWhere(
-          (c) => result.isAfter(c.cycleStartTime) && result.isBefore(c.cycleEndTime),
-      orElse: () => null,
-    );
-    bloc.add(DetectCycleEvent(matched));
+    bloc.add(DetectCycleEvent(result));
   }
 
   Widget _cycleInfo() {
     return BlocBuilder<ActionBloc, ActionState>(
-      buildWhen: (_, curr) => curr is CycleUpdatedState,
+      buildWhen: (_, curr) => curr is CycleDetectedState,
       builder: (context, state) {
-        final cycle = state is CycleUpdatedState ? state.cycle : null;
+        final cycle = state is CycleDetectedState ? state.cycle : null;
         if (cycle == null) return const SizedBox.shrink();
 
         return Container(
@@ -210,7 +201,7 @@ class _CreateActionView extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.pink.shade100.withOpacity(0.4),
+                color: Colors.pink.shade100.withAlpha(100),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -224,21 +215,10 @@ class _CreateActionView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Chu kỳ liên quan",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.pink.shade700,
-                        )),
+                    Text("Chu kỳ liên quan").w600().text16().customColor(Colors.pink.shade700),
                     const SizedBox(height: 4),
-                    Text(
-                      "${cycle.name} (${DateFormat('dd/MM').format(cycle.startDate)} - ${DateFormat('dd/MM').format(cycle.endDate)})",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    ),
+                    Text("${cycle.cycleStartTime.globalDateFormat()} - ${cycle.cycleEndTime.globalDateFormat()}"
+                    ).text14().w500().black87Color(),
                   ],
                 ),
               )

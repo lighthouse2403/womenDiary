@@ -5,6 +5,7 @@ class ActionModel {
    String emoji = '';
    String title = '';
    String note = '';
+   String cycleId = '';
    ActionType type = ActionType.stomachache;
    DateTime time = DateTime.now();
 
@@ -28,6 +29,7 @@ class ActionModel {
     emoji = json['emoji'];
     title = json['title'];
     note = json['note'];
+    cycleId = json['cycleId'];
     time = DateTime.fromMillisecondsSinceEpoch(json['time'] as int);
     type = (json['type'] as int).toActionType();
   }
@@ -40,6 +42,7 @@ class ActionModel {
     data['note'] = note;
     data['time'] = time.millisecondsSinceEpoch;
     data['type'] = type.index;
+    data['cycleId'] = cycleId;
     return data;
   }
 }

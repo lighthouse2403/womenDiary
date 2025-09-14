@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/action_model.dart';
+import 'package:women_diary/cycle/cycle_model.dart';
 
 class ActionState extends Equatable {
   const ActionState();
@@ -29,6 +30,15 @@ class ActionLoadedState extends ActionState {
 
   @override
   List<Object?> get props => [actions.length];
+}
+
+class CycleDetectedState extends ActionState {
+  final CycleModel cycle;
+
+  const CycleDetectedState(this.cycle);
+
+  @override
+  List<Object?> get props => [cycle.id];
 }
 
 class ActionLoadedErrorState extends ActionState {
@@ -96,6 +106,13 @@ class NoteUpdatedState extends ActionState {
 
 class ActionSavedSuccessfullyState extends ActionState {
   const ActionSavedSuccessfullyState();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class ActionDeletedState extends ActionState {
+  const ActionDeletedState();
 
   @override
   List<Object?> get props => [];

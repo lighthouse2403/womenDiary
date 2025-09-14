@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/common/widgets/date_picker/custom_date_picker.dart';
+import 'package:women_diary/common/widgets/date_picker/custom_date_picker.dart' as FeminineDateTimePicker;
 import 'package:women_diary/schedule/bloc/schedule_bloc.dart';
 import 'package:women_diary/schedule/bloc/schedule_event.dart';
 import 'package:women_diary/schedule/bloc/schedule_state.dart';
@@ -19,7 +22,7 @@ class ScheduleDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => ScheduleBloc()..add(InitScheduleDetailEvent(schedule)),
-      child: _ScheduleDetailView(schedule: schedule,),
+      child: _ScheduleDetailView(schedule: schedule),
     );
   }
 }
@@ -153,26 +156,22 @@ class _ScheduleDetailViewState extends State<_ScheduleDetailView> {
   }
 
   Future<void> _pickDateTime(BuildContext context, DateTime initial) async {
-    final pickedDate = await showDatePicker(
+    final pickedDate = await FeminineDateTimePicker.showFeminineDateTimePicker(
       context: context,
-      initialDate: initial,
+      initialDate: DateTime.now(),
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      locale: const Locale('vi'), // 👈 ép tiếng Việt (hoặc 'en', 'ja', ...)
     );
-    if (pickedDate == null) return;
 
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(initial),
-    );
-    if (pickedTime == null) return;
+    if (pickedDate == null) return;
 
     final result = DateTime(
       pickedDate.year,
       pickedDate.month,
       pickedDate.day,
-      pickedTime.hour,
-      pickedTime.minute,
+      pickedDate.hour,
+      pickedDate.minute,
     );
 
     context.read<ScheduleBloc>().add(UpdateTimeEvent(result));
@@ -242,7 +241,7 @@ class _ScheduleDetailViewState extends State<_ScheduleDetailView> {
                   value: isReminderOn,
                   activeColor: Colors.pink,
                   onChanged: (value) {
-                    context.read<ScheduleBloc>().add(UpdateReminderEvent(value));
+                    context.read<ScheduleBloc>().add(UpdateReminderEvent(value, widget.schedule));
                   },
                 )
               ],

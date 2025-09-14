@@ -48,7 +48,7 @@ class PrettyCyclePainter extends CustomPainter {
         sweep,
         false,
         Paint()
-          ..color = phase.color.withOpacity(0.3)
+          ..color = phase.color.withAlpha(75)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 6
           ..maskFilter = const MaskFilter.blur(BlurStyle.outer, 5),
@@ -165,7 +165,7 @@ class PrettyCyclePainter extends CustomPainter {
               start,
               end,
               Paint()
-                ..color = Colors.amber.withOpacity(0.7)
+                ..color = Colors.amber.withAlpha(175)
                 ..strokeWidth = 1.2
                 ..strokeCap = StrokeCap.round,
             );

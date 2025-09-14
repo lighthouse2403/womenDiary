@@ -17,10 +17,10 @@ class LoadActionEvent extends ActionEvent {
 }
 
 class DetectCycleEvent extends ActionEvent {
-  const DetectCycleEvent();
-
+  const DetectCycleEvent(this.actionTime);
+  final DateTime actionTime;
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [actionTime];
 }
 
 class UpdateActionTypeEvent extends ActionEvent {

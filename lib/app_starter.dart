@@ -124,7 +124,7 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
       showDialog(
         context: materialContext,
         barrierDismissible: !isForce,
-        barrierColor: Colors.pink.shade100.withOpacity(0.4),
+        barrierColor: Colors.pink.shade100.withAlpha(100),
         builder: (_) {
           return Dialog(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),

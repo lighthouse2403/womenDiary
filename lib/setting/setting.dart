@@ -149,7 +149,7 @@ class _SettingViewState extends State<SettingView> {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       elevation: 4,
-      shadowColor: color.withOpacity(0.3),
+      shadowColor: color.withAlpha(75),
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
@@ -158,7 +158,7 @@ class _SettingViewState extends State<SettingView> {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: color.withOpacity(0.2),
+                  backgroundColor: color.withAlpha(50),
                   child: Icon(icon, color: color),
                 ),
                 const SizedBox(width: 10),
@@ -241,7 +241,7 @@ class _SettingViewState extends State<SettingView> {
               children: [
                 CircleAvatar(
                   radius: 18,
-                  backgroundColor: (color ?? Colors.pink).withOpacity(0.1),
+                  backgroundColor: (color ?? Colors.pink).withAlpha(30),
                   child: Icon(icon, color: color ?? Colors.pink),
                 ),
                 const SizedBox(width: 10),
@@ -267,9 +267,9 @@ class _SettingViewState extends State<SettingView> {
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
                 activeTrackColor: color ?? Colors.pink,
-                inactiveTrackColor: (color ?? Colors.pink).withOpacity(0.2),
+                inactiveTrackColor: (color ?? Colors.pink).withAlpha(50),
                 thumbColor: color ?? Colors.pink,
-                overlayColor: (color ?? Colors.pink).withOpacity(0.1),
+                overlayColor: (color ?? Colors.pink).withAlpha(30),
                 trackHeight: 6,
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
                 overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
