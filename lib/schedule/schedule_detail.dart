@@ -91,7 +91,7 @@ class _ScheduleDetailViewState extends State<_ScheduleDetailView> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Chi tiết hành động").text20().pinkColor().w600(),
+        title: const Text("Chi tiết").text20().pinkColor().w600(),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.pink),
@@ -103,7 +103,7 @@ class _ScheduleDetailViewState extends State<_ScheduleDetailView> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -158,10 +158,10 @@ class _ScheduleDetailViewState extends State<_ScheduleDetailView> {
   Future<void> _pickDateTime(BuildContext context, DateTime initial) async {
     final pickedDate = await FeminineDateTimePicker.showFeminineDateTimePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: initial,
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now().add(const Duration(days: 365)),
-      locale: const Locale('vi'), // 👈 ép tiếng Việt (hoặc 'en', 'ja', ...)
+      locale: const Locale('vi'),
     );
 
     if (pickedDate == null) return;

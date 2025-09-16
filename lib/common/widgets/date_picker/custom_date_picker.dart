@@ -31,7 +31,7 @@ Future<DateTime?> showFeminineDateTimePicker({
               borderRadius: BorderRadius.circular(28),
             ),
             child: Container(
-              padding: const EdgeInsets.all(18),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Colors.pink.shade50, Colors.purple.shade50],
@@ -41,7 +41,7 @@ Future<DateTime?> showFeminineDateTimePicker({
                 borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.pink.shade100.withOpacity(0.3),
+                    color: Colors.pink.shade100.withAlpha(80),
                     blurRadius: 10,
                     offset: const Offset(0, 5),
                   )
@@ -120,7 +120,7 @@ Future<DateTime?> showFeminineDateTimePicker({
                       Container(
                         height: 150,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withAlpha(180),
                           borderRadius: BorderRadius.circular(18),
                           boxShadow: [
                             BoxShadow(
@@ -174,7 +174,7 @@ Future<DateTime?> showFeminineDateTimePicker({
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.pink.shade200.withOpacity(0.5),
+                                color: Colors.pink.shade200.withAlpha(130),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
