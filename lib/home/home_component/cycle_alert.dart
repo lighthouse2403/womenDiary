@@ -48,7 +48,7 @@ class CycleAlert extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () =>
-                context.read<HomeBloc>().add(EndMenstruationEvent()),
+                context.read<HomeBloc>().add(EndCycleEvent()),
           )
               : ElevatedButton.icon(
             icon: const Text("🌸").text18(),

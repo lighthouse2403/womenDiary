@@ -130,18 +130,12 @@ class _CreateScheduleView extends StatelessWidget {
     );
     if (pickedDate == null) return;
 
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(initial),
-    );
-    if (pickedTime == null) return;
-
     final result = DateTime(
       pickedDate.year,
       pickedDate.month,
       pickedDate.day,
-      pickedTime.hour,
-      pickedTime.minute,
+      pickedDate.hour,
+      pickedDate.minute,
     );
 
     context.read<ScheduleBloc>().add(UpdateTimeEvent(result));
