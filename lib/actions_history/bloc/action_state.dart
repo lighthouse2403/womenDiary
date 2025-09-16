@@ -29,7 +29,7 @@ class ActionLoadedState extends ActionState {
   const ActionLoadedState({required this.actions,});
 
   @override
-  List<Object?> get props => [actions.length];
+  List<Object?> get props => [actions.length, DateTime.now()];
 }
 
 class CycleDetectedState extends ActionState {

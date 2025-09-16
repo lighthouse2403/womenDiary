@@ -133,7 +133,7 @@ class ActionRow extends StatelessWidget {
             isDestructiveAction: true,
             onPressed: () {
               Navigator.of(ctx).pop(true);
-              context.read<ActionBloc>().add(DeleteActionDetailEvent(action.id));
+              context.read<ActionBloc>().add(DeleteActionFromListEvent(action.id));
             },
           ),
         ],

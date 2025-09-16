@@ -53,6 +53,7 @@ class _ScheduleViewState extends State<_ScheduleView>
         List<ScheduleModel> scheduleList =
         (state is ScheduleLoadedState) ? state.scheduleList : [];
 
+        print('$state');
         if (scheduleList.isEmpty) return _buildEmptyView();
 
         final groupedSchedules = _groupSchedulesByDate(scheduleList);

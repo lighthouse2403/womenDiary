@@ -122,9 +122,15 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   }
 
   void _onUpdateReminderOnList(UpdateReminderOnListEvent event, Emitter<ScheduleState> emit) async {
-    scheduleList.firstWhere((shedule) => shedule.id == event.schedule.id).isReminderOn = !event.schedule.isReminderOn;
+    final schedule = scheduleList.firstWhere(
+          (s) => s.id == event.schedule.id,
+      orElse: () => throw Exception("Schedule not found"),
+    );
 
-    await DatabaseHandler.updateSchedule(scheduleList.firstWhere((shedule) => shedule.id == event.schedule.id));
+    schedule.isReminderOn = !schedule.isReminderOn;
+
+    await DatabaseHandler.updateSchedule(schedule);
+    print('schedule ${schedule.isReminderOn}');
     emit(ScheduleLoadedState(scheduleList));
   }
 }
