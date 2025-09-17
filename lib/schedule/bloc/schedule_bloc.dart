@@ -54,6 +54,12 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
   void _onDeleteScheduleFromList(DeleteScheduleFromListEvent event, Emitter<ScheduleState> emit) async {
     await DatabaseHandler.deleteSchedule(event.schedule.id);
+    final notificationId = (event.schedule.createdTime.millisecondsSinceEpoch/1000).round() ;
+
+    if (scheduleDetail.isReminderOn) {
+      await NotificationService().cancelNotification(notificationId);
+    }
+
     List<ScheduleModel> scheduleList = await DatabaseHandler.getSchedules(
       startTime: startTime.millisecondsSinceEpoch,
       endTime: endTime.millisecondsSinceEpoch,
@@ -97,12 +103,27 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   void _onDeleteScheduleDetail(DeleteScheduleDetailEvent event, Emitter<ScheduleState> emit) async {
     await DatabaseHandler.deleteSchedule(event.schedule.id);
     final notificationId = (event.schedule.createdTime.millisecondsSinceEpoch/1000).round() ;
-    await NotificationService().cancelNotification(notificationId);
-
+    if (event.schedule.isReminderOn) {
+      await NotificationService().cancelNotification(notificationId);
+    }
     emit(ScheduleSavedSuccessfullyState());
   }
 
   void _onUpdateTime(UpdateTimeEvent event, Emitter<ScheduleState> emit) async {
+    final id = (scheduleDetail.createdTime.millisecondsSinceEpoch/1000).round();
+
+    if (scheduleDetail.isReminderOn) {
+      /// Remove notification at old time
+      await NotificationService().cancelNotification(id);
+
+      /// create new notification at new time
+      await NotificationService().scheduleNotification(
+        id: id,
+        title: "Nhắc nhở lịch trình",
+        body: scheduleDetail.title,
+        scheduledTime: event.time,
+      );
+    }
     scheduleDetail.time = event.time;
     emit(TimeUpdatedState(event.time));
   }
@@ -120,7 +141,19 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     scheduleDetail.isReminderOn = event.isReminderOn;
     if (event.schedule != null) {
       await DatabaseHandler.updateSchedule(event.schedule!);
+      final notificationId = (event.schedule!.createdTime.millisecondsSinceEpoch/1000).round() ;
+      if (scheduleDetail.isReminderOn) {
+        await NotificationService().scheduleNotification(
+          id: notificationId,
+          title: "Nhắc nhở lịch trình",
+          body: scheduleDetail.title,
+          scheduledTime: scheduleDetail.time,
+        );
+      } else {
+        await NotificationService().cancelNotification(notificationId);
+      }
     }
+
     emit(ReminderUpdatedState(event.isReminderOn));
   }
 
