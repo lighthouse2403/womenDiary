@@ -130,7 +130,19 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     schedule.isReminderOn = !schedule.isReminderOn;
 
     await DatabaseHandler.updateSchedule(schedule);
-    print('schedule ${schedule.isReminderOn}');
+    final notificationId = (schedule.createdTime.millisecondsSinceEpoch/1000).round() ;
+
+    if (scheduleDetail.isReminderOn) {
+      await NotificationService().scheduleNotification(
+        id: notificationId,
+        title: "Nhắc nhở lịch trình",
+        body: scheduleDetail.title,
+        scheduledTime: scheduleDetail.time,
+      );
+    } else {
+      await NotificationService().cancelNotification(notificationId);
+    }
+
     emit(ScheduleLoadedState(scheduleList));
   }
 }

@@ -13,7 +13,7 @@ class ScheduleLoadedState extends ScheduleState {
 
   final List<ScheduleModel> scheduleList;
   @override
-  List<Object?> get props => [scheduleList.length, DateTime.now()];
+  List<Object?> get props => [DateTime.now()];
 }
 
 /// Action detail
