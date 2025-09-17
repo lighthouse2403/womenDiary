@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:local_auth/local_auth.dart';
 
 class BiometricService {
@@ -12,10 +14,11 @@ class BiometricService {
         return true;
       }
 
+      final biometricOnly = Platform.isIOS ? false : true;
       final didAuthenticate = await _auth.authenticate(
         localizedReason: 'Xác thực để tiếp tục sử dụng ứng dụng',
-        options: const AuthenticationOptions(
-          biometricOnly: false,
+        options: AuthenticationOptions(
+          biometricOnly: biometricOnly,
           stickyAuth: true,
           useErrorDialogs: true,
         ),
