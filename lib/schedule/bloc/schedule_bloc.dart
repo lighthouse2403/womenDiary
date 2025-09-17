@@ -7,7 +7,6 @@ import 'package:women_diary/schedule/schedule_model.dart';
 
 class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   /// Schedule list
-  List<ScheduleModel> scheduleList = [];
   DateTime startTime = DateTime.now().subtract(Duration(days: 365));
   DateTime endTime = DateTime.now().add(Duration(days: 60));
 
@@ -35,7 +34,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     print('startTime: ${startTime}');
     print('endTime: ${endTime}');
 
-    scheduleList = await DatabaseHandler.getSchedules(
+    List<ScheduleModel> scheduleList = await DatabaseHandler.getSchedules(
         startTime: startTime.millisecondsSinceEpoch,
         endTime: endTime.millisecondsSinceEpoch,
     );
@@ -45,7 +44,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   void _onUpdateDateRange(UpdateDateRangeEvent event, Emitter<ScheduleState> emit) async {
     startTime = event.startTime;
     endTime = event.endTime;
-    scheduleList = await DatabaseHandler.getSchedules(
+    List<ScheduleModel> scheduleList = await DatabaseHandler.getSchedules(
         startTime: startTime.millisecondsSinceEpoch,
         endTime: endTime.millisecondsSinceEpoch,
     );
@@ -55,7 +54,10 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
   void _onDeleteScheduleFromList(DeleteScheduleFromListEvent event, Emitter<ScheduleState> emit) async {
     await DatabaseHandler.deleteSchedule(event.schedule.id);
-    scheduleList.removeWhere((Schedule) => Schedule.id == event.schedule.id);
+    List<ScheduleModel> scheduleList = await DatabaseHandler.getSchedules(
+      startTime: startTime.millisecondsSinceEpoch,
+      endTime: endTime.millisecondsSinceEpoch,
+    );
     emit(ScheduleLoadedState(scheduleList));
   }
 
@@ -63,6 +65,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   void _onLoadScheduleDetail(InitScheduleDetailEvent event, Emitter<ScheduleState> emit) async {
     scheduleDetail = event.initialSchedule;
     emit(TimeUpdatedState(scheduleDetail.time));
+    emit(SaveButtonState(true));
     emit(ReminderUpdatedState(scheduleDetail.isReminderOn));
   }
 
@@ -122,15 +125,14 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   }
 
   void _onUpdateReminderOnList(UpdateReminderOnListEvent event, Emitter<ScheduleState> emit) async {
-    final schedule = scheduleList.firstWhere(
-          (s) => s.id == event.schedule.id,
-      orElse: () => throw Exception("Schedule not found"),
+
+    event.schedule.isReminderOn = !event.schedule.isReminderOn;
+    await DatabaseHandler.updateSchedule(event.schedule);
+    List<ScheduleModel> scheduleList = await DatabaseHandler.getSchedules(
+      startTime: startTime.millisecondsSinceEpoch,
+      endTime: endTime.millisecondsSinceEpoch,
     );
-
-    schedule.isReminderOn = !schedule.isReminderOn;
-
-    await DatabaseHandler.updateSchedule(schedule);
-    final notificationId = (schedule.createdTime.millisecondsSinceEpoch/1000).round() ;
+    final notificationId = (event.schedule.createdTime.millisecondsSinceEpoch/1000).round() ;
 
     if (scheduleDetail.isReminderOn) {
       await NotificationService().scheduleNotification(

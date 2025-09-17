@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
-import 'package:women_diary/common/widgets/date_picker/custom_date_picker.dart';
 import 'package:women_diary/common/widgets/date_picker/custom_date_picker.dart' as FeminineDateTimePicker;
 import 'package:women_diary/schedule/bloc/schedule_bloc.dart';
 import 'package:women_diary/schedule/bloc/schedule_event.dart';

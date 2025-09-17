@@ -13,7 +13,7 @@ class ScheduleLoadedState extends ScheduleState {
 
   final List<ScheduleModel> scheduleList;
   @override
-  List<Object?> get props => [DateTime.now()];
+  List<Object?> get props => [DateTime.now().microsecondsSinceEpoch, scheduleList];
 }
 
 /// Action detail
