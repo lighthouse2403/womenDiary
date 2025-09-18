@@ -42,6 +42,8 @@ class _CycleCalendarViewState extends State<_CycleCalendarView> {
         print(state);
         List<CycleModel> cycles = state is LoadedAllCycleState ? state.cycleList : [];
         return MultiRangeCalendar(
+          minDate: DateTime.now().subtract(Duration(days: 365*10)),
+          maxDate: DateTime.now().add(Duration(days: 30)),
           initialRanges: cycles,
           onAddRange: (range) {
             context.read<CycleBloc>().add(CreateCycleEvent(range));
