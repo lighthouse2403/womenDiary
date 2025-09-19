@@ -1,9 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:women_diary/_gen/assets.gen.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/cycle/cycle_model.dart';
+import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/setting/bloc/setting_bloc.dart';
 import 'package:women_diary/setting/bloc/setting_event.dart';
@@ -62,10 +69,37 @@ class _SettingViewState extends State<SettingView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.pink.shade50,
-      appBar: BaseAppBar(
-        hasBack: true,
-        title: 'Cài đặt',
-        backgroundColor: Colors.pink.shade200,
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('Cài đặt').w600().text18().whiteColor().ellipsis(),
+        backgroundColor: AppColors.pinkTextColor,
+        leading: InkWell(
+          onTap: () async {
+            final cycleLength = LocalStorageService.isUsingAverageValue()
+                ? await DatabaseHandler.getAverageCycleLength()
+                : LocalStorageService.getCycleLength();
+            CycleModel lastCycle = await DatabaseHandler.getLastCycle();
+            DateTime cycleEndTime = lastCycle.cycleStartTime.add(Duration(days: cycleLength - 1));
+            DateTime menstruationEndTime = lastCycle.cycleStartTime.add(Duration(days: LocalStorageService.getMenstruationLength() - 1));
+            print('cycleStartTime: ${lastCycle.cycleStartTime}');
+            print('cycleEndTime: ${cycleEndTime}');
+            print('menstruationEndTime: ${menstruationEndTime}');
+
+            lastCycle.cycleEndTime = cycleEndTime;
+            lastCycle.menstruationEndTime = menstruationEndTime;
+            DatabaseHandler.updateCycle(lastCycle);
+
+            context.pop();
+          },
+          child: Align(
+            alignment: Alignment.center,
+            child: Assets.icons.arrowBack.svg(
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn)
+            ),
+          ),
+        ),
       ),
       body: SafeArea(
         child: ListView(

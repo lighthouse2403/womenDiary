@@ -177,6 +177,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
       endTime: endTime.millisecondsSinceEpoch,
     );
     final notificationId = (event.schedule.createdTime.millisecondsSinceEpoch/1000).round() ;
+    await NotificationService().cancelNotification(notificationId);
 
     if (scheduleDetail.isReminderOn) {
       await NotificationService().scheduleNotification(
@@ -185,8 +186,6 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
         body: scheduleDetail.title,
         scheduledTime: scheduleDetail.time,
       );
-    } else {
-      await NotificationService().cancelNotification(notificationId);
     }
 
     emit(ScheduleLoadedState(scheduleList));
