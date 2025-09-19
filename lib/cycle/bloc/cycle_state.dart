@@ -13,7 +13,7 @@ class LoadedAllCycleState extends CycleState {
 
   final List<CycleModel> cycleList;
   @override
-  List<Object?> get props => [cycleList.length];
+  List<Object?> get props => [cycleList.length, DateTime.now()];
 }
 
 class LoadedCycleDetailState extends CycleState {

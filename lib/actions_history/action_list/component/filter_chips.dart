@@ -10,10 +10,11 @@ class FilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ActionBloc, ActionState, ActionType?>(
-      selector: (state) =>
-      state is ActionTypeUpdatedState ? state.type : null,
-      builder: (context, selectedType) {
+    return BlocBuilder<ActionBloc, ActionState>(
+      buildWhen: (pre,cur) => cur is ActionTypeUpdatedState,
+      builder: (context, state) {
+        ActionType? selectedType = state is ActionTypeUpdatedState ? state.type : null;
+        print('selectedType ${selectedType}');
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Wrap(

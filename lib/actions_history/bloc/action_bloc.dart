@@ -54,7 +54,8 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
         endTime: endTime.millisecondsSinceEpoch,
         type: type
     );
-    emit(ActionTypeUpdatedState(type: event.actionType));
+    print('type: ${type}');
+    emit(ActionTypeUpdatedState(type: type));
     emit(ActionLoadedState(actions: actions));
   }
 

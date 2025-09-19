@@ -114,7 +114,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
 
         await DatabaseHandler.updateCycle(cycleList[i]);
       }
-      await LocalStorageService.updateAverageCycleLength((totalCycleDays/countCycle).round());
+      print('cycleList ${cycleList.length}');
       emit(LoadedAllCycleState(cycleList));
     } catch (error) {
     }

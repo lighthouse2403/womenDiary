@@ -16,9 +16,9 @@ import 'package:women_diary/home/home.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:women_diary/schedule/new_schedule.dart';
-import 'package:women_diary/schedule/schedule_detail.dart';
-import 'package:women_diary/schedule/schedule_list.dart';
+import 'package:women_diary/schedule/schedule_detail/new_schedule.dart';
+import 'package:women_diary/schedule/schedule_detail/schedule_detail.dart';
+import 'package:women_diary/schedule/schedule_list/schedule_list.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
 import 'package:women_diary/setting/setting.dart';
 

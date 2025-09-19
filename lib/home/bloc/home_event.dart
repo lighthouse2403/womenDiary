@@ -35,6 +35,13 @@ class StartNewCycleEvent extends HomeEvent {
   List<Object?> get props => [];
 }
 
+class EndCycleEvent extends HomeEvent {
+  const EndCycleEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 class EndMenstruationEvent extends HomeEvent {
   const EndMenstruationEvent();
 

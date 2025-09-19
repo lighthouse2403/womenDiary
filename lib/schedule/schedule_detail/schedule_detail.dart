@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
-import 'package:women_diary/common/widgets/date_picker/custom_date_picker.dart';
 import 'package:women_diary/common/widgets/date_picker/custom_date_picker.dart' as FeminineDateTimePicker;
 import 'package:women_diary/schedule/bloc/schedule_bloc.dart';
 import 'package:women_diary/schedule/bloc/schedule_event.dart';
@@ -91,7 +89,7 @@ class _ScheduleDetailViewState extends State<_ScheduleDetailView> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Chi tiết hành động").text20().pinkColor().w600(),
+        title: const Text("Chi tiết").text20().pinkColor().w600(),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.pink),
@@ -103,7 +101,7 @@ class _ScheduleDetailViewState extends State<_ScheduleDetailView> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -158,10 +156,10 @@ class _ScheduleDetailViewState extends State<_ScheduleDetailView> {
   Future<void> _pickDateTime(BuildContext context, DateTime initial) async {
     final pickedDate = await FeminineDateTimePicker.showFeminineDateTimePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: initial,
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now().add(const Duration(days: 365)),
-      locale: const Locale('vi'), // 👈 ép tiếng Việt (hoặc 'en', 'ja', ...)
+      locale: const Locale('vi'),
     );
 
     if (pickedDate == null) return;

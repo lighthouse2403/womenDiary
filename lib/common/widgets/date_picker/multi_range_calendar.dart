@@ -3,17 +3,22 @@ import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class MultiRangeCalendar extends StatefulWidget {
   final List<CycleModel> initialRanges;
   final void Function(CycleModel) onAddRange;
   final void Function(String) onDeleteRange;
+  final DateTime? minDate;
+  final DateTime? maxDate;
 
   const MultiRangeCalendar({
     super.key,
     this.initialRanges = const [],
     required this.onAddRange,
     required this.onDeleteRange,
+    this.minDate,
+    this.maxDate,
   });
 
   @override
@@ -23,11 +28,54 @@ class MultiRangeCalendar extends StatefulWidget {
 class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
   DateTime? _pendingStart;
   late List<CycleModel> _ranges;
+  late List<DateTime> _months;
+
+  final ItemScrollController _scrollController = ItemScrollController();
+  final ItemPositionsListener _positionsListener =
+  ItemPositionsListener.create();
+
+  int? _todayIndex;
+  bool _showTodayButton = false;
 
   @override
   void initState() {
     super.initState();
     _ranges = List.from(widget.initialRanges);
+
+    final min = widget.minDate ?? DateTime.now().subtract(const Duration(days: 730));
+    final max = widget.maxDate ?? DateTime.now().add(const Duration(days: 365));
+    _months = _generateMonths(min, max);
+
+    final now = DateTime.now();
+    _todayIndex =
+        _months.indexWhere((m) => m.year == now.year && m.month == now.month);
+
+    // Scroll đến tháng hiện tại
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_todayIndex != null && _todayIndex != -1 && _scrollController.isAttached) {
+        _scrollController.scrollTo(
+          index: _todayIndex!,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+
+    // Theo dõi vị trí scroll để hiển thị nút hôm nay
+    _positionsListener.itemPositions.addListener(() {
+      if (_todayIndex == null) return;
+      final positions = _positionsListener.itemPositions.value;
+      if (positions.isEmpty) return;
+
+      final visibleIndexes = positions.map((e) => e.index).toList();
+      final isTodayVisible = visibleIndexes.contains(_todayIndex);
+
+      if (_showTodayButton == isTodayVisible) {
+        setState(() {
+          _showTodayButton = !isTodayVisible;
+        });
+      }
+    });
   }
 
   @override
@@ -40,9 +88,6 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final months = _generateMonths(DateTime(now.year, now.month - 6, 1), 13);
-
     return Scaffold(
       backgroundColor: Colors.pink[50],
       appBar: BaseAppBar(
@@ -56,19 +101,35 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
           )
         ],
       ),
-      body: ListView.builder(
-        itemCount: months.length,
-        itemBuilder: (context, index) => _buildMonthView(months[index]),
+      body: ScrollablePositionedList.builder(
+        itemScrollController: _scrollController,
+        itemPositionsListener: _positionsListener,
+        itemCount: _months.length,
+        itemBuilder: (context, index) => _buildMonthView(_months[index]),
       ),
+      floatingActionButton: (_showTodayButton && _todayIndex != null)
+          ? FloatingActionButton(
+        backgroundColor: Colors.pink[300],
+        child: const Icon(Icons.today, color: Colors.white),
+        onPressed: () {
+          if (_todayIndex != null && _scrollController.isAttached) {
+            _scrollController.scrollTo(
+              index: _todayIndex!,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+            );
+          }
+        },
+      )
+          : null,
     );
   }
 
   Widget _buildMonthView(DateTime month) {
     final daysInMonth = DateUtils.getDaysInMonth(month.year, month.month);
-    final firstWeekday = DateTime(month.year, month.month, 1).weekday; // Thứ của ngày đầu tiên
+    final firstWeekday = DateTime(month.year, month.month, 1).weekday;
     final dayHeaders = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
 
-    // Tạo danh sách ngày, bao gồm các ô trống trước ngày 1
     final totalCells = daysInMonth + (firstWeekday - 1);
     final cells = List<DateTime?>.generate(totalCells, (index) {
       final dayNum = index - (firstWeekday - 2);
@@ -121,7 +182,7 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
           ),
         ),
 
-        // Lưới các ngày
+        // Lưới ngày
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -134,16 +195,13 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
           itemCount: cells.length,
           itemBuilder: (context, index) {
             final day = cells[index];
-            if (day == null) {
-              return const SizedBox.shrink();
-            }
+            if (day == null) return const SizedBox.shrink();
             return _buildDayCell(day);
           },
         ),
       ],
     );
   }
-
 
   Widget _buildDayCell(DateTime day) {
     bool isInRange = false;
@@ -162,28 +220,34 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
     final isToday = _isSameDay(day, DateTime.now());
     final isPending = _pendingStart != null && _isSameDay(_pendingStart!, day);
 
-    Color? bgColor;
-    Color textColor = Colors.black87;
+    final isBeforeMin = widget.minDate != null && day.isBefore(widget.minDate!);
+    final isAfterMax = widget.maxDate != null && day.isAfter(widget.maxDate!);
+    final isDisabled = isBeforeMin || isAfterMax;
 
-    if (isStart) {
-      bgColor = Colors.pink[400];
-      textColor = Colors.white;
-    } else if (isEnd) {
-      bgColor = Colors.pink[300];
-      textColor = Colors.white;
-    } else if (isInRange) {
-      bgColor = Colors.pink[100];
-      textColor = Colors.white;
-    } else if (isPending) {
-      bgColor = Colors.orange[200];
-      textColor = Colors.white;
+    Color? bgColor;
+    Color textColor = isDisabled ? Colors.grey : Colors.black87;
+
+    if (!isDisabled) {
+      if (isStart) {
+        bgColor = Colors.pink[400];
+        textColor = Colors.white;
+      } else if (isEnd) {
+        bgColor = Colors.pink[300];
+        textColor = Colors.white;
+      } else if (isInRange) {
+        bgColor = Colors.pink[100];
+        textColor = Colors.white;
+      } else if (isPending) {
+        bgColor = Colors.orange[200];
+        textColor = Colors.white;
+      }
     }
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(100),
-        onTap: () => _onDayTapped(day),
+        onTap: isDisabled ? null : () => _onDayTapped(day),
         child: Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(
@@ -209,8 +273,7 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
       a.year == b.year && a.month == b.month && a.day == b.day;
 
   bool _isInRange(DateTime day, CycleModel range) =>
-      !day.isBefore(range.cycleStartTime) &&
-          !day.isAfter(range.menstruationEndTime);
+      !day.isBefore(range.cycleStartTime) && !day.isAfter(range.menstruationEndTime);
 
   String? _findRangeId(DateTime day) {
     for (final r in _ranges) {
@@ -267,7 +330,16 @@ class _MultiRangeCalendarState extends State<MultiRangeCalendar> {
     });
   }
 
-  List<DateTime> _generateMonths(DateTime from, int count) {
-    return List.generate(count, (i) => DateTime(from.year, from.month + i, 1));
+  /// Tạo list tháng từ min -> max
+  List<DateTime> _generateMonths(DateTime min, DateTime max) {
+    final months = <DateTime>[];
+    DateTime cursor = DateTime(min.year, min.month);
+    final end = DateTime(max.year, max.month);
+
+    while (!cursor.isAfter(end)) {
+      months.add(cursor);
+      cursor = DateTime(cursor.year, cursor.month + 1);
+    }
+    return months;
   }
 }

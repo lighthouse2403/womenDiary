@@ -6,6 +6,7 @@ import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/common/widgets/date_picker/custom_date_picker.dart' as FeminineDateTimePicker;
 import 'package:women_diary/schedule/bloc/schedule_bloc.dart';
 import 'package:women_diary/schedule/bloc/schedule_event.dart';
 import 'package:women_diary/schedule/bloc/schedule_state.dart';
@@ -120,26 +121,21 @@ class _CreateScheduleView extends StatelessWidget {
   }
 
   Future<void> _pickDateTime(BuildContext context, DateTime initial) async {
-    final pickedDate = await showDatePicker(
+    final pickedDate = await FeminineDateTimePicker.showFeminineDateTimePicker(
       context: context,
       initialDate: initial,
       firstDate: DateTime.now().subtract(const Duration(days: 365)),
       lastDate: DateTime.now().add(const Duration(days: 365)),
+      locale: const Locale('vi'),
     );
     if (pickedDate == null) return;
-
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(initial),
-    );
-    if (pickedTime == null) return;
 
     final result = DateTime(
       pickedDate.year,
       pickedDate.month,
       pickedDate.day,
-      pickedTime.hour,
-      pickedTime.minute,
+      pickedDate.hour,
+      pickedDate.minute,
     );
 
     context.read<ScheduleBloc>().add(UpdateTimeEvent(result));

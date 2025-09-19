@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/date_time_extension.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
+import 'package:women_diary/common/widgets/date_picker/custom_date_picker.dart' as FeminineDateTimePicker;
 import 'package:women_diary/cycle/first_setup/bloc/cycle_setup_bloc.dart';
 import 'package:women_diary/cycle/first_setup/bloc/cycle_setup_event.dart';
 import 'package:women_diary/cycle/first_setup/bloc/cycle_setup_state.dart';
@@ -259,11 +260,12 @@ class _LastPeriodDatePicker extends StatelessWidget {
             const SizedBox(height: 12),
             InkWell(
               onTap: () async {
-                final selectedDate = await showDatePicker(
+                final selectedDate = await FeminineDateTimePicker.showFeminineDateTimePicker(
                   context: context,
                   initialDate: lastPeriodDate,
                   firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                  lastDate: DateTime.now(),
+                  lastDate: DateTime.now().add(const Duration(days: 365)),
+                  locale: const Locale('vi'),
                 );
                 if (selectedDate != null) {
                   context

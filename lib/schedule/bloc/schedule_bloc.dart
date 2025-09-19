@@ -7,7 +7,6 @@ import 'package:women_diary/schedule/schedule_model.dart';
 
 class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   /// Schedule list
-  List<ScheduleModel> scheduleList = [];
   DateTime startTime = DateTime.now().subtract(Duration(days: 365));
   DateTime endTime = DateTime.now().add(Duration(days: 60));
 
@@ -35,7 +34,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     print('startTime: ${startTime}');
     print('endTime: ${endTime}');
 
-    scheduleList = await DatabaseHandler.getSchedules(
+    List<ScheduleModel> scheduleList = await DatabaseHandler.getSchedules(
         startTime: startTime.millisecondsSinceEpoch,
         endTime: endTime.millisecondsSinceEpoch,
     );
@@ -45,7 +44,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   void _onUpdateDateRange(UpdateDateRangeEvent event, Emitter<ScheduleState> emit) async {
     startTime = event.startTime;
     endTime = event.endTime;
-    scheduleList = await DatabaseHandler.getSchedules(
+    List<ScheduleModel> scheduleList = await DatabaseHandler.getSchedules(
         startTime: startTime.millisecondsSinceEpoch,
         endTime: endTime.millisecondsSinceEpoch,
     );
@@ -55,7 +54,16 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
   void _onDeleteScheduleFromList(DeleteScheduleFromListEvent event, Emitter<ScheduleState> emit) async {
     await DatabaseHandler.deleteSchedule(event.schedule.id);
-    scheduleList.removeWhere((Schedule) => Schedule.id == event.schedule.id);
+    final notificationId = (event.schedule.createdTime.millisecondsSinceEpoch/1000).round() ;
+
+    if (scheduleDetail.isReminderOn) {
+      await NotificationService().cancelNotification(notificationId);
+    }
+
+    List<ScheduleModel> scheduleList = await DatabaseHandler.getSchedules(
+      startTime: startTime.millisecondsSinceEpoch,
+      endTime: endTime.millisecondsSinceEpoch,
+    );
     emit(ScheduleLoadedState(scheduleList));
   }
 
@@ -63,6 +71,7 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   void _onLoadScheduleDetail(InitScheduleDetailEvent event, Emitter<ScheduleState> emit) async {
     scheduleDetail = event.initialSchedule;
     emit(TimeUpdatedState(scheduleDetail.time));
+    emit(SaveButtonState(true));
     emit(ReminderUpdatedState(scheduleDetail.isReminderOn));
   }
 
@@ -105,12 +114,27 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
   void _onDeleteScheduleDetail(DeleteScheduleDetailEvent event, Emitter<ScheduleState> emit) async {
     await DatabaseHandler.deleteSchedule(event.schedule.id);
     final notificationId = (event.schedule.createdTime.millisecondsSinceEpoch/1000).round() ;
-    await NotificationService().cancelNotification(notificationId);
-
+    if (event.schedule.isReminderOn) {
+      await NotificationService().cancelNotification(notificationId);
+    }
     emit(ScheduleSavedSuccessfullyState());
   }
 
   void _onUpdateTime(UpdateTimeEvent event, Emitter<ScheduleState> emit) async {
+    final id = (scheduleDetail.createdTime.millisecondsSinceEpoch/1000).round();
+
+    if (scheduleDetail.isReminderOn) {
+      /// Remove notification at old time
+      await NotificationService().cancelNotification(id);
+
+      /// create new notification at new time
+      await NotificationService().scheduleNotification(
+        id: id,
+        title: "Nhắc nhở lịch trình",
+        body: scheduleDetail.title,
+        scheduledTime: event.time,
+      );
+    }
     scheduleDetail.time = event.time;
     emit(TimeUpdatedState(event.time));
   }
@@ -128,14 +152,43 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
     scheduleDetail.isReminderOn = event.isReminderOn;
     if (event.schedule != null) {
       await DatabaseHandler.updateSchedule(event.schedule!);
+      final notificationId = (event.schedule!.createdTime.millisecondsSinceEpoch/1000).round() ;
+      if (scheduleDetail.isReminderOn) {
+        await NotificationService().scheduleNotification(
+          id: notificationId,
+          title: "Nhắc nhở lịch trình",
+          body: scheduleDetail.title,
+          scheduledTime: scheduleDetail.time,
+        );
+      } else {
+        await NotificationService().cancelNotification(notificationId);
+      }
     }
+
     emit(ReminderUpdatedState(event.isReminderOn));
   }
 
   void _onUpdateReminderOnList(UpdateReminderOnListEvent event, Emitter<ScheduleState> emit) async {
-    scheduleList.firstWhere((shedule) => shedule.id == event.schedule.id).isReminderOn = !event.schedule.isReminderOn;
 
-    await DatabaseHandler.updateSchedule(scheduleList.firstWhere((shedule) => shedule.id == event.schedule.id));
+    event.schedule.isReminderOn = !event.schedule.isReminderOn;
+    await DatabaseHandler.updateSchedule(event.schedule);
+    List<ScheduleModel> scheduleList = await DatabaseHandler.getSchedules(
+      startTime: startTime.millisecondsSinceEpoch,
+      endTime: endTime.millisecondsSinceEpoch,
+    );
+    final notificationId = (event.schedule.createdTime.millisecondsSinceEpoch/1000).round() ;
+
+    if (scheduleDetail.isReminderOn) {
+      await NotificationService().scheduleNotification(
+        id: notificationId,
+        title: "Nhắc nhở lịch trình",
+        body: scheduleDetail.title,
+        scheduledTime: scheduleDetail.time,
+      );
+    } else {
+      await NotificationService().cancelNotification(notificationId);
+    }
+
     emit(ScheduleLoadedState(scheduleList));
   }
 }

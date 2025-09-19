@@ -1,5 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:women_diary/common/extension/date_time_extension.dart';
+import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/database/data_handler.dart';
+import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
 import 'package:women_diary/home/bloc/home_state.dart';
 import 'package:women_diary/home/phase_model.dart';
@@ -7,6 +10,8 @@ import 'package:women_diary/home/phase_model.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(const HomeState()) {
     on<LoadCycleEvent>(_onLoadLocalData);
+    on<EndCycleEvent>(_onEndCycle);
+
   }
 
   Future<void> _onLoadLocalData(
@@ -14,11 +19,49 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     emit(state.copyWith(isLoadingCycle: true, isLoadingSchedule: true));
 
+    final cycleData = await _generateCycleData();
+    emit(state.copyWith(cycle: cycleData, isLoadingCycle: false));
+
+    // --- Load schedule ---
+    final schedulesFuture = DatabaseHandler.getAllSchedule();
+    final schedules = await schedulesFuture;
+    emit(state.copyWith(
+      schedules: schedules,
+      isLoadingSchedule: false,
+    ));
+  }
+
+  Future<List<PhaseModel>> _buildPhases(int cycle, int menstruation) async {
+    return PhaseFactory.createPhases(
+        cycleLength: cycle,
+        menstruationLength: menstruation
+    );
+  }
+
+  Future<void> _onEndCycle(EndCycleEvent event, Emitter<HomeState> emit) async {
+    final lastCycleFuture = await DatabaseHandler.getLastCycle();
+    lastCycleFuture.cycleEndTime = DateTime.now().subtract(Duration(days: 1));
+    DatabaseHandler.updateCycle(lastCycleFuture);
+
+    /// Create new cycle
+    final cycleLength = LocalStorageService.isUsingAverageValue()
+        ? await DatabaseHandler.getAverageCycleLength()
+        : LocalStorageService.getCycleLength();
+    DateTime cycleStartTime = DateTime.now().startOfDay();
+    DateTime cycleEndTime = DateTime.now().add(Duration(days: cycleLength - 1));
+    DateTime menstruationEndTime = DateTime.now().add(Duration(days: LocalStorageService.getMenstruationLength() - 1));
+
+    CycleModel newCycle = CycleModel.init(cycleStartTime, cycleEndTime, menstruationEndTime);
+    DatabaseHandler.insertCycle(newCycle);
+
+    final cycleData = await _generateCycleData();
+    emit(state.copyWith(cycle: cycleData, isLoadingCycle: false));
+  }
+
+  Future<CycleData> _generateCycleData() async {
     final lastCycleFuture = await DatabaseHandler.getLastCycle();
     final longestCycle = await DatabaseHandler.getLongestCycle();
     final shortestCycle = await DatabaseHandler.getShortestCycle();
-
-    final schedulesFuture = DatabaseHandler.getAllSchedule();
 
     // --- Load cycle ---
     final lastCycle = await lastCycleFuture;
@@ -34,7 +77,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     final menstruationLength = lastCycle.menstruationEndTime.difference(lastCycle.cycleStartTime).inDays + 1;
 
-    final currentDay = DateTime.now().difference(lastCycle.cycleStartTime).inDays;
+    final currentDay = DateTime.now().difference(lastCycle.cycleStartTime).inDays + 1;
 
     final phases = await _buildPhases(cycleLength, menstruationLength);
     final currentPhase = _findCurrentPhase(phases, currentDay, cycleLength);
@@ -61,26 +104,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       phases: phases,
     );
 
-    emit(state.copyWith(
-      cycle: cycleData,
-      isLoadingCycle: false,
-    ));
-
-    // --- Load schedule ---
-    final schedules = await schedulesFuture;
-    emit(state.copyWith(
-      schedules: schedules,
-      isLoadingSchedule: false,
-    ));
+    return cycleData;
   }
-
-  Future<List<PhaseModel>> _buildPhases(int cycle, int menstruation) async {
-    return PhaseFactory.createPhases(
-        cycleLength: cycle,
-        menstruationLength: menstruation
-    );
-  }
-
   PhaseModel _findCurrentPhase(List<PhaseModel> phases, int currentDay, int cycleLength) {
     for (final phase in phases) {
       final start = phase.startDay;

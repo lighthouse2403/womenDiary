@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:women_diary/biometric_service.dart';
@@ -7,8 +6,6 @@ import 'package:women_diary/l10n/app_localizations.dart';
 import 'package:women_diary/routes/routes.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/update_checker.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class AppStarter extends StatefulWidget {
   const AppStarter({super.key});
