@@ -68,6 +68,17 @@ class ScheduleBloc extends Bloc<ScheduleEvent, ScheduleState> {
 
   void _onUpdateScheduleDetail(UpdateScheduleDetailEvent event, Emitter<ScheduleState> emit) async {
     await DatabaseHandler.updateSchedule(scheduleDetail);
+    final notificationId = (scheduleDetail.createdTime.millisecondsSinceEpoch/1000).round() ;
+    await NotificationService().cancelNotification(notificationId);
+
+    if (scheduleDetail.isReminderOn) {
+      await NotificationService().scheduleNotification(
+        id: notificationId,
+        title: "Nhắc nhở lịch trình",
+        body: scheduleDetail.title,
+        scheduledTime: scheduleDetail.time,
+      );
+    }
     emit(ScheduleSavedSuccessfullyState());
   }
 

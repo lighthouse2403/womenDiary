@@ -88,7 +88,6 @@ class _CycleLengthSlider extends StatelessWidget {
                 .w600()
                 .pinkColor(),
             const SizedBox(height: 12),
-
             // slider chiếm full chiều ngang
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
@@ -100,7 +99,7 @@ class _CycleLengthSlider extends StatelessWidget {
                 activeTrackColor: Colors.pinkAccent,
                 inactiveTrackColor: Colors.pink.shade100,
                 thumbColor: Colors.pink,
-                overlayColor: Colors.pink.withOpacity(0.2),
+                overlayColor: Colors.pink.withAlpha(50),
               ),
               child: Slider(
                 value: cycleLength.toDouble(),
@@ -140,7 +139,7 @@ class _CycleLengthSlider extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.pink.shade100.withOpacity(0.5),
+                        color: Colors.pink.shade100.withAlpha(130),
                         blurRadius: 6,
                         offset: const Offset(0, 3),
                       )
@@ -199,7 +198,7 @@ class _CircleIconButton extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.pink.shade100.withOpacity(0.6),
+              color: Colors.pink.shade100.withAlpha(150),
               blurRadius: 6,
               offset: const Offset(0, 3),
             ),
