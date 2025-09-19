@@ -80,13 +80,8 @@ class _SettingViewState extends State<SettingView> {
                 : LocalStorageService.getCycleLength();
             CycleModel lastCycle = await DatabaseHandler.getLastCycle();
             DateTime cycleEndTime = lastCycle.cycleStartTime.add(Duration(days: cycleLength - 1));
-            DateTime menstruationEndTime = lastCycle.cycleStartTime.add(Duration(days: LocalStorageService.getMenstruationLength() - 1));
-            print('cycleStartTime: ${lastCycle.cycleStartTime}');
-            print('cycleEndTime: ${cycleEndTime}');
-            print('menstruationEndTime: ${menstruationEndTime}');
 
             lastCycle.cycleEndTime = cycleEndTime;
-            lastCycle.menstruationEndTime = menstruationEndTime;
             DatabaseHandler.updateCycle(lastCycle);
 
             context.pop();
