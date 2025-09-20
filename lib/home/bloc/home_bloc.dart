@@ -47,9 +47,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final cycleLength = LocalStorageService.isUsingAverageValue()
         ? await DatabaseHandler.getAverageCycleLength()
         : LocalStorageService.getCycleLength();
-    DateTime cycleStartTime = DateTime.now().startOfDay();
-    DateTime cycleEndTime = DateTime.now().add(Duration(days: cycleLength - 1));
-    DateTime menstruationEndTime = DateTime.now().add(Duration(days: LocalStorageService.getMenstruationLength() - 1));
+    final menstruationLength = LocalStorageService.getMenstruationLength();
+    DateTime now = DateTime.now().startOfDay();
+    DateTime cycleStartTime = now;
+    DateTime cycleEndTime = now.add(Duration(days: cycleLength - 1));
+    DateTime menstruationEndTime = now.add(Duration(days: menstruationLength - 1));
 
     CycleModel newCycle = CycleModel.init(cycleStartTime, cycleEndTime, menstruationEndTime);
     DatabaseHandler.insertCycle(newCycle);

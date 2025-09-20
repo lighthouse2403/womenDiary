@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:women_diary/chat/bloc/chat_bloc.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/base/base_statefull_widget.dart';
@@ -74,10 +75,16 @@ class _NewThreadState extends BaseStatefulState<NewThread> {
               ),
               child: InkWell(
                 onTap: () async {
-                  loadingView.show(context);
-                  await FirebaseChat.instance.addNewThread(textController.text);
-                  loadingView.hide();
-                  Navigator.of(context).pop();
+                  String newQuestion = textController.text;
+                  if (newQuestion.isNotEmpty) {
+                    loadingView.show(context);
+                    await FirebaseChat.instance.addNewThread(textController.text);
+                    loadingView.hide();
+                    Navigator.of(context).pop();
+                  } else {
+                    Fluttertoast.showToast(msg: 'Vui lòng nhập câu hỏi trước khi gửi.');
+                  }
+
                 },
                 child: const Text('Tạo mới').w500().text16().whiteColor(),
               ),
