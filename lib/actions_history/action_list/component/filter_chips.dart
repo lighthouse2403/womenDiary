@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:women_diary/actions_history/action_type.dart';
+import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/actions_history/bloc/action_bloc.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
@@ -13,7 +13,10 @@ class FilterChips extends StatelessWidget {
     return BlocBuilder<ActionBloc, ActionState>(
       buildWhen: (pre,cur) => cur is ActionTypeUpdatedState,
       builder: (context, state) {
-        ActionType? selectedType = state is ActionTypeUpdatedState ? state.type : null;
+        ActionTypeModel? selectedType = state is ActionTypeUpdatedState
+            ? state.type : null;
+        List<ActionTypeModel> allType = state is ActionTypeUpdatedState
+            ? state.allType : [];
         print('selectedType ${selectedType}');
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -27,9 +30,9 @@ class FilterChips extends StatelessWidget {
                 onTap: () =>
                     context.read<ActionBloc>().add(UpdateActionTypeEvent(null)),
               ),
-              ...ActionType.values.map((type) => _chip(
+              ...allType.map((type) => _chip(
                 context,
-                label: type.display,
+                label: type.title,
                 selected: selectedType == type,
                 onTap: () => context
                     .read<ActionBloc>()

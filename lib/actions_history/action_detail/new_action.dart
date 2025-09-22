@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:women_diary/actions_history/action_type.dart';
+import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/actions_history/bloc/action_bloc.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
@@ -323,16 +323,17 @@ class _CreateActionView extends StatelessWidget {
         BlocBuilder<ActionBloc, ActionState>(
           buildWhen: (pre, current) => current is ActionTypeUpdatedState,
           builder: (context, state) {
-            ActionType? selectedType = state is ActionTypeUpdatedState
-                ? state.type
-                : ActionType.stomachache;
+            ActionTypeModel? selectedType = state is ActionTypeUpdatedState
+                ? state.type : null;
+            List<ActionTypeModel> allType = state is ActionTypeUpdatedState
+                ? state.allType : [];
             return Wrap(
               spacing: 12,
               runSpacing: 12,
-              children: ActionType.values.map((type) {
+              children: allType.map((type) {
                 final isSelected = selectedType == type;
                 return ChoiceChip(
-                  label: Text(type.display),
+                  label: Text(type.title),
                   selected: isSelected,
                   onSelected: (_) => context
                       .read<ActionBloc>()

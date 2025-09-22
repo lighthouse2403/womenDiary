@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
 import 'package:women_diary/actions_history/action_model.dart';
@@ -12,7 +11,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
   List<ActionModel> actions = [];
   DateTime startTime = DateTime.now().subtract(Duration(days: 90));
   DateTime endTime = DateTime.now();
-  ActionType? type;
+  ActionTypeModel? type;
   List<CycleModel> cycleList = [];
 
   /// Action detail
@@ -22,7 +21,6 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
   ActionBloc() : super(ActionHistoryLoading()) {
     on<LoadActionEvent>(_onLoadActions);
     on<UpdateActionTypeEvent>(_onUpdateActionType);
-    on<UpdateDateRangeEvent>(_onUpdateDateRange);
 
     /// Action detail
     on<InitActionDetailEvent>(_onLoadActionDetail);
@@ -39,23 +37,17 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
 
   Future<void> _onLoadActions(LoadActionEvent event, Emitter<ActionState> emit) async {
     cycleList = await DatabaseHandler.getAllCycle();
-    actions = await DatabaseHandler.getActions(
-        startTime: startTime.millisecondsSinceEpoch,
-        endTime: DateTime.now().millisecondsSinceEpoch,
-        type: type
-    );
+    actions = await DatabaseHandler.getActionsByType(typeId: type?.id);
     emit(ActionLoadedState(actions: actions));
   }
 
   void _onUpdateActionType(UpdateActionTypeEvent event, Emitter<ActionState> emit) async {
     type = event.actionType;
-    actions = await DatabaseHandler.getActions(
-        startTime: startTime.millisecondsSinceEpoch,
-        endTime: endTime.millisecondsSinceEpoch,
-        type: type
-    );
-    print('type: ${type}');
-    emit(ActionTypeUpdatedState(type: type));
+    actions = await DatabaseHandler.getActionsByType(typeId: type?.id);
+    List<ActionTypeModel> types = await DatabaseHandler.getAllActionType();
+
+    print('type: ${type?.title}');
+    emit(ActionTypeUpdatedState(type: type, allType: types));
     emit(ActionLoadedState(actions: actions));
   }
 
@@ -63,18 +55,6 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
     cycle = await DatabaseHandler.getCycleByDate(event.actionTime) ?? cycle;
     actionDetail.cycleId = cycle.id;
     emit(CycleDetectedState(cycle));
-  }
-
-  void _onUpdateDateRange(UpdateDateRangeEvent event, Emitter<ActionState> emit) async {
-    startTime = event.startTime;
-    endTime = event.endTime;
-    actions = await DatabaseHandler.getActions(
-        startTime: startTime.millisecondsSinceEpoch,
-        endTime: endTime.millisecondsSinceEpoch,
-        type: type
-    );
-
-    emit(ActionLoadedState(actions: actions));
   }
 
   void _onDeleteActionFromList(DeleteActionFromListEvent event, Emitter<ActionState> emit) async {

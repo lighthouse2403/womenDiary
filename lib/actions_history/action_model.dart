@@ -1,4 +1,4 @@
-import 'package:women_diary/actions_history/action_type.dart';
+import 'package:women_diary/database/data_handler.dart';
 
 class ActionModel {
    String id = '${DateTime.now().millisecondsSinceEpoch}';
@@ -6,7 +6,7 @@ class ActionModel {
    String title = '';
    String note = '';
    String cycleId = '';
-   ActionType type = ActionType.stomachache;
+   String typeId = '';
    DateTime time = DateTime.now();
 
   ActionModel({
@@ -21,7 +21,7 @@ class ActionModel {
     this.title  = title;
     this.note   = note;
     this.time   = time;
-    this.type   = ActionType.stomachache;
+    this.typeId = '';
   }
 
   ActionModel.fromDatabase(Map<String, dynamic> json) {
@@ -31,7 +31,7 @@ class ActionModel {
     note = json['note'];
     cycleId = json['cycleId'];
     time = DateTime.fromMillisecondsSinceEpoch(json['time'] as int);
-    type = (json['type'] as int).toActionType();
+    typeId = json['typeId'];
   }
 
   Map<String, dynamic> toJson() {
@@ -41,8 +41,46 @@ class ActionModel {
     data['title'] = title;
     data['note'] = note;
     data['time'] = time.millisecondsSinceEpoch;
-    data['type'] = type.index;
+    data['typeId'] = typeId;
     data['cycleId'] = cycleId;
+    return data;
+  }
+}
+
+class ActionTypeModel {
+  String id = '${DateTime.now().millisecondsSinceEpoch}';
+  String emoji = '';
+  String title = '';
+  DateTime createdTime = DateTime.now();
+  DateTime updatedTime = DateTime.now();
+
+  ActionTypeModel({
+    required this.id,
+    required this.emoji,
+    required this.title
+  });
+
+  ActionTypeModel.init(String title, String emoji) {
+    this.id = '${DateTime.now().millisecondsSinceEpoch}';
+    this.emoji  = emoji;
+    this.title  = title;
+  }
+
+  ActionTypeModel.fromDatabase(Map<String, dynamic> json) {
+    id = json['id'];
+    emoji = json['emoji'];
+    title = json['title'];
+    createdTime = DateTime.fromMillisecondsSinceEpoch(json['createdTime'] as int);
+    updatedTime = DateTime.fromMillisecondsSinceEpoch(json['updatedTime'] as int);
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['emoji'] = emoji;
+    data['title'] = title;
+    data['createdTime'] = createdTime.millisecondsSinceEpoch;
+    data['updatedTime'] = updatedTime.millisecondsSinceEpoch;
     return data;
   }
 }

@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/action_model.dart';
 
 class ActionEvent extends Equatable {
@@ -24,12 +23,12 @@ class DetectCycleEvent extends ActionEvent {
 }
 
 class UpdateActionTypeEvent extends ActionEvent {
-  final ActionType? actionType;
+  final ActionTypeModel? actionType;
 
   const UpdateActionTypeEvent(this.actionType);
 
   @override
-  List<Object?> get props => [actionType];
+  List<Object?> get props => [actionType?.id];
 }
 
 class UpdateDateRangeEvent extends ActionEvent {

@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:women_diary/actions_history/action_type.dart';
 import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 
@@ -15,12 +14,12 @@ class ActionHistoryInitial extends ActionState {}
 class ActionHistoryLoading extends ActionState {}
 
 class ActionTypeUpdatedState extends ActionState {
-  final ActionType? type;
-
-  const ActionTypeUpdatedState({required this.type});
+  final ActionTypeModel? type;
+  final List<ActionTypeModel> allType;
+  const ActionTypeUpdatedState({required this.type, required this.allType});
 
   @override
-  List<Object?> get props => [type];
+  List<Object?> get props => [type?.id, allType.length];
 }
 
 class ActionLoadedState extends ActionState {
