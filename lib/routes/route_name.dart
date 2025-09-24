@@ -26,6 +26,9 @@ class RoutesName {
   static const String actionHistory = '/actionHistory';
   static const String actionDetail = '/actionHistory/actionDetail';
   static const String newAction = '/actionHistory/newAction';
+  static const String actionType = '/actionHistory/actionType';
+  static const String newActionType = '/actionHistory/actionType/newActionType';
+  static const String actionTypeDetail = '/actionHistory/actionType/actionTypeDetail';
 
   /// Schedule
   static const String schedules = '/schedules';

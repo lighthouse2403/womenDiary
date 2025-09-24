@@ -2,12 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:women_diary/_gen/assets.gen.dart';
 import 'package:women_diary/actions_history/action_list/component/action_row.dart';
 import 'package:women_diary/actions_history/action_list/component/filter_chips.dart';
 import 'package:women_diary/actions_history/bloc/action_bloc.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
 import 'package:women_diary/actions_history/action_model.dart';
+import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/routes/route_name.dart';
@@ -30,8 +32,21 @@ class _ActionHistoryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: SafeArea(
+    return Scaffold(
+      appBar: BaseAppBar(
+        backgroundColor: Colors.pink[200],
+        hasBack: true,
+        title: 'Hành động',
+        actions: [
+          InkWell(
+            onTap: () {
+              context.navigateTo(RoutesName.actionType);
+            },
+            child: Assets.icons.setting.svg(width: 14, height: 14),
+          )
+        ],
+      ),
+      body: SafeArea(
         child: Stack(
           children: [
             Column(

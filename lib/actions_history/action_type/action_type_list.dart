@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class ActionType {
+class ActionTypeTemp {
   final String id;
   final String name;
   final String emoji;
   final Color color;
 
-  ActionType({
+  ActionTypeTemp({
     required this.id,
     required this.name,
     required this.emoji,
@@ -14,18 +14,18 @@ class ActionType {
   });
 }
 
-class ActionTypeListScreen extends StatefulWidget {
-  const ActionTypeListScreen({Key? key}) : super(key: key);
+class ActionTypeList extends StatefulWidget {
+  const ActionTypeList({Key? key}) : super(key: key);
 
   @override
-  State<ActionTypeListScreen> createState() => _ActionTypeListScreenState();
+  State<ActionTypeList> createState() => _ActionTypeListState();
 }
 
-class _ActionTypeListScreenState extends State<ActionTypeListScreen> {
-  final List<ActionType> _items = [
-    ActionType(id: '1', name: 'Đi bộ', emoji: '🚶‍♀️', color: Colors.green),
-    ActionType(id: '2', name: 'Chạy bộ', emoji: '🏃‍♂️', color: Colors.orange),
-    ActionType(id: '3', name: 'Ngủ', emoji: '😴', color: Colors.blue),
+class _ActionTypeListState extends State<ActionTypeList> {
+  final List<ActionTypeTemp> _items = [
+    ActionTypeTemp(id: '1', name: 'Đi bộ', emoji: '🚶‍♀️', color: Colors.green),
+    ActionTypeTemp(id: '2', name: 'Chạy bộ', emoji: '🏃‍♂️', color: Colors.orange),
+    ActionTypeTemp(id: '3', name: 'Ngủ', emoji: '😴', color: Colors.blue),
   ];
 
   void _removeItem(String id) {

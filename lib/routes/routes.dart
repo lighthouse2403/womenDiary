@@ -2,6 +2,7 @@ import 'package:women_diary/actions_history/action_detail/action_detail.dart';
 import 'package:women_diary/actions_history/action_detail/new_action.dart';
 import 'package:women_diary/actions_history/action_list/action_history.dart';
 import 'package:women_diary/actions_history/action_model.dart';
+import 'package:women_diary/actions_history/action_type/action_type_list.dart';
 import 'package:women_diary/bottom_tab_bar/bottom_tab_bar.dart';
 import 'package:women_diary/chat/chat_detail.dart';
 import 'package:women_diary/chat/chat_list.dart';
@@ -122,6 +123,26 @@ class Routes {
           path: RoutesName.newAction,
           pageBuilder: (context, state) {
             return _createPageFadeTransition(state: state, child: NewAction());
+          },
+        ),
+        GoRoute(
+          path: RoutesName.actionType,
+          pageBuilder: (context, state) {
+            return _createPageFadeTransition(state: state, child: ActionTypeList());
+          },
+        ),
+        GoRoute(
+          path: RoutesName.newActionType,
+          pageBuilder: (context, state) {
+            return _createPageFadeTransition(state: state, child: ActionTypeList());
+          },
+        ),
+        GoRoute(
+          path: RoutesName.actionTypeDetail,
+          pageBuilder: (context, state) {
+            ActionTypeModel actionTypeDetail = state.extra as ActionTypeModel;
+
+            return _createPageFadeTransition(state: state, child: ActionTypeList());
           },
         ),
         GoRoute(
