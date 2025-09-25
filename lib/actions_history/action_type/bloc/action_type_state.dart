@@ -14,7 +14,11 @@ class ActionTypeLoadedState extends ActionTypeState {
   const ActionTypeLoadedState({required this.actionTypes});
 
   @override
-  List<Object?> get props => [DateTime.now().microsecondsSinceEpoch];
+  List<Object?> get props => [
+    actionTypes.map((e) => e.title),
+    actionTypes.map((e) => e.emoji),
+    DateTime.now().microsecondsSinceEpoch
+  ];
 }
 
 class ActionTypeLoadedErrorState extends ActionTypeState {
