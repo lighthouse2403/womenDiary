@@ -17,11 +17,12 @@ class FilterChips extends StatelessWidget {
             ? state.type : null;
         List<ActionTypeModel> allType = state is ActionTypeUpdatedState
             ? state.allType : [];
-        print('selectedType ${selectedType}');
+        print('selectedType ${selectedType?.title}');
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           child: Wrap(
             spacing: 8,
+            runSpacing: 6,
             children: [
               _chip(
                 context,
@@ -33,7 +34,7 @@ class FilterChips extends StatelessWidget {
               ...allType.map((type) => _chip(
                 context,
                 label: type.title,
-                selected: selectedType == type,
+                selected: selectedType?.id == type.id,
                 onTap: () => context
                     .read<ActionBloc>()
                     .add(UpdateActionTypeEvent(type)),
@@ -49,6 +50,7 @@ class FilterChips extends StatelessWidget {
       {required String label,
         required bool selected,
         required VoidCallback onTap}) {
+    print('${label} ${selected}');
     return ChoiceChip(
       label: Text(label,
           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
@@ -58,7 +60,7 @@ class FilterChips extends StatelessWidget {
       labelStyle: TextStyle(
         color: selected ? Colors.pink.shade700 : Colors.black87,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
         side: BorderSide(

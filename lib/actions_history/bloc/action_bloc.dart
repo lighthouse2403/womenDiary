@@ -37,8 +37,11 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
 
   Future<void> _onLoadActions(LoadActionEvent event, Emitter<ActionState> emit) async {
     cycleList = await DatabaseHandler.getAllCycle();
+    List<ActionTypeModel> types = await DatabaseHandler.getAllActionType();
     actions = await DatabaseHandler.getActionsByType(typeId: type?.id);
+    emit(ActionTypeUpdatedState(type: type, allType: types));
     emit(ActionLoadedState(actions: actions));
+
   }
 
   void _onUpdateActionType(UpdateActionTypeEvent event, Emitter<ActionState> emit) async {
@@ -46,7 +49,6 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
     actions = await DatabaseHandler.getActionsByType(typeId: type?.id);
     List<ActionTypeModel> types = await DatabaseHandler.getAllActionType();
 
-    print('type: ${type?.title}');
     emit(ActionTypeUpdatedState(type: type, allType: types));
     emit(ActionLoadedState(actions: actions));
   }

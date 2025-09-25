@@ -46,7 +46,7 @@ class _ActionHistoryView extends StatelessWidget {
             borderRadius: BorderRadius.circular(30),
             child: Padding(
               padding: const EdgeInsets.all(12),
-              child: Assets.icons.setting.svg(width: 20, height: 20, colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+              child: Assets.icons.setting.svg(width: 22, height: 22, colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn)),
             ),
           )
         ],
