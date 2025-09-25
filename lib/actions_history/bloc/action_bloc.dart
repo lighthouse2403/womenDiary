@@ -1,6 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:women_diary/actions_history/action_type/bloc/action_type_event.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
 import 'package:women_diary/actions_history/action_model.dart';
@@ -40,7 +38,12 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
   Future<void> _onLoadActions(LoadActionEvent event, Emitter<ActionState> emit) async {
     cycleList = await DatabaseHandler.getAllCycle();
     List<ActionTypeModel> types = await DatabaseHandler.getAllActionType();
+    print('load action ${type?.id}');
+
     actions = await DatabaseHandler.getActionsByType(typeId: type?.id);
+
+    print('actions ${actions.map((e) => e.toJson())}');
+
     emit(ActionTypeUpdatedState(type: type, allType: types));
     emit(ActionLoadedState(actions: actions));
 
@@ -53,6 +56,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
 
   void _onUpdateActionType(UpdateActionTypeEvent event, Emitter<ActionState> emit) async {
     type = event.actionType;
+    actionDetail.typeId = type?.id ?? '';
     actions = await DatabaseHandler.getActionsByType(typeId: type?.id);
     List<ActionTypeModel> types = await DatabaseHandler.getAllActionType();
 

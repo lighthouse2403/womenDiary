@@ -397,7 +397,7 @@ class DatabaseHandler {
     final List<Map<String, dynamic>> list = await db.query(
       actionTable,
       where: "typeId = ?",
-      whereArgs: [typeId],
+      whereArgs: [typeId ?? ''],
       orderBy: 'time DESC',
     );
     print('list ${list}');
