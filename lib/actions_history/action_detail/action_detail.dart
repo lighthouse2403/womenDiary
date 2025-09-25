@@ -21,7 +21,7 @@ class ActionDetail extends StatelessWidget {
     return BlocProvider(
       create: (_) => ActionBloc()
         ..add(InitActionDetailEvent(action))
-        ..add(DetectCycleEvent(action.time)),
+        ..add(DetectCycleEvent(action.time))..add(LoadAllActionTypeEvent()),
       child: _ActionDetailView(action: action),
     );
   }
@@ -346,7 +346,7 @@ class _ActionDetailView extends StatelessWidget {
               spacing: 12,
               runSpacing: 12,
               children: allType.map((type) {
-                final isSelected = selectedType == type;
+                final isSelected = selectedType?.id == type.id;
                 return ChoiceChip(
                   label: Text(type.title),
                   selected: isSelected,

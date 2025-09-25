@@ -18,7 +18,7 @@ class NewAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => ActionBloc()..add(DetectCycleEvent(DateTime.now())),
+      create: (_) => ActionBloc()..add(DetectCycleEvent(DateTime.now()))..add(LoadAllActionTypeEvent()),
       child: const _CreateActionView(),
     );
   }
@@ -331,7 +331,7 @@ class _CreateActionView extends StatelessWidget {
               spacing: 12,
               runSpacing: 12,
               children: allType.map((type) {
-                final isSelected = selectedType == type;
+                final isSelected = selectedType?.id == type.id;
                 return ChoiceChip(
                   label: Text(type.title),
                   selected: isSelected,

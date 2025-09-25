@@ -15,6 +15,13 @@ class LoadActionEvent extends ActionEvent {
   List<Object?> get props => [];
 }
 
+class LoadAllActionTypeEvent extends ActionEvent {
+  const LoadAllActionTypeEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 class DetectCycleEvent extends ActionEvent {
   const DetectCycleEvent(this.actionTime);
   final DateTime actionTime;

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:women_diary/actions_history/action_type/bloc/action_type_event.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
 import 'package:women_diary/actions_history/action_model.dart';
@@ -21,6 +22,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
   ActionBloc() : super(ActionHistoryLoading()) {
     on<LoadActionEvent>(_onLoadActions);
     on<UpdateActionTypeEvent>(_onUpdateActionType);
+    on<LoadAllActionTypeEvent>(_onLoadActionType);
 
     /// Action detail
     on<InitActionDetailEvent>(_onLoadActionDetail);
@@ -42,6 +44,11 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
     emit(ActionTypeUpdatedState(type: type, allType: types));
     emit(ActionLoadedState(actions: actions));
 
+  }
+
+  Future<void> _onLoadActionType(LoadAllActionTypeEvent event, Emitter<ActionState> emit) async {
+    List<ActionTypeModel> types = await DatabaseHandler.getAllActionType();
+    emit(ActionTypeUpdatedState(type: type, allType: types));
   }
 
   void _onUpdateActionType(UpdateActionTypeEvent event, Emitter<ActionState> emit) async {
