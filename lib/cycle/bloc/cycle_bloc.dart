@@ -1,11 +1,22 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/common/extension/date_time_extension.dart';
+import 'package:women_diary/common/notification_service.dart';
 import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/cycle/bloc/cycle_event.dart';
 import 'package:women_diary/cycle/bloc/cycle_state.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/database/local_storage_service.dart';
+
+enum CycleNotificationType {
+  follicular(0),
+  ovulation(1),
+  ovulationDay(2),
+  luteal(2);
+
+  final int value;
+  const CycleNotificationType(this.value);
+}
 
 class CycleBloc extends Bloc<CycleEvent, CycleState> {
   List<CycleModel> cycleList = [];
@@ -57,6 +68,10 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
         await DatabaseHandler.updateCycle(cycleList[i]);
       }
       await LocalStorageService.updateAverageCycleLength((totalCycleDays/countCycle).round());
+
+      /// Create new notification
+      handleCycleNotification(event.newCycle);
+
       emit(LoadedAllCycleState(cycleList));
     } catch (error) {
       // emit state lỗi nếu cần
@@ -101,22 +116,99 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
       /// Update average cycle length
       cycleList.sort((a, b) => a.cycleStartTime.compareTo(b.cycleStartTime));
 
-      int totalCycleDays = 0;
-      int countCycle = 0;
       for (int i = 0; i < cycleList.length; i++) {
         if (i < cycleList.length - 1) {
           cycleList[i].cycleEndTime =
               cycleList[i + 1].cycleStartTime.subtract(const Duration(days: 1));
-
-          totalCycleDays += cycleList[i].cycleEndTime.difference(cycleList[i].cycleStartTime).inDays;
-          countCycle += 1;
         }
 
         await DatabaseHandler.updateCycle(cycleList[i]);
       }
-      print('cycleList ${cycleList.length}');
+      CycleModel lastCycle = await DatabaseHandler.getLastCycle();
+      handleCycleNotification(lastCycle);
+
       emit(LoadedAllCycleState(cycleList));
     } catch (error) {
     }
+  }
+
+  void handleCycleNotification(CycleModel lastCycle) async {
+    await NotificationService().cancelNotification(CycleNotificationType.follicular.value);
+    await NotificationService().cancelNotification(CycleNotificationType.ovulation.value);
+    await NotificationService().cancelNotification(CycleNotificationType.ovulationDay.value);
+    await NotificationService().cancelNotification(CycleNotificationType.luteal.value);
+
+    DateTime menstruationNotification = DateTime(
+        lastCycle.menstruationEndTime.year,
+        lastCycle.menstruationEndTime.month,
+        lastCycle.menstruationEndTime.day,
+        8,
+        0
+    );
+
+    DateTime ovulationPhase = lastCycle.cycleEndTime.subtract(Duration(days: 18));
+    DateTime ovulationNotification = DateTime(
+        ovulationPhase.year,
+        ovulationPhase.month,
+        ovulationPhase.day,
+        8,
+        0
+    );
+
+    DateTime ovulationDate = lastCycle.cycleEndTime.subtract(Duration(days: 15));
+    DateTime ovulationDayNotification = DateTime(
+        ovulationDate.year,
+        ovulationDate.month,
+        ovulationDate.day,
+        8,
+        0
+    );
+
+    DateTime lutealDate = lastCycle.cycleEndTime.subtract(Duration(days: 13));
+    DateTime lutealNotification = DateTime(
+        lutealDate.year,
+        lutealDate.month,
+        lutealDate.day,
+        8,
+        0
+    );
+
+    /// Add notification if it's the future
+    if (lastCycle.menstruationEndTime.isAfter(DateTime.now())) {
+      await NotificationService().scheduleNotification(
+        id: CycleNotificationType.follicular.value,
+        title: "Giai đoạn an toàn",
+        body: '${lastCycle.menstruationEndTime.globalDateFormat()} ~ ${ovulationPhase.globalDateFormat()}',
+        scheduledTime: menstruationNotification,
+      );
+    }
+
+    if (ovulationNotification.isAfter(DateTime.now())) {
+      await NotificationService().scheduleNotification(
+        id: CycleNotificationType.ovulation.value,
+        title: "Giai đoạn nguyên hiểm",
+        body: '${lastCycle.menstruationEndTime.globalDateFormat()} ~ ${ovulationPhase.globalDateFormat()}',
+        scheduledTime: ovulationNotification,
+      );
+    }
+
+    if (ovulationDate.isAfter(DateTime.now())) {
+      await NotificationService().scheduleNotification(
+        id: CycleNotificationType.ovulationDay.value,
+        title: "Giai đoạn an toàn",
+        body: '${ovulationDate.globalDateFormat()}',
+        scheduledTime: ovulationDayNotification,
+      );
+    }
+
+    if (lutealDate.isAfter(DateTime.now())) {
+      await NotificationService().scheduleNotification(
+        id: CycleNotificationType.luteal.value,
+        title: "Giai đoạn an toàn",
+        body: '${lutealDate} ~ ${lastCycle.cycleEndTime.globalDateFormat()}',
+        scheduledTime: lutealNotification,
+      );
+    }
+
   }
 }
