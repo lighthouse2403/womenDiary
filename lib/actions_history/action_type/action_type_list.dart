@@ -1,77 +1,255 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:women_diary/actions_history/action_model.dart';
+import 'package:women_diary/actions_history/action_type/bloc/action_type_bloc.dart';
+import 'package:women_diary/actions_history/action_type/bloc/action_type_event.dart';
+import 'package:women_diary/actions_history/action_type/bloc/action_type_state.dart';
+import 'package:women_diary/common/base/base_app_bar.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 
-class ActionTypeTemp {
-  final String id;
-  final String name;
-  final String emoji;
-  final Color color;
-
-  ActionTypeTemp({
-    required this.id,
-    required this.name,
-    required this.emoji,
-    required this.color,
-  });
-}
-
-class ActionTypeList extends StatefulWidget {
-  const ActionTypeList({Key? key}) : super(key: key);
+class ActionTypeListScreen extends StatelessWidget {
+  const ActionTypeListScreen({super.key});
 
   @override
-  State<ActionTypeList> createState() => _ActionTypeListState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => ActionTypeBloc()..add(LoadActionTypeEvent()),
+      child: const _ActionTypeList(),
+    );
+  }
 }
 
-class _ActionTypeListState extends State<ActionTypeList> {
-  final List<ActionTypeTemp> _items = [
-    ActionTypeTemp(id: '1', name: 'Đi bộ', emoji: '🚶‍♀️', color: Colors.green),
-    ActionTypeTemp(id: '2', name: 'Chạy bộ', emoji: '🏃‍♂️', color: Colors.orange),
-    ActionTypeTemp(id: '3', name: 'Ngủ', emoji: '😴', color: Colors.blue),
-  ];
+class _ActionTypeList extends StatefulWidget {
+  const _ActionTypeList({Key? key}) : super(key: key);
 
-  void _removeItem(String id) {
-    setState(() => _items.removeWhere((item) => item.id == id));
+  @override
+  State<_ActionTypeList> createState() => _ActionTypeListState();
+}
+
+class _ActionTypeListState extends State<_ActionTypeList> {
+  final _titleController = TextEditingController();
+  final _emojiController = TextEditingController();
+
+  void _openBottomSheet(BuildContext context, {ActionTypeModel? item}) {
+    if (item != null) {
+      _titleController.text = item.title;
+      _emojiController.text = item.emoji;
+    } else {
+      _titleController.clear();
+      _emojiController.clear();
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (dialogContext) {
+        return SingleChildScrollView(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(dialogContext).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(item == null ? "Thêm Action Type" : "Cập nhật Action Type")
+                  .text18()
+                  .w600()
+                  .black87Color(),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _emojiController,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 28),
+                maxLength: 4,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                    RegExp(
+                      r'[\u{1F300}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]',
+                        unicode: true,
+                    ),
+                  ),
+                ],
+                decoration: InputDecoration(
+                  counterText: "",
+                  hintText: "🌸",
+                  filled: true,
+                  fillColor: Colors.pink.shade50,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  hintText: "Tên action type...",
+                  filled: true,
+                  fillColor: Colors.pink.shade50,
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 14,
+                    horizontal: 16,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  final title = _titleController.text.trim();
+                  final emoji = _emojiController.text.trim();
+                  print('update sction type: $title - $emoji');
+
+                  if (title.isNotEmpty && emoji.isNotEmpty) {
+                    if (item == null) {
+                      context
+                          .read<ActionTypeBloc>()
+                          .add(CreateActionTypeDetailEvent(title, emoji));
+                    } else {
+                      context.read<ActionTypeBloc>().add(
+                          UpdateActionTypeDetailEvent(
+                              id: item.id,
+                              title: title,
+                              emoji: emoji
+                          )
+                      );
+                    }
+                    Navigator.pop(dialogContext);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.pinkTextColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24, vertical: 14),
+                ),
+                child: const Text("Lưu").whiteColor().text16(),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _emojiController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Danh sách Action Type')),
-      body: _items.isEmpty
-          ? const Center(child: Text('Chưa có action type nào.'))
-          : ListView.builder(
-        itemCount: _items.length,
-        itemBuilder: (context, index) {
-          final item = _items[index];
-          return Dismissible(
-            key: ValueKey(item.id),
-            background: Container(
-              color: Colors.red,
-              alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const Icon(Icons.delete, color: Colors.white),
-            ),
-            secondaryBackground: Container(
-              color: Colors.red,
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: const Icon(Icons.delete, color: Colors.white),
-            ),
-            onDismissed: (_) => _removeItem(item.id),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: item.color,
-                child: Text(item.emoji, style: const TextStyle(fontSize: 18)),
-              ),
-              title: Text(item.name),
-            ),
+      backgroundColor: const Color(0xFFFFF9FB),
+      appBar: BaseAppBar(
+        hasBack: true,
+        title: 'Danh sách Action Type',
+        backgroundColor: AppColors.pinkTextColor,
+      ),
+      body: BlocBuilder<ActionTypeBloc, ActionTypeState>(
+        buildWhen: (pre, cur) => cur is ActionTypeLoadedState,
+        builder: (context, state) {
+          List<ActionTypeModel> actionTypes =
+          state is ActionTypeLoadedState ? state.actionTypes : [];
+          if (actionTypes.isEmpty) {
+            return Center(
+              child: Text('Chưa có action type nào.').text16().black87Color(),
+            );
+          }
+
+          return ListView.separated(
+            padding: const EdgeInsets.all(20),
+            itemCount: actionTypes.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 14),
+            itemBuilder: (context, index) {
+              final item = actionTypes[index];
+              return Dismissible(
+                key: ValueKey(item.id),
+                background: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.pinkTextColor,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                secondaryBackground: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.pinkTextColor,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                onDismissed: (_) {
+                  context
+                      .read<ActionTypeBloc>()
+                      .add(DeleteActionTypeEvent(item.id));
+                },
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () => _openBottomSheet(context, item: item),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.pink.shade100.withAlpha(80),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 18,
+                      ),
+                      leading: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFFFEEF2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(item.emoji).text30(),
+                      ),
+                      title:
+                      Text(item.title).w500().text17().black87Color(),
+                    ),
+                  ),
+                ),
+              );
+            },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _openBottomSheet(context),
+        backgroundColor: AppColors.pinkTextColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
 }
-
-// ---------------------------
-// USAGE EXAMPLE
-// runApp(MaterialApp(home: ActionTypeListScreen()));
-// ---------------------------

@@ -128,13 +128,13 @@ class Routes {
         GoRoute(
           path: RoutesName.actionType,
           pageBuilder: (context, state) {
-            return _createPageFadeTransition(state: state, child: ActionTypeList());
+            return _createPageFadeTransition(state: state, child: ActionTypeListScreen());
           },
         ),
         GoRoute(
           path: RoutesName.newActionType,
           pageBuilder: (context, state) {
-            return _createPageFadeTransition(state: state, child: ActionTypeList());
+            return _createPageFadeTransition(state: state, child: ActionTypeListScreen());
           },
         ),
         GoRoute(
@@ -142,7 +142,7 @@ class Routes {
           pageBuilder: (context, state) {
             ActionTypeModel actionTypeDetail = state.extra as ActionTypeModel;
 
-            return _createPageFadeTransition(state: state, child: ActionTypeList());
+            return _createPageFadeTransition(state: state, child: ActionTypeListScreen());
           },
         ),
         GoRoute(

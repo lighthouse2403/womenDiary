@@ -56,8 +56,8 @@ class ActionTypeModel {
 
   ActionTypeModel({
     required this.id,
+    required this.title,
     required this.emoji,
-    required this.title
   });
 
   ActionTypeModel.init(String title, String emoji) {

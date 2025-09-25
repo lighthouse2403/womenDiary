@@ -10,6 +10,7 @@ import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
 import 'package:women_diary/actions_history/action_model.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
+import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/routes/route_name.dart';
@@ -34,15 +35,19 @@ class _ActionHistoryView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: BaseAppBar(
-        backgroundColor: Colors.pink[200],
-        hasBack: true,
+        hasBack: false,
         title: 'Hành động',
+        backgroundColor: AppColors.pinkTextColor,
         actions: [
           InkWell(
             onTap: () {
-              context.navigateTo(RoutesName.actionType);
+              context.navigateTo(RoutesName.actionType).then((value) => context.read<ActionBloc>().add(const LoadActionEvent()));
             },
-            child: Assets.icons.setting.svg(width: 14, height: 14),
+            borderRadius: BorderRadius.circular(30),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Assets.icons.setting.svg(width: 20, height: 20, colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+            ),
           )
         ],
       ),

@@ -26,17 +26,22 @@ class InitActionTypeDetailEvent extends ActionTypeEvent {
 }
 
 class UpdateActionTypeDetailEvent extends ActionTypeEvent {
-  const UpdateActionTypeDetailEvent();
+  const UpdateActionTypeDetailEvent({required this.id, required this.title, required this.emoji});
+  final String title;
+  final String emoji;
+  final String id;
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [id, title, emoji];
 }
 
 class CreateActionTypeDetailEvent extends ActionTypeEvent {
-  const CreateActionTypeDetailEvent();
+  const CreateActionTypeDetailEvent(this.title, this.emoji);
 
+  final String title;
+  final String emoji;
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [title, emoji];
 }
 
 class DeleteActionTypeEvent extends ActionTypeEvent {

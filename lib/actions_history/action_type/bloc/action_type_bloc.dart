@@ -1,23 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:women_diary/actions_history/action_type/bloc/action_type_event.dart';
 import 'package:women_diary/actions_history/action_type/bloc/action_type_state.dart';
 import 'package:women_diary/actions_history/action_model.dart';
-import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/database/data_handler.dart';
 
 class ActionTypeBloc extends Bloc<ActionTypeEvent, ActionTypeState> {
 
-  ActionTypeModel typeDetail = ActionTypeModel.init('', '');
-
   ActionTypeBloc() : super(ActionTypeState()) {
     on<LoadActionTypeEvent>(_onLoadActionTypes);
-    on<InitActionTypeDetailEvent>(_onInitActionType);
 
-    /// Action detail
-    on<UpdateEmojiTypeEvent>(_onUpdatedEmoji);
-    on<UpdateTitleTypeEvent>(_onUpdatedTitle);
-    
+    on<DeleteActionTypeEvent>(_onDeletedActionType);
     on<UpdateActionTypeDetailEvent>(_onUpdatedActionType);
     on<CreateActionTypeDetailEvent>(_onCreateActionType);
   }
@@ -27,26 +19,29 @@ class ActionTypeBloc extends Bloc<ActionTypeEvent, ActionTypeState> {
     emit(ActionTypeLoadedState(actionTypes: actionTypes));
   }
 
-  void _onInitActionType(InitActionTypeDetailEvent event, Emitter<ActionTypeState> emit) async {
-    typeDetail = event.initialActionType;
-    emit(ActionTypeUpdatedState(typeDetail));
-  }
-
-  void _onUpdatedEmoji(UpdateEmojiTypeEvent event, Emitter<ActionTypeState> emit) async {
-    typeDetail.emoji = event.emoji;
-  }
-
-  void _onUpdatedTitle(UpdateTitleTypeEvent event, Emitter<ActionTypeState> emit) async {
-    typeDetail.title = event.title;
+  void _onDeletedActionType(DeleteActionTypeEvent event, Emitter<ActionTypeState> emit) async {
+    await DatabaseHandler.deleteActionType(event.id);
+    List<ActionTypeModel> actionTypes = await DatabaseHandler.getAllActionType();
+    emit(ActionTypeLoadedState(actionTypes: actionTypes));
   }
 
   void _onUpdatedActionType(UpdateActionTypeDetailEvent event, Emitter<ActionTypeState> emit) async {
-    await DatabaseHandler.updateActionType(typeDetail);
-    emit(ActionTypeSavedSuccessfullyState());
+    ActionTypeModel actionType = ActionTypeModel(id: event.id, title: event.title, emoji: event.emoji);
+    await DatabaseHandler.updateActionType(actionType);
+
+    print('updateActionType: ${actionType.toJson()}');
+
+    List<ActionTypeModel> actionTypes = await DatabaseHandler.getAllActionType();
+    print('updateActionType: ${actionTypes.map((e) => e.toJson())}');
+
+    emit(ActionTypeLoadedState(actionTypes: actionTypes));
   }
 
   void _onCreateActionType(CreateActionTypeDetailEvent event, Emitter<ActionTypeState> emit) async {
-    await DatabaseHandler.insertNewActionType(typeDetail);
-    emit(ActionTypeSavedSuccessfullyState());
+    ActionTypeModel newActionType = ActionTypeModel.init(event.title, event.emoji);
+    await DatabaseHandler.insertNewActionType(newActionType);
+
+    List<ActionTypeModel> actionTypes = await DatabaseHandler.getAllActionType();
+    emit(ActionTypeLoadedState(actionTypes: actionTypes));
   }
 }
