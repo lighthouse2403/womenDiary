@@ -373,8 +373,8 @@ class DatabaseHandler {
   static Future<List<ActionModel>> getActionsByType({String? typeId}) async {
     final db = await DatabaseHandler.db(actionTable);
 
-    // final whereClauses = <String>[];
-    // final whereArgs = <dynamic>[];
+    final whereClauses = <String>[];
+    final whereArgs = <dynamic>[];
     //
     // if (startTime != null) {
     //   whereClauses.add('time >= ?');
@@ -386,18 +386,18 @@ class DatabaseHandler {
     //   whereArgs.add(endTime);
     // }
 
-    // if (typeId != null) {
-    //   whereClauses.add('typeId = ?');
-    //   whereArgs.add(typeId);
-    // }
+    if (typeId != null) {
+      whereClauses.add('typeId = ?');
+      whereArgs.add(typeId);
+    }
 
 
-    // final whereString = whereClauses.isNotEmpty ? whereClauses.join(' AND ') : null;
+    final whereString = whereClauses.isNotEmpty ? whereClauses.join(' AND ') : null;
 
     final List<Map<String, dynamic>> list = await db.query(
       actionTable,
-      where: "typeId = ?",
-      whereArgs: [typeId ?? ''],
+      where: whereString,
+      whereArgs: whereArgs,
       orderBy: 'time DESC',
     );
     print('list ${list}');
@@ -444,6 +444,18 @@ class DatabaseHandler {
           actionTable,
           where: "id = ?",
           whereArgs: [id]);
+    } catch (err) {
+      debugPrint("Something went wrong when deleting an item: $err");
+    }
+  }
+
+  static Future<void> deleteActionByType(String typeId) async {
+    final db = await DatabaseHandler.db(actionTable);
+    try {
+      await db.delete(
+          actionTable,
+          where: "typeId = ?",
+          whereArgs: [typeId]);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }
@@ -501,6 +513,7 @@ class DatabaseHandler {
           actionTypeTable,
           where: "id = ?",
           whereArgs: [id]);
+      DatabaseHandler.deleteActionByType(id);
     } catch (err) {
       debugPrint("Something went wrong when deleting an item: $err");
     }

@@ -7,7 +7,6 @@ import 'package:women_diary/database/data_handler.dart';
 
 class ActionBloc extends Bloc<ActionEvent, ActionState> {
   /// Action list
-  List<ActionModel> actions = [];
   DateTime startTime = DateTime.now().subtract(Duration(days: 90));
   DateTime endTime = DateTime.now();
   ActionTypeModel? type;
@@ -40,9 +39,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
     List<ActionTypeModel> types = await DatabaseHandler.getAllActionType();
     print('load action ${type?.id}');
 
-    actions = await DatabaseHandler.getActionsByType(typeId: type?.id);
-
-    print('actions ${actions.map((e) => e.toJson())}');
+    List<ActionModel> actions = await DatabaseHandler.getActionsByType(typeId: type?.id);
 
     emit(ActionTypeUpdatedState(type: type, allType: types));
     emit(ActionLoadedState(actions: actions));
@@ -57,7 +54,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
   void _onUpdateActionType(UpdateActionTypeEvent event, Emitter<ActionState> emit) async {
     type = event.actionType;
     actionDetail.typeId = type?.id ?? '';
-    actions = await DatabaseHandler.getActionsByType(typeId: type?.id);
+    List<ActionModel> actions = await DatabaseHandler.getActionsByType(typeId: type?.id);
     List<ActionTypeModel> types = await DatabaseHandler.getAllActionType();
 
     emit(ActionTypeUpdatedState(type: type, allType: types));
@@ -72,7 +69,7 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
 
   void _onDeleteActionFromList(DeleteActionFromListEvent event, Emitter<ActionState> emit) async {
     await DatabaseHandler.deleteAction(event.id);
-    actions.removeWhere((action) => action.id == event.id);
+    List<ActionModel> actions = await DatabaseHandler.getActionsByType(typeId: type?.id);
     emit(ActionLoadedState(actions: actions));
   }
 
@@ -89,14 +86,19 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
   }
 
   void _onCreateActionDetail(CreateActionDetailEvent event, Emitter<ActionState> emit) async {
+    print('_onCreateActionDetail: ${actionDetail.toJson()}');
     await DatabaseHandler.insertNewAction(actionDetail);
+    actionDetail = ActionModel.init('', DateTime.now(), '', '');
+
+
     emit(ActionSavedSuccessfullyState());
   }
 
   void _onDeleteActionDetail(DeleteActionDetailEvent event, Emitter<ActionState> emit) async {
     await DatabaseHandler.deleteAction(event.id);
     actionDetail = ActionModel.init('', DateTime.now(), '', '');
-    emit(ActionSavedSuccessfullyState());
+    List<ActionModel> actions = await DatabaseHandler.getActionsByType(typeId: type?.id);
+    emit(ActionLoadedState(actions: actions));
   }
 
   void _onUpdateEmoji(UpdateEmojiEvent event, Emitter<ActionState> emit) async {
