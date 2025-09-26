@@ -31,7 +31,7 @@ class CycleSetupBloc extends Bloc<CycleSetupEvent, CycleSetupState> {
     lastPeriodDate = event.date;
   }
 
-  void _submitCycleInformation(SubmitCycleInformationEvent event, Emitter<CycleSetupState> emit) {
+  Future<void> _submitCycleInformation(SubmitCycleInformationEvent event, Emitter<CycleSetupState> emit) async {
     LocalStorageService.updateCycleLength(cycleLength);
     LocalStorageService.updateMenstruationLength(menstruationLength);
 
@@ -40,7 +40,7 @@ class CycleSetupBloc extends Bloc<CycleSetupEvent, CycleSetupState> {
         lastPeriodDate.add(Duration(days: cycleLength - 1)),
         lastPeriodDate.add(Duration(days: menstruationLength - 1))
     );
-    DatabaseHandler.insertCycle(cycle);
+    await DatabaseHandler.insertCycle(cycle);
     emit(SavedCycleInformationState());
   }
 }
