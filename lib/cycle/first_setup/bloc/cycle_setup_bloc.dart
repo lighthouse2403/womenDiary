@@ -29,6 +29,7 @@ class CycleSetupBloc extends Bloc<CycleSetupEvent, CycleSetupState> {
 
   void _onChangingLastPeriodDate(LastPeriodDateChangedEvent event, Emitter<CycleSetupState> emit) {
     lastPeriodDate = event.date;
+    emit(UpdatedLastPeriodDateState(lastPeriodDate));
   }
 
   Future<void> _submitCycleInformation(SubmitCycleInformationEvent event, Emitter<CycleSetupState> emit) async {
