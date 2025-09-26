@@ -33,8 +33,8 @@ class CycleSetupBloc extends Bloc<CycleSetupEvent, CycleSetupState> {
   }
 
   Future<void> _submitCycleInformation(SubmitCycleInformationEvent event, Emitter<CycleSetupState> emit) async {
-    LocalStorageService.updateCycleLength(cycleLength);
-    LocalStorageService.updateMenstruationLength(menstruationLength);
+    await LocalStorageService.updateCycleLength(cycleLength);
+    await LocalStorageService.updateMenstruationLength(menstruationLength);
 
     CycleModel cycle = CycleModel.init(
         lastPeriodDate,

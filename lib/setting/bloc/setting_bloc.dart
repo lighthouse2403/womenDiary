@@ -28,28 +28,28 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     emit(UpdateGoalState(goal));
   }
 
-  void _onUpdateCycleLength(UpdateCycleLengthEvent event, Emitter<SettingState> emit) {
-    LocalStorageService.updateCycleLength(event.value);
+  Future<void> _onUpdateCycleLength(UpdateCycleLengthEvent event, Emitter<SettingState> emit) async {
+    await LocalStorageService.updateCycleLength(event.value);
     emit(UpdateCycleLengthState(event.value));
   }
 
-  void _onUpdateMenstruationLength(UpdateMenstruationLengthEvent event, Emitter<SettingState> emit) {
-    LocalStorageService.updateMenstruationLength(event.value);
+  Future<void> _onUpdateMenstruationLength(UpdateMenstruationLengthEvent event, Emitter<SettingState> emit) async {
+    await LocalStorageService.updateMenstruationLength(event.value);
     emit(UpdateMenstruationLengthState(event.value));
   }
 
-  void _onToggleAverage(ToggleAverageEvent event, Emitter<SettingState> emit) {
-    LocalStorageService.updateUsingAverageValue(event.value);
+  Future<void> _onToggleAverage(ToggleAverageEvent event, Emitter<SettingState> emit) async {
+    await LocalStorageService.updateUsingAverageValue(event.value);
     emit(UpdateUsingAverageState(event.value));
   }
 
-  void _onToggleBiometricEnabled(UpdateUsingBiometricEvent event, Emitter<SettingState> emit) {
-    LocalStorageService.updateUsingBiometric(event.value);
+  Future<void> _onToggleBiometricEnabled(UpdateUsingBiometricEvent event, Emitter<SettingState> emit) async {
+    await LocalStorageService.updateUsingBiometric(event.value);
     emit(UpdateUsingBiometricState(event.value));
   }
 
-  void _onUpdateUserGoal(UpdateUserGoal event, Emitter<SettingState> emit) {
-    LocalStorageService.updateGoal(event.goal);
+  Future<void> _onUpdateUserGoal(UpdateUserGoal event, Emitter<SettingState> emit) async {
+    await LocalStorageService.updateGoal(event.goal);
     emit(UpdateGoalState(event.goal));
   }
 }

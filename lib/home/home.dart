@@ -126,7 +126,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         icon: const Icon(Icons.settings),
         label: const Text("Thiết lập cá nhân").text16().w700(),
         onPressed: () {
-          context.navigateTo(RoutesName.setting);
+          context.navigateTo(RoutesName.setting).then((value) => context.read<HomeBloc>().add(LoadCycleEvent()));
         },
       ),
     );
