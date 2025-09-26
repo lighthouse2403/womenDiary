@@ -76,6 +76,9 @@ class ActionBloc extends Bloc<ActionEvent, ActionState> {
   /// --------------------------- Action Detail --------------------------------
   void _onLoadActionDetail(InitActionDetailEvent event, Emitter<ActionState> emit) async {
     actionDetail = event.initialAction;
+    type = await DatabaseHandler.getActionType(actionDetail.typeId);
+    List<ActionTypeModel> types = await DatabaseHandler.getAllActionType();
+    emit(ActionTypeUpdatedState(type: type, allType: types));
     emit(EmojiUpdatedState(actionDetail.emoji));
     emit(TimeUpdatedState(actionDetail.time));
   }
