@@ -173,7 +173,7 @@ class DatabaseHandler {
 
     // Chỉ lấy các cycle trong quá khứ hoặc đang diễn ra
     final pastCycles = allCycle.where(
-          (e) => e.cycleStartTime.isBefore(now) || e.cycleStartTime.isAtSameMomentAs(now),
+          (e) => e.cycleEndTime.isBefore(now) || e.cycleEndTime.isAtSameMomentAs(now),
     ).toList();
 
     if (pastCycles.isEmpty) return 30;

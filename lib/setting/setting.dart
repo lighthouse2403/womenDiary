@@ -370,7 +370,7 @@ class _SettingViewState extends State<SettingView> {
     builder: (context, state) {
       bool isEnabled =
       (state is UpdateUsingAverageState) ? state.isUsingAverage : false;
-      int avgLength = LocalStorageService.getAverageCycleLength();
+      int avgLength = (state is UpdateUsingAverageState) ? state.averageCycle : 30;
 
       print('avgLength: ${avgLength}');
       return Column(
