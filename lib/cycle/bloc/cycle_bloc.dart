@@ -195,7 +195,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
     if (ovulationDate.isAfter(DateTime.now())) {
       await NotificationService().scheduleNotification(
         id: CycleNotificationType.ovulationDay.value,
-        title: "Giai đoạn an toàn",
+        title: "Ngày rụng trứng",
         body: '${ovulationDate.globalDateFormat()}',
         scheduledTime: ovulationDayNotification,
       );
