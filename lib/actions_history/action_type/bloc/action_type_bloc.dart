@@ -8,6 +8,7 @@ class ActionTypeBloc extends Bloc<ActionTypeEvent, ActionTypeState> {
 
   ActionTypeBloc() : super(ActionTypeState()) {
     on<LoadActionTypeEvent>(_onLoadActionTypes);
+    on<UpdateActionTypeEvent>(_onUpdateActionType);
 
     on<DeleteActionTypeEvent>(_onDeletedActionType);
     on<UpdateActionTypeDetailEvent>(_onUpdatedActionType);
@@ -17,6 +18,10 @@ class ActionTypeBloc extends Bloc<ActionTypeEvent, ActionTypeState> {
   Future<void> _onLoadActionTypes(LoadActionTypeEvent event, Emitter<ActionTypeState> emit) async {
     List<ActionTypeModel> actionTypes = await DatabaseHandler.getAllActionType();
     emit(ActionTypeLoadedState(actionTypes: actionTypes));
+  }
+
+  Future<void> _onUpdateActionType(UpdateActionTypeEvent event, Emitter<ActionTypeState> emit) async {
+    emit(SaveButtonState(event.title.isNotEmpty && event.emoji.isNotEmpty));
   }
 
   void _onDeletedActionType(DeleteActionTypeEvent event, Emitter<ActionTypeState> emit) async {

@@ -33,6 +33,7 @@ class _ActionTypeListState extends State<_ActionTypeList> {
   final _emojiController = TextEditingController();
 
   void _openBottomSheet(BuildContext context, {ActionTypeModel? item}) {
+    // giữ nguyên behavior ban đầu (prefill nếu edit)
     if (item != null) {
       _titleController.text = item.title;
       _emojiController.text = item.emoji;
@@ -41,6 +42,9 @@ class _ActionTypeListState extends State<_ActionTypeList> {
       _emojiController.clear();
     }
 
+    final bloc = context.read<ActionTypeBloc>();
+    bloc.add(UpdateActionTypeEvent(_emojiController.text, _titleController.text));
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -48,98 +52,120 @@ class _ActionTypeListState extends State<_ActionTypeList> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (dialogContext) {
-        return SingleChildScrollView(
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: MediaQuery.of(dialogContext).viewInsets.bottom + 20,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(item == null ? "Thêm Action Type" : "Cập nhật Action Type")
-                  .text18()
-                  .w600()
-                  .black87Color(),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _emojiController,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 28),
-                maxLength: 4,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                    RegExp(
-                      r'[\u{1F300}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]',
-                        unicode: true,
-                    ),
-                  ),
-                ],
-                decoration: InputDecoration(
-                  counterText: "",
-                  hintText: "🌸",
-                  filled: true,
-                  fillColor: Colors.pink.shade50,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _titleController,
-                decoration: InputDecoration(
-                  hintText: "Tên action type...",
-                  filled: true,
-                  fillColor: Colors.pink.shade50,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 14,
-                    horizontal: 16,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  final title = _titleController.text.trim();
-                  final emoji = _emojiController.text.trim();
-                  print('update sction type: $title - $emoji');
+        // đảm bảo bottom sheet dùng cùng instance bloc
+        return BlocProvider.value(
+          value: bloc,
+          child: BlocBuilder<ActionTypeBloc, ActionTypeState>(
+            builder: (context, state) {
+              final bool isValid = (state is SaveButtonState)
+                  ? state.isEnable
+                  : (_titleController.text.trim().isNotEmpty &&
+                  _emojiController.text.trim().isNotEmpty);
 
-                  if (title.isNotEmpty && emoji.isNotEmpty) {
-                    if (item == null) {
-                      context
-                          .read<ActionTypeBloc>()
-                          .add(CreateActionTypeDetailEvent(title, emoji));
-                    } else {
-                      context.read<ActionTypeBloc>().add(
-                          UpdateActionTypeDetailEvent(
-                              id: item.id,
-                              title: title,
-                              emoji: emoji
-                          )
-                      );
-                    }
-                    Navigator.pop(dialogContext);
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.pinkTextColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24, vertical: 14),
+              return SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  top: 20,
+                  bottom: MediaQuery.of(dialogContext).viewInsets.bottom + 20,
                 ),
-                child: const Text("Lưu").whiteColor().text16(),
-              ),
-            ],
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(item == null ? "Thêm Action Type" : "Cập nhật Action Type")
+                        .text18()
+                        .w600()
+                        .black87Color(),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _emojiController,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 28),
+                      maxLength: 4,
+                      onChanged: (emoji) {
+                        context.read<ActionTypeBloc>().add(UpdateActionTypeEvent(emoji, _titleController.text));
+                      },
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(
+                            r'[\u{1F300}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1F9FF}]',
+                            unicode: true,
+                          ),
+                        ),
+                      ],
+                      decoration: InputDecoration(
+                        counterText: "",
+                        hintText: "🌸",
+                        filled: true,
+                        fillColor: Colors.pink.shade50,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _titleController,
+                      onChanged: (title) {
+                        context.read<ActionTypeBloc>().add(UpdateActionTypeEvent(_emojiController.text, title));
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Tên action type...",
+                        filled: true,
+                        fillColor: Colors.pink.shade50,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                          horizontal: 16,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: isValid
+                          ? () {
+                        final title = _titleController.text.trim();
+                        final emoji = _emojiController.text.trim();
+                        // giữ nguyên logic tạo/update như file gốc
+                        if (title.isNotEmpty && emoji.isNotEmpty) {
+                          if (item == null) {
+                            context
+                                .read<ActionTypeBloc>()
+                                .add(CreateActionTypeDetailEvent(title, emoji));
+                          } else {
+                            context.read<ActionTypeBloc>().add(
+                              UpdateActionTypeDetailEvent(
+                                id: item.id,
+                                title: title,
+                                emoji: emoji,
+                              ),
+                            );
+                          }
+                          Navigator.pop(dialogContext);
+                        }
+                      }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isValid ? AppColors.pinkTextColor : Colors.grey.shade400,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 14,
+                        ),
+                      ),
+                      child: const Text("Lưu").text16().whiteColor().w500(),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         );
       },
