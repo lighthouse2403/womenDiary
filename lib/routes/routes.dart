@@ -81,13 +81,6 @@ class Routes {
               pageBuilder: (context, state) {
                 return _createPageFadeTransition(state: state, child: ActionHistory());
               },
-            ),
-            GoRoute(
-              parentNavigatorKey: _shellNavigatorKey,
-              path: RoutesName.chat,
-              pageBuilder: (context, state) {
-                return _createPageFadeTransition(state: state, child: Chat());
-              },
             )
           ],
         ),
