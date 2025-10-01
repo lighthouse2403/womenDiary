@@ -47,20 +47,65 @@ class CycleDetail extends StatelessWidget {
             if (state is CycleSavedSuccessfullyState) {
               showDialog(
                 context: context,
-                barrierDismissible: false,
-                builder: (_) {
-                  return AlertDialog(
-                    title: const Text('Thông báo'),
-                    content: const Text('Đã lưu thành công!'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          context.pop();
-                        },
-                        child: const Text('OK'),
+                builder: (dialogContext) {
+                  return Dialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Icon nữ tính
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.pink.shade50,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: const EdgeInsets.all(16),
+                            child: Icon(
+                              Icons.favorite,
+                              color: Colors.pinkAccent,
+                              size: 48,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            "Thành công!",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.pink.shade700,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            "Dữ liệu của bạn đã được lưu lại 💕",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16, color: Colors.black87),
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(dialogContext);
+                              context.pop();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.pinkAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                            ),
+                            child: const Text(
+                              "OK",
+                              style: TextStyle(fontSize: 16, color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   );
                 },
               );

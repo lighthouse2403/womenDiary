@@ -19,7 +19,6 @@ enum CycleNotificationType {
 }
 
 class CycleBloc extends Bloc<CycleEvent, CycleState> {
-  List<CycleModel> cycleList = [];
   CycleModel cycleDetail = CycleModel(DateTime.now());
   List<ActionModel> actions = [];
 
@@ -34,7 +33,8 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
 
   Future<void> _loadAllCycle(LoadAllCycleEvent event, Emitter<CycleState> emit) async {
     try {
-      cycleList = await DatabaseHandler.getAllCycle();
+      final List<CycleModel> cycleList = await DatabaseHandler.getAllCycle();
+      print('_loadAllCycle ${cycleList.map((e) => e.note)}');
       emit(LoadedAllCycleState(cycleList));
     } catch (error) {
     }
@@ -50,7 +50,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
       await DatabaseHandler.insertCycle(event.newCycle);
 
       // Lấy lại toàn bộ danh sách cycle và sắp xếp theo ngày bắt đầu
-      cycleList = await DatabaseHandler.getAllCycle();
+      List<CycleModel> cycleList = await DatabaseHandler.getAllCycle();
       cycleList.sort((a, b) => a.cycleStartTime.compareTo(b.cycleStartTime));
 
       int totalCycleDays = 0;
@@ -102,6 +102,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
   Future<void> _updateCycleDetail(UpdateCycleEvent event, Emitter<CycleState> emit) async {
     try {
       await DatabaseHandler.updateCycle(cycleDetail);
+      print('_updateCycleDetail ${cycleDetail.note}');
       emit(CycleSavedSuccessfullyState());
     } catch (error) {
       // Có thể emit state lỗi ở đây
@@ -111,8 +112,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
   Future<void> _deleteCycle(DeleteCycleEvent event, Emitter<CycleState> emit) async {
     try {
       await DatabaseHandler.deleteCycleById(event.id);
-      cycleList.removeWhere((e) => e.id == event.id);
-
+      List<CycleModel> cycleList = await DatabaseHandler.getAllCycle();
       /// Update average cycle length
       cycleList.sort((a, b) => a.cycleStartTime.compareTo(b.cycleStartTime));
 
