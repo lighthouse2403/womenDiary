@@ -1,0 +1,1 @@
+ /Users/dangnguyen/Downloads/Projects/women_diary/.dart_tool/flutter_build/f273c3d44eab07b19f84b2d38eecb3d9/native_assets.json: 
