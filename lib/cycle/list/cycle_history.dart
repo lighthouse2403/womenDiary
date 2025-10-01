@@ -56,12 +56,7 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
           ),
           IconButton(
             onPressed: () {
-              context
-                  .navigateTo(
-                RoutesName.cycleCalendar,
-                arguments: context.read<CycleBloc>().cycleList,
-              )
-                  .then((_) {
+              context.navigateTo(RoutesName.cycleCalendar).then((_) {
                 context.read<CycleBloc>().add(const LoadAllCycleEvent());
               });
             },
@@ -74,10 +69,15 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
         ],
       ),
       body: BlocBuilder<CycleBloc, CycleState>(
-        buildWhen: (pre, current) => current is LoadedAllCycleState,
+        buildWhen: (pre, current) {
+          print('pre: $pre current: $current');
+          return current is LoadedAllCycleState;
+        },
         builder: (context, state) {
+          print('State: $state');
           if (state is LoadedAllCycleState && state.cycleList.isNotEmpty) {
             final filtered = _applyFilter(state.cycleList);
+            print('LoadedAllCycleState: ${state.cycleList.map((e) => e.note)}');
             return _buildBody(filtered);
           }
           return const EmptyView(
@@ -91,6 +91,7 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
 
   // ===== Body với chart + list =====
   Widget _buildBody(List<CycleModel> list) {
+    print("build list: ${list.map((e) => e.note)}");
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -140,7 +141,9 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
       ),
       child: GestureDetector(
         onTap: () {
-          context.navigateTo(RoutesName.cycleDetail, arguments: cycle);
+          context.navigateTo(RoutesName.cycleDetail, arguments: cycle).then((_) {
+            return context.read<CycleBloc>().add(LoadAllCycleEvent());
+          });
         },
         child: _buildCycleCard(cycle, cycleDays, menstruationDays, totalRatio, menstruationRatio, isCurrent),
       ),

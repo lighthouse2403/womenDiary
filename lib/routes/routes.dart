@@ -101,7 +101,6 @@ class Routes {
         GoRoute(
           path: RoutesName.cycleCalendar,
           pageBuilder: (context, state) {
-            List<CycleModel> cycleList = state.extra as List<CycleModel>;
             return _createPageFadeTransition(state: state, child: CycleCalendar());
           },
         ),
@@ -128,20 +127,6 @@ class Routes {
         GoRoute(
           path: RoutesName.actionType,
           pageBuilder: (context, state) {
-            return _createPageFadeTransition(state: state, child: ActionTypeListScreen());
-          },
-        ),
-        GoRoute(
-          path: RoutesName.newActionType,
-          pageBuilder: (context, state) {
-            return _createPageFadeTransition(state: state, child: ActionTypeListScreen());
-          },
-        ),
-        GoRoute(
-          path: RoutesName.actionTypeDetail,
-          pageBuilder: (context, state) {
-            ActionTypeModel actionTypeDetail = state.extra as ActionTypeModel;
-
             return _createPageFadeTransition(state: state, child: ActionTypeListScreen());
           },
         ),

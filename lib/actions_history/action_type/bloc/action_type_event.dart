@@ -52,21 +52,13 @@ class DeleteActionTypeEvent extends ActionTypeEvent {
   List<Object?> get props => [id];
 }
 
-class UpdateEmojiTypeEvent extends ActionTypeEvent {
+class UpdateActionTypeEvent extends ActionTypeEvent {
+  final String title;
   final String emoji;
 
-  const UpdateEmojiTypeEvent(this.emoji);
+  const UpdateActionTypeEvent(this.title, this.emoji);
 
   @override
-  List<Object?> get props => [emoji];
-}
-
-class UpdateTitleTypeEvent extends ActionTypeEvent {
-  final String title;
-
-  const UpdateTitleTypeEvent(this.title);
-
-  @override
-  List<Object?> get props => [title];
+  List<Object?> get props => [title, emoji];
 }
 

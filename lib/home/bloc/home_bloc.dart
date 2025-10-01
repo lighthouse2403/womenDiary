@@ -14,8 +14,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   }
 
-  Future<void> _onLoadLocalData(
-      LoadCycleEvent event, Emitter<HomeState> emit) async {
+  Future<void> _onLoadLocalData(LoadCycleEvent event, Emitter<HomeState> emit) async {
 
     emit(state.copyWith(isLoadingCycle: true, isLoadingSchedule: true));
 

@@ -30,10 +30,11 @@ class SettingState extends Equatable {
 }
 
 class UpdateUsingAverageState extends SettingState {
-  const UpdateUsingAverageState(this.isUsingAverage);
+  const UpdateUsingAverageState(this.isUsingAverage, this.averageCycle);
   final bool isUsingAverage;
+  final int averageCycle;
   @override
-  List<Object> get props => [isUsingAverage];
+  List<Object> get props => [isUsingAverage, averageCycle];
 }
 
 class UpdateCycleLengthState extends SettingState {

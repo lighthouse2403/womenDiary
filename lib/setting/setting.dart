@@ -137,16 +137,26 @@ class _SettingViewState extends State<SettingView> {
                 ListTile(
                   leading: const Icon(Icons.phone_android, color: Colors.blue),
                   title: const Text("Phiên bản ứng dụng"),
-                  trailing: Text(
-                    _appVersion.isEmpty ? "..." : _appVersion,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
+                  trailing: Text(_appVersion.isEmpty ? "..." : _appVersion).w600(),
                 ),
                 ListTile(
                   leading: const Icon(Icons.email, color: Colors.green),
                   title: const Text("Liên hệ nhà phát triển"),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: _contactDeveloper,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.science, color: Colors.deepPurple),
+                  title: const Text("Cơ sở khoa học tính chu kỳ"),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () async {
+                    final uri = Uri.parse(
+                      "https://www.mayoclinic.org/healthy-lifestyle/womens-health/in-depth/menstrual-cycle/art-20047186",
+                    );
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                    }
+                  },
                 ),
               ],
             ),
@@ -370,7 +380,7 @@ class _SettingViewState extends State<SettingView> {
     builder: (context, state) {
       bool isEnabled =
       (state is UpdateUsingAverageState) ? state.isUsingAverage : false;
-      int avgLength = LocalStorageService.getAverageCycleLength();
+      int avgLength = (state is UpdateUsingAverageState) ? state.averageCycle : 30;
 
       print('avgLength: ${avgLength}');
       return Column(
