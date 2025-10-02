@@ -86,12 +86,10 @@ class _ChatState extends BaseStatefulState<Chat> {
                         return InkWell(
                           borderRadius: BorderRadius.circular(16),
                           onTap: () {
-                            AdsHelper.showAds(dismiss: () {
-                              context.navigateTo(
-                                RoutesName.chatDetail,
-                                arguments: thread,
-                              ).then((value) => chatBloc.add(const LoadThreads()));
-                            });
+                            context.navigateTo(
+                              RoutesName.chatDetail,
+                              arguments: thread,
+                            ).then((value) => chatBloc.add(const LoadThreads()));
                           },
                           child: ThreadRow(thread: thread),
                         );

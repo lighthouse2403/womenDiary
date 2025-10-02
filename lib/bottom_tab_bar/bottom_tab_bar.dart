@@ -19,9 +19,9 @@ class MainBottomTabBar extends StatefulWidget {
 class MainBottomTabBarState extends State<MainBottomTabBar> {
   int selectedIndex = 0;
 
-  List<String> routeNames = [RoutesName.home, RoutesName.cycleList, RoutesName.schedules, RoutesName.actionHistory, RoutesName.chat];
-  List<String> labels = ['Trang chủ','Lịch sử', 'Kế hoạch', 'Hoạt động', 'Diễn đàn'];
-  List<SvgGenImage> images = [Assets.icons.home, Assets.icons.history, Assets.icons.calendar, Assets.icons.actions, Assets.icons.chat];
+  List<String> routeNames = [RoutesName.home, RoutesName.cycleList, RoutesName.schedules, RoutesName.actionHistory];
+  List<String> labels = ['Trang chủ','Lịch sử', 'Kế hoạch', 'Hoạt động'];
+  List<SvgGenImage> images = [Assets.icons.home, Assets.icons.history, Assets.icons.calendar, Assets.icons.actions];
 
   @override
   Widget build(BuildContext context) {
