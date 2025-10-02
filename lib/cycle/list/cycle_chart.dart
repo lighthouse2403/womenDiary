@@ -74,7 +74,7 @@ class CycleChart extends StatelessWidget {
                       showTitles: true,
                       reservedSize: 36,
                       getTitlesWidget: (v, meta) =>
-                          Text("${v.toInt()}d", style: const TextStyle(fontSize: 10)),
+                          Text("${v.toInt()}d").text10(),
                     ),
                   ),
                   bottomTitles: AxisTitles(
@@ -83,8 +83,7 @@ class CycleChart extends StatelessWidget {
                       interval: ((maxDate.difference(minDate).inDays) / 4).clamp(1, 90).toDouble(),
                       getTitlesWidget: (v, meta) {
                         final d = minDate.add(Duration(days: v.toInt()));
-                        return Text(DateFormat("MM/yy").format(d),
-                            style: const TextStyle(fontSize: 10));
+                        return Text(DateFormat("MM/yy").format(d)).text10();
                       },
                     ),
                   ),

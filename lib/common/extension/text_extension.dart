@@ -19,6 +19,17 @@ extension TextExtension on Text? {
     return Text(this?.data ?? '', style: this?.style?.pinkTextColor(), textAlign: this?.textAlign, overflow: this?.overflow, maxLines: this?.maxLines);
   }
 
+  Text pink300Color() {
+    return Text(this?.data ?? '', style: this?.style?.pink300Color(), textAlign: this?.textAlign, overflow: this?.overflow, maxLines: this?.maxLines);
+  }
+
+  Text pink700Color() {
+    return Text(this?.data ?? '', style: this?.style?.pink700Color(), textAlign: this?.textAlign, overflow: this?.overflow, maxLines: this?.maxLines);
+  }
+
+  Text pink800Color() {
+    return Text(this?.data ?? '', style: this?.style?.pink300Color(), textAlign: this?.textAlign, overflow: this?.overflow, maxLines: this?.maxLines);
+  }
   Text greyColor() {
     return Text(this?.data ?? '', style: this?.style?.greyColor(), textAlign: this?.textAlign, overflow: this?.overflow, maxLines: this?.maxLines);
   }

@@ -17,7 +17,6 @@ class FilterChips extends StatelessWidget {
             ? state.type : null;
         List<ActionTypeModel> allType = state is ActionTypeUpdatedState
             ? state.allType : [];
-        print('selectedType ${selectedType?.title}');
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           child: Wrap(

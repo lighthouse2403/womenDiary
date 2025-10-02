@@ -124,7 +124,7 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 8),
           Text("Nhấn nút bên dưới để thêm bản ghi đầu tiên của bạn ❤️")
               .text14()
-              .customColor(Colors.grey),
+              .greyColor(),
         ],
       ),
     );

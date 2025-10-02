@@ -89,7 +89,6 @@ class _CycleLengthSlider extends StatelessWidget {
                 .w600()
                 .pinkColor(),
             const SizedBox(height: 12),
-            // slider chiếm full chiều ngang
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
                 trackHeight: 6,
@@ -221,7 +220,7 @@ class _MenstruationLengthSlider extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Độ dài kỳ kinh (ngày):", style: TextStyle(fontSize: 14)),
+            const Text("Độ dài kỳ kinh (ngày):").text14(),
             Slider(
               value: menstruationLength.toDouble(),
               min: 2,

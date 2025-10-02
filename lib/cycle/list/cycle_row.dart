@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/date_time_extension.dart';
+import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 
 class CycleRow extends StatelessWidget {
@@ -27,22 +29,14 @@ class CycleRow extends StatelessWidget {
             children: [
               const Icon(Icons.water_drop_outlined, color: Colors.pink, size: 20),
               const SizedBox(width: 8),
-              Text(
-                'Chu kỳ (${duration} ngày)',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.pink.shade800,
-                ),
-              ),
+              Text('Chu kỳ (${duration} ngày)').pink800Color().w600(),
             ],
           ),
-
-          const SizedBox(height: 8),
-          // Thời gian
+          Constants.vSpacer8,
           Row(
             children: [
               Icon(Icons.calendar_today, size: 18, color: Colors.grey),
-              const SizedBox(width: 8),
+              Constants.vSpacer8,
               Expanded(
                 child: Text(
                   '${cycle.cycleStartTime.globalDateFormat()} → ${cycle.menstruationEndTime.globalDateFormat()}',

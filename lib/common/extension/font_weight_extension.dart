@@ -6,7 +6,9 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: FontWeight.w400,
         fontSize: this?.fontSize,
         color:  this?.color,
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -15,7 +17,9 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: FontWeight.w500,
         fontSize: this?.fontSize,
         color:  this?.color,
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -24,7 +28,9 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: FontWeight.w600,
         fontSize: this?.fontSize,
         color:  this?.color,
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -33,7 +39,9 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: FontWeight.w700,
         fontSize: this?.fontSize,
         color: this?.color,
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -42,7 +50,9 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: FontWeight.w800,
         fontSize: this?.fontSize,
         color: this?.color,
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -52,7 +62,8 @@ extension FontWeightExtension on TextStyle? {
         fontSize: this?.fontSize,
         color:  this?.color,
         overflow: this?.overflow,
-        height: this?.height
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 }
