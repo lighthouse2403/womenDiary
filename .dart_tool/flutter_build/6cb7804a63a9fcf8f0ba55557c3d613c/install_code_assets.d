@@ -1,0 +1,1 @@
+ /Users/golfzon/Documents/projects/beacon_women_diary_flutter/.dart_tool/flutter_build/6cb7804a63a9fcf8f0ba55557c3d613c/native_assets.json: 
