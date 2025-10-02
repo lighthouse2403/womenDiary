@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:women_diary/common/ads/gdpr_helper.dart';
 
 /// Bridge gọi GDPR plugin native (Swift)
 class GDPRPlugin {
@@ -31,8 +32,10 @@ class AdsHelper {
 
     try {
       if (Platform.isIOS) {
-        final gdprData = await GDPRPlugin.getGDPRValues();
-        _canShowAds = _evaluateGDPR(gdprData);
+        final gdprValues = await GDPRHelper.getGDPRValues();
+        if (gdprValues != null) {
+          _canShowAds = GDPRHelper.evaluateGDPR(gdprValues);
+        }
       } else {
         _canShowAds = true;
       }
@@ -55,6 +58,7 @@ class AdsHelper {
   /// Hiển thị interstitial ad
   static void showAd({required Function onDismiss}) {
     if (!_canShowAds) {
+      print('can not show ads');
       onDismiss();
       return;
     }
@@ -62,6 +66,8 @@ class AdsHelper {
     double currentTime = DateTime.now().millisecondsSinceEpoch / 1000;
 
     if (_interstitialAd == null) {
+      print('_interstitialAd null');
+
       onDismiss();
       loadInterstitialAd();
       return;
@@ -74,14 +80,19 @@ class AdsHelper {
         onAdDismissedFullScreenContent: (ad) {
           ad.dispose();
           loadInterstitialAd();
+          print('onAdDismissedFullScreenContent');
+
           onDismiss();
         },
         onAdFailedToShowFullScreenContent: (ad, error) {
           ad.dispose();
           loadInterstitialAd();
+          print('onAdFailedToShowFullScreenContent');
+
           onDismiss();
         },
       );
+      print('show()');
 
       _interstitialAd?.show();
       _interstitialAd = null;
@@ -120,36 +131,5 @@ class AdsHelper {
     } else {
       throw UnsupportedError("Unsupported platform");
     }
-  }
-
-  /// Logic check GDPR (chuyển từ Swift sang Dart)
-  static bool _evaluateGDPR(Map<String, dynamic> gdprData) {
-    final purposeConsent = gdprData['purposeConsent'] ?? "";
-    final vendorConsent = gdprData['vendorConsent'] ?? "";
-    final purposeLI = gdprData['purposeLI'] ?? "";
-    final vendorLI = gdprData['vendorLI'] ?? "";
-    final gdprApplies = gdprData['gdprApplies'] == 1;
-
-    if (!gdprApplies) return true;
-
-    int googleId = 755;
-    bool hasGoogleVendorConsent =
-        vendorConsent.length >= googleId && vendorConsent[googleId - 1] == "1";
-    bool hasGoogleVendorLI =
-        vendorLI.length >= googleId && vendorLI[googleId - 1] == "1";
-
-    // Must have consent for Purpose 1
-    bool hasConsentForPurpose1 =
-        purposeConsent.isNotEmpty && purposeConsent[0] == "1" && hasGoogleVendorConsent;
-
-    // Must have consent or LI for purposes 2,7,9,10
-    bool hasConsentOrLI = [2, 7, 9, 10].every((i) {
-      bool consentOk =
-          purposeConsent.length >= i && purposeConsent[i - 1] == "1" && hasGoogleVendorConsent;
-      bool liOk = purposeLI.length >= i && purposeLI[i - 1] == "1" && hasGoogleVendorLI;
-      return consentOk || liOk;
-    });
-
-    return hasConsentForPurpose1 && hasConsentOrLI;
   }
 }

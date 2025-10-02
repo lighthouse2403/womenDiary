@@ -1,82 +1,54 @@
-import 'dart:async';
 import 'package:flutter/services.dart';
-
-class GDPRValues {
-  final String purposeConsent;
-  final String vendorConsent;
-  final String purposeLI;
-  final String vendorLI;
-  final int gdprApplies;
-
-  GDPRValues({
-    required this.purposeConsent,
-    required this.vendorConsent,
-    required this.purposeLI,
-    required this.vendorLI,
-    required this.gdprApplies,
-  });
-}
 
 class GDPRHelper {
   static const MethodChannel _channel = MethodChannel('gdpr_plugin');
 
-  static Future<GDPRValues> getGDPRValues() async {
-    final Map<dynamic, dynamic>? map = await _channel.invokeMethod('getGDPRValues');
-    if (map == null) {
-      return GDPRValues(purposeConsent: '', vendorConsent: '', purposeLI: '', vendorLI: '', gdprApplies: 0);
+  /// Lấy dữ liệu GDPR từ native iOS
+  static Future<Map<String, dynamic>?> getGDPRValues() async {
+    try {
+      final result = await _channel.invokeMethod('getGDPRValues');
+      print('result ${result}');
+      if (result == null) return null;
+
+      final map = Map<String, dynamic>.from(result as Map);
+      print('map ${map}');
+
+      return map;
+    } on PlatformException catch (e) {
+      print("GDPR check error: $e");
+      return null;
     }
-    return GDPRValues(
-      purposeConsent: (map['purposeConsent'] ?? '') as String,
-      vendorConsent: (map['vendorConsent'] ?? '') as String,
-      purposeLI: (map['purposeLI'] ?? '') as String,
-      vendorLI: (map['vendorLI'] ?? '') as String,
-      gdprApplies: (map['gdprApplies'] ?? 0) as int,
-    );
   }
 
-// helpers to mimic your Swift logic
-  static bool _hasAttribute(String input, int index) {
-    return input.length >= index && input[index - 1] == '1';
-  }
+  /// Logic check GDPR (dùng lại code bạn có)
+  static bool evaluateGDPR(Map<String, dynamic> gdprData) {
+    final purposeConsent = gdprData['purposeConsent'] ?? "";
+    final vendorConsent = gdprData['vendorConsent'] ?? "";
+    final purposeLI = gdprData['purposeLI'] ?? "";
+    final vendorLI = gdprData['vendorLI'] ?? "";
+    final gdprApplies = gdprData['gdprApplies'] == 1;
 
-  static bool _hasConsentFor(List<int> purposes, String purposeConsent, bool hasVendorConsent) {
-    return purposes.every((i) => _hasAttribute(purposeConsent, i)) && hasVendorConsent;
-  }
+    if (!gdprApplies) return true;
 
-  static bool _hasConsentOrLegitimateInterestFor(List<int> purposes, String purposeConsent, String purposeLI, bool hasVendorConsent, bool hasVendorLI) {
-    return purposes.every((i) {
-      return (_hasAttribute(purposeLI, i) && hasVendorLI) || (_hasAttribute(purposeConsent, i) && hasVendorConsent);
+    int googleId = 755;
+    bool hasGoogleVendorConsent =
+        vendorConsent.length >= googleId && vendorConsent[googleId - 1] == "1";
+    bool hasGoogleVendorLI =
+        vendorLI.length >= googleId && vendorLI[googleId - 1] == "1";
+
+    // Must have consent for Purpose 1
+    bool hasConsentForPurpose1 =
+        purposeConsent.isNotEmpty && purposeConsent[0] == "1" && hasGoogleVendorConsent;
+
+    // Must have consent or LI for purposes 2,7,9,10
+    bool hasConsentOrLI = [2, 7, 9, 10].every((i) {
+      bool consentOk =
+          purposeConsent.length >= i && purposeConsent[i - 1] == "1" && hasGoogleVendorConsent;
+      bool liOk = purposeLI.length >= i && purposeLI[i - 1] == "1" && hasGoogleVendorLI;
+      return consentOk || liOk;
     });
-  }
 
-// Google vendor id from your Swift example
-  static const int _googleId = 755;
-
-  static Future<bool> canShowAds() async {
-    final vals = await getGDPRValues();
-    final purposeConsent = vals.purposeConsent;
-    final vendorConsent = vals.vendorConsent;
-    final vendorLI = vals.vendorLI;
-    final purposeLI = vals.purposeLI;
-
-    final hasGoogleVendorConsent = _hasAttribute(vendorConsent, _googleId);
-    final hasGoogleVendorLI = _hasAttribute(vendorLI, _googleId);
-
-    return _hasConsentFor([1], purposeConsent, hasGoogleVendorConsent) &&
-        _hasConsentOrLegitimateInterestFor([2, 7, 9, 10], purposeConsent, purposeLI, hasGoogleVendorConsent, hasGoogleVendorLI);
-  }
-
-  static Future<bool> canShowPersonalizedAds() async {
-    final vals = await getGDPRValues();
-    final purposeConsent = vals.purposeConsent;
-    final vendorConsent = vals.vendorConsent;
-    final vendorLI = vals.vendorLI;
-    final purposeLI = vals.purposeLI;
-
-    final hasGoogleVendorConsent = _hasAttribute(vendorConsent, _googleId);
-    final hasGoogleVendorLI = _hasAttribute(vendorLI, _googleId);
-
-    return _hasConsentFor([1, 3, 4], purposeConsent, hasGoogleVendorConsent) &&
-        _hasConsentOrLegitimateInterestFor([2, 7, 9, 10], purposeConsent, purposeLI, hasGoogleVendorConsent, hasGoogleVendorLI);
+    print('hasConsentForPurpose1 $hasConsentForPurpose1 hasConsentOrLI: $hasConsentOrLI');
+    return hasConsentForPurpose1 && hasConsentOrLI;
   }
 }

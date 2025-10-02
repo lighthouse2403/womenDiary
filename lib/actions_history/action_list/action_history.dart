@@ -9,6 +9,7 @@ import 'package:women_diary/actions_history/bloc/action_bloc.dart';
 import 'package:women_diary/actions_history/bloc/action_event.dart';
 import 'package:women_diary/actions_history/bloc/action_state.dart';
 import 'package:women_diary/actions_history/action_model.dart';
+import 'package:women_diary/common/admob_handle.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
@@ -158,9 +159,12 @@ class _AddButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         color: Colors.pinkAccent.shade100,
         borderRadius: BorderRadius.circular(30),
-        onPressed: () => context
-            .navigateTo(RoutesName.newAction)
-            .then((_) => context.read<ActionBloc>().add(const LoadActionEvent())),
+        onPressed: () {
+          AdsHelper.showAd(onDismiss: () {
+            context.navigateTo(RoutesName.newAction)
+                .then((_) => context.read<ActionBloc>().add(const LoadActionEvent()));
+          });
+        },
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

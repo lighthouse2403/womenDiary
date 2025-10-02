@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:women_diary/common/admob_handle.dart';
 import 'package:women_diary/common/firebase/firebase_option.dart';
 import 'package:women_diary/common/firebase/firebase_user.dart';
 import 'package:women_diary/common/notification_service.dart';
@@ -18,7 +19,7 @@ void main() async {
 
   await FirebaseUser.instance.addUser();
   await LocalStorageService.init();
-
+  await AdsHelper.init();
   runApp(const MyApp());
 }
 
