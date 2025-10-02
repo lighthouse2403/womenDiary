@@ -8,7 +8,9 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: this?.fontWeight,
         fontSize: this?.fontSize,
         color:  Constants.pinkTextColor(),
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -17,7 +19,9 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: this?.fontWeight,
         fontSize: this?.fontSize,
         color:  Constants.mainColor(),
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -26,7 +30,9 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: this?.fontWeight,
         fontSize: this?.fontSize,
         color:  Constants.primaryTextColor(),
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -35,7 +41,9 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: this?.fontWeight,
         fontSize: this?.fontSize,
         color:  Colors.black,
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -44,7 +52,42 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: this?.fontWeight,
         fontSize: this?.fontSize,
         color:  Colors.black87,
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
+    );
+  }
+
+  TextStyle pink700Color() {
+    return TextStyle(
+        fontWeight: this?.fontWeight,
+        fontSize: this?.fontSize,
+        color:  Colors.pink.shade700,
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
+    );
+  }
+
+  TextStyle pink300Color() {
+    return TextStyle(
+        fontWeight: this?.fontWeight,
+        fontSize: this?.fontSize,
+        color:  Colors.pink.shade300,
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
+    );
+  }
+
+  TextStyle pink800Color() {
+    return TextStyle(
+        fontWeight: this?.fontWeight,
+        fontSize: this?.fontSize,
+        color:  Colors.pink.shade800,
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -53,7 +96,9 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: this?.fontWeight,
         fontSize: this?.fontSize,
         color:  Colors.white,
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -62,7 +107,9 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: this?.fontWeight,
         fontSize: this?.fontSize,
         color:  Colors.red,
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -71,7 +118,9 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: this?.fontWeight,
         fontSize: this?.fontSize,
         color:  Colors.grey,
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -80,7 +129,9 @@ extension FontWeightExtension on TextStyle? {
         fontWeight: this?.fontWeight,
         fontSize: this?.fontSize,
         color:  color,
-        overflow: this?.overflow
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 }

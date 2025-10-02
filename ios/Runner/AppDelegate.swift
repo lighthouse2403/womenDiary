@@ -8,6 +8,8 @@ import UIKit
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
+      GDPRPlugin.register(with: self.registrar(forPlugin: "gdpr_plugin")!)
+
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

@@ -55,8 +55,6 @@ class _ScheduleViewState extends State<_ScheduleView>
         (state is ScheduleLoadedState) ? state.scheduleList : [];
 
         if (scheduleList.isEmpty) return _buildEmptyView();
-        print('scheduleList ${scheduleList.length}');
-
         final groupedSchedules = _groupSchedulesByDate(scheduleList);
 
         return ListView(

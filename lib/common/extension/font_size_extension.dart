@@ -7,6 +7,8 @@ extension FontSizeExtension on TextStyle? {
       fontSize: 8,
       color:  this?.color,
       overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -16,6 +18,8 @@ extension FontSizeExtension on TextStyle? {
       fontSize: 10,
       color:  this?.color,
       overflow: this?.overflow,
+      height: this?.height,
+      fontStyle: this?.fontStyle
     );
   }
 
@@ -25,6 +29,8 @@ extension FontSizeExtension on TextStyle? {
       fontSize: 12,
       color:  this?.color,
       overflow: this?.overflow,
+      height: this?.height,
+      fontStyle: this?.fontStyle
     );
   }
 
@@ -34,6 +40,8 @@ extension FontSizeExtension on TextStyle? {
       fontSize: 13,
       color:  this?.color,
       overflow: this?.overflow,
+      height: this?.height,
+      fontStyle: this?.fontStyle
     );
   }
 
@@ -43,6 +51,8 @@ extension FontSizeExtension on TextStyle? {
       fontSize: 14,
       color:  this?.color,
       overflow: this?.overflow,
+      height: this?.height,
+      fontStyle: this?.fontStyle
     );
   }
 
@@ -52,6 +62,8 @@ extension FontSizeExtension on TextStyle? {
       fontSize: 15,
       color:  this?.color,
       overflow: this?.overflow,
+      height: this?.height,
+      fontStyle: this?.fontStyle
     );
   }
 
@@ -61,6 +73,8 @@ extension FontSizeExtension on TextStyle? {
       fontSize: 16,
       color:  this?.color,
       overflow: this?.overflow,
+      height: this?.height,
+      fontStyle: this?.fontStyle
     );
   }
 
@@ -70,6 +84,8 @@ extension FontSizeExtension on TextStyle? {
       fontSize: 17,
       color:  this?.color,
       overflow: this?.overflow,
+      height: this?.height,
+      fontStyle: this?.fontStyle
     );
   }
 
@@ -79,6 +95,8 @@ extension FontSizeExtension on TextStyle? {
       fontSize: 18,
       color:  this?.color,
       overflow: this?.overflow,
+      height: this?.height,
+      fontStyle: this?.fontStyle
     );
   }
 
@@ -88,6 +106,19 @@ extension FontSizeExtension on TextStyle? {
       fontSize: 20,
       color:  this?.color,
       overflow: this?.overflow,
+      height: this?.height,
+      fontStyle: this?.fontStyle
+    );
+  }
+
+  TextStyle text22() {
+    return TextStyle(
+        fontWeight: this?.fontWeight,
+        fontSize: 22,
+        color:  this?.color,
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -97,6 +128,30 @@ extension FontSizeExtension on TextStyle? {
       fontSize: 24,
       color:  this?.color,
       overflow: this?.overflow,
+      height: this?.height,
+      fontStyle: this?.fontStyle
+    );
+  }
+
+  TextStyle text26() {
+    return TextStyle(
+        fontWeight: this?.fontWeight,
+        fontSize: 26,
+        color:  this?.color,
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
+    );
+  }
+
+  TextStyle text28() {
+    return TextStyle(
+        fontWeight: this?.fontWeight,
+        fontSize: 28,
+        color:  this?.color,
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -106,6 +161,19 @@ extension FontSizeExtension on TextStyle? {
       fontSize: 30,
       color:  this?.color,
       overflow: this?.overflow,
+      height: this?.height,
+      fontStyle: this?.fontStyle
+    );
+  }
+
+  TextStyle text36() {
+    return TextStyle(
+        fontWeight: this?.fontWeight,
+        fontSize: 36,
+        color:  this?.color,
+        overflow: this?.overflow,
+        height: this?.height,
+        fontStyle: this?.fontStyle
     );
   }
 
@@ -115,6 +183,8 @@ extension FontSizeExtension on TextStyle? {
       fontSize: size,
       color:  this?.color,
       overflow: this?.overflow,
+      height: this?.height,
+      fontStyle: this?.fontStyle
     );
   }
   /// Setup overflow
@@ -124,6 +194,8 @@ extension FontSizeExtension on TextStyle? {
       fontSize: this?.fontSize,
       color:  this?.color,
       overflow: TextOverflow.ellipsis,
+      height: this?.height,
+      fontStyle: this?.fontStyle
     );
   }
 
@@ -133,6 +205,8 @@ extension FontSizeExtension on TextStyle? {
       fontSize: this?.fontSize,
       color:  this?.color,
       overflow: TextOverflow.clip,
+      height: this?.height,
+      fontStyle: this?.fontStyle
     );
   }
 
@@ -142,7 +216,8 @@ extension FontSizeExtension on TextStyle? {
       fontSize: this?.fontSize,
       color:  this?.color,
       overflow: this?.overflow,
-      height: height
+      height: height,
+      fontStyle: this?.fontStyle
     );
   }
 }

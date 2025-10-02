@@ -101,14 +101,10 @@ class ActionRow extends StatelessWidget {
                   color: Colors.pink.shade100,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(
-                  DateFormat('HH:mm').format(action.time),
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.pink.shade700,
-                  ),
-                ),
+                child: Text(DateFormat('HH:mm').format(action.time))
+                    .text12()
+                    .w600()
+                    .customColor(Colors.pink.shade700),
               ),
             ],
           ),

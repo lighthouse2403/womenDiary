@@ -70,22 +70,14 @@ class CycleDetail extends StatelessWidget {
                               size: 48,
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            "Thành công!",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.pink.shade700,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            "Dữ liệu của bạn đã được lưu lại 💕",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 16, color: Colors.black87),
-                          ),
-                          const SizedBox(height: 20),
+                          Constants.vSpacer16,
+                          Text("Thành công!").text20().w600().pink700Color(),
+                          Constants.vSpacer8,
+                          const Text("Dữ liệu của bạn đã được lưu lại 💕")
+                              .text16()
+                              .black87Color()
+                              .center(),
+                          Constants.vSpacer20,
                           ElevatedButton(
                             onPressed: () {
                               Navigator.pop(dialogContext);
@@ -98,10 +90,7 @@ class CycleDetail extends StatelessWidget {
                               ),
                               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                             ),
-                            child: const Text(
-                              "OK",
-                              style: TextStyle(fontSize: 16, color: Colors.white),
-                            ),
+                            child: const Text("OK").text16().whiteColor(),
                           ),
                         ],
                       ),
@@ -185,7 +174,7 @@ class CycleDetail extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Ghi chú', style: const TextStyle(fontWeight: FontWeight.w600)),
+        Text('Ghi chú').w600(),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
@@ -227,7 +216,7 @@ class CycleDetail extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Chi tiết').text16().w700(),
-        const SizedBox(height: 12),
+        Constants.vSpacer12,
         TweenAnimationBuilder<double>(
           duration: const Duration(milliseconds: 1200),
           curve: Curves.easeOutCubic,
@@ -289,12 +278,7 @@ class CycleDetail extends StatelessWidget {
             right: isLast ? const Radius.circular(16) : Radius.zero,
           ),
         ),
-        child: Text(
-          text,
-          style: const TextStyle(
-              fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white),
-          textAlign: TextAlign.center,
-        ),
+        child: Text(text).text12().w500().whiteColor().center(),
       ),
     );
   }

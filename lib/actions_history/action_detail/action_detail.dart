@@ -124,8 +124,7 @@ class _ActionDetailView extends StatelessWidget {
               onTap: () => _pickDateTime(context, time),
               borderRadius: BorderRadius.circular(12),
               child: Container(
-                padding:
-                const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -203,10 +202,7 @@ class _ActionDetailView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Chu kỳ liên quan")
-                        .w600()
-                        .text16()
-                        .customColor(Colors.pink.shade700),
+                    Text("Chu kỳ liên quan").w600().text16().customColor(Colors.pink.shade700),
                     const SizedBox(height: 4),
                     Text(
                       "${cycle.cycleStartTime.globalDateFormat()} - ${cycle.cycleEndTime.globalDateFormat()}",

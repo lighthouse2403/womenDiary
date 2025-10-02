@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:women_diary/_gen/assets.gen.dart';
 import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/common/widgets/empty_view.dart';
 import 'package:women_diary/cycle/bloc/cycle_bloc.dart';
@@ -70,14 +71,11 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
       ),
       body: BlocBuilder<CycleBloc, CycleState>(
         buildWhen: (pre, current) {
-          print('pre: $pre current: $current');
           return current is LoadedAllCycleState;
         },
         builder: (context, state) {
-          print('State: $state');
           if (state is LoadedAllCycleState && state.cycleList.isNotEmpty) {
             final filtered = _applyFilter(state.cycleList);
-            print('LoadedAllCycleState: ${state.cycleList.map((e) => e.note)}');
             return _buildBody(filtered);
           }
           return const EmptyView(
@@ -91,7 +89,6 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
 
   // ===== Body với chart + list =====
   Widget _buildBody(List<CycleModel> list) {
-    print("build list: ${list.map((e) => e.note)}");
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
@@ -259,16 +256,14 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
                       ],
                     ),
                     IgnorePointer(
-                      child: Text(
-                        '${cycleDays} ngày',
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w800,
-                          color: isCurrent
+                      child: Text('${cycleDays} ngày')
+                          .text12()
+                          .w800()
+                          .customColor(
+                            isCurrent
                               ? Colors.black.withAlpha(200)
-                              : Colors.black.withAlpha(150),
-                        ),
-                      ),
+                              : Colors.black.withAlpha(150)
+                          ),
                     ),
                   ],
                 ),
@@ -282,7 +277,7 @@ class _CycleHistoryViewState extends State<_CycleHistoryView> {
               const SizedBox(width: 6),
               _pill('Chu kỳ: ${cycleDays}d', Colors.pink.shade50, Colors.pink.shade400),
               if (cycle.note.trim().isNotEmpty) ...[
-                const SizedBox(width: 6),
+                Constants.hSpacer6,
                 Flexible(
                   child: _pill(
                     '📝 ${cycle.note.trim()}',
