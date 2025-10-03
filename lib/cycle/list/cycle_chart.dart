@@ -47,8 +47,7 @@ class CycleChart extends StatelessWidget {
         children: [
           const Text("Xu hướng độ dài chu kỳ")
               .w700()
-              .text14()
-              .customColor(Colors.pink),
+              .text14().pinkColor(),
           const SizedBox(height: 12),
           Expanded(
             child: LineChart(

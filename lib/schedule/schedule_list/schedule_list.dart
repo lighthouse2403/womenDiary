@@ -124,7 +124,7 @@ class _ScheduleViewState extends State<_ScheduleView>
         const Icon(CupertinoIcons.calendar_today,
             size: 20, color: Colors.pinkAccent),
         const SizedBox(width: 6),
-        Text("Ngày $date").text16().w600().customColor(Colors.pink.shade700),
+        Text("Ngày $date").text16().w600().pink700Color(),
       ],
     );
   }
@@ -169,7 +169,7 @@ class _ScheduleViewState extends State<_ScheduleView>
           const SizedBox(height: 8),
           Text("Nhấn nút + để thêm lịch đầu tiên cho bạn 🌸")
               .text14()
-              .customColor(Colors.grey),
+              .greyColor(),
         ],
       ),
     );
