@@ -17,8 +17,8 @@ class LocalStorageService {
     await _prefs?.setString('languageId', languageId);
   }
 
-  static String getLanguage() {
-    return _prefs?.getString('languageId') ?? 'en';
+  static Future<String> getLanguage() async {
+    return await _prefs?.getString('languageId') ?? 'vi';
   }
 
   /// ----------------------------- UUID VALUES -------------------------------
@@ -26,8 +26,8 @@ class LocalStorageService {
     await _prefs?.setString('uuid', uuid);
   }
 
-  static String getUuid() {
-    return _prefs?.getString('uuid') ?? '';
+  static Future<String> getUuid() async {
+    return await _prefs?.getString('uuid') ?? '';
   }
 
   /// ----------------------------- CYCLE VALUES -------------------------------
@@ -35,7 +35,7 @@ class LocalStorageService {
     await _prefs?.setInt('cycleLength', cycleLength);
   }
 
-  static int getCycleLength() {
+  static Future<int> getCycleLength() async {
     return _prefs?.getInt('cycleLength') ?? 0;
   }
 
@@ -44,8 +44,8 @@ class LocalStorageService {
     await _prefs?.setInt('updateMenstruationLength', menstrualLength);
   }
 
-  static int getMenstruationLength() {
-    return _prefs?.getInt('updateMenstruationLength') ?? 0;
+  static Future<int> getMenstruationLength() async {
+    return await _prefs?.getInt('updateMenstruationLength') ?? 0;
   }
 
   /// Goal
@@ -53,7 +53,7 @@ class LocalStorageService {
     await _prefs?.setInt('goal', goal.value);
   }
 
-  static UserGoal getGoal() {
+  static Future<UserGoal> getGoal() async {
     int goalValue = _prefs?.getInt('goal') ?? 0;
     return UserGoal.fromInt(goalValue);
   }
@@ -63,8 +63,8 @@ class LocalStorageService {
     await _prefs?.setBool('use_biometric', useBiometric);
   }
 
-  static bool checkUsingBiometric() {
-    return _prefs?.getBool('use_biometric') ?? false;
+  static Future<bool> checkUsingBiometric() async {
+    return await _prefs?.getBool('use_biometric') ?? false;
   }
 
   /// ----------------------------- AVERAGE VALUES -----------------------------
@@ -73,8 +73,8 @@ class LocalStorageService {
     await _prefs?.setBool('isUsingAverageValue', isUsingAverageValue);
   }
 
-  static bool isUsingAverageValue() {
-    return _prefs?.getBool('isUsingAverageValue') ?? false;
+  static Future<bool> isUsingAverageValue() async {
+    return await _prefs?.getBool('isUsingAverageValue') ?? false;
   }
 
   /// Average Mestruation length
@@ -82,8 +82,8 @@ class LocalStorageService {
     await _prefs?.setInt('averageMenstruationLength', cycleLength);
   }
 
-  static int getAverageMenstruationLength() {
-    return _prefs?.getInt('averageMenstruationLength') ?? getMenstruationLength();
+  static Future<int> getAverageMenstruationLength() async {
+    return await _prefs?.getInt('averageMenstruationLength') ?? getMenstruationLength();
   }
 
   /// Average Cycle length
@@ -91,16 +91,16 @@ class LocalStorageService {
     await _prefs?.setInt(_averageCycle, cycleLength);
   }
 
-  static int getAverageCycleLength() {
-    return _prefs?.getInt(_averageCycle) ?? getCycleLength();
+  static Future<int> getAverageCycleLength() async {
+    return await _prefs?.getInt(_averageCycle) ?? getCycleLength();
   }
 
   static Future<void> saveSkippedVersion(String version) async {
     await _prefs?.setString(_skipVersionKey, version);
   }
 
-  static String? getSkippedVersion() {
-    return _prefs?.getString(_skipVersionKey);
+  static Future<String?> getSkippedVersion() async {
+    return await _prefs?.getString(_skipVersionKey);
   }
 
   static Future<void> clear() async {

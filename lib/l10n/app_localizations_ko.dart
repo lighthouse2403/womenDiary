@@ -9,11 +9,17 @@ class AppLocalizationsKo extends AppLocalizations {
   AppLocalizationsKo([String locale = 'ko']) : super(locale);
 
   @override
-  String get commonErrorTitle => 'Oops, something went wrong';
+  String get cycleTitle => 'Cycle length';
 
   @override
-  String get networkError => 'Your network connection is unstable. Check your connection and try again.';
+  String get settingTitle => 'Setting';
 
   @override
-  String get accessDenied => 'Access denied';
+  String get faceIdTitle => 'FaceId';
+
+  @override
+  String get goalTitle => 'Goal';
+
+  @override
+  String get appVersion => 'Phiên bản ứng dụng';
 }

@@ -9,11 +9,17 @@ class AppLocalizationsVi extends AppLocalizations {
   AppLocalizationsVi([String locale = 'vi']) : super(locale);
 
   @override
-  String get commonErrorTitle => 'Oops, something went wrong';
+  String get cycleTitle => 'Chu kỳ';
 
   @override
-  String get networkError => 'Your network connection is unstable. Check your connection and try again.';
+  String get settingTitle => 'Cài đặt';
 
   @override
-  String get accessDenied => 'Access denied';
+  String get faceIdTitle => 'Face Id';
+
+  @override
+  String get goalTitle => 'Mục tiêu';
+
+  @override
+  String get appVersion => 'Phiên bản ứng dụng';
 }

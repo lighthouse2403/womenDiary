@@ -43,9 +43,10 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
   Future<void> _createCycle(CreateCycleEvent event, Emitter<CycleState> emit) async {
     try {
       // Thêm chu kỳ mới vào DB
-      bool isUsingAverage = LocalStorageService.isUsingAverageValue();
+      bool isUsingAverage = await LocalStorageService.isUsingAverageValue();
       if (isUsingAverage) {
-        event.newCycle.cycleEndTime = event.newCycle.cycleStartTime.add(Duration(days: LocalStorageService.getAverageCycleLength() - 1));
+        int averageCycle = await LocalStorageService.getAverageCycleLength();
+        event.newCycle.cycleEndTime = event.newCycle.cycleStartTime.add(Duration(days: averageCycle - 1));
       }
       await DatabaseHandler.insertCycle(event.newCycle);
 

@@ -5,8 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:women_diary/_gen/assets.gen.dart';
+import 'package:women_diary/app_bloc/app_bloc.dart';
+import 'package:women_diary/app_bloc/app_event.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
 import 'package:women_diary/common/constants/constants.dart';
+import 'package:women_diary/common/extension/context_extension.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/database/data_handler.dart';
@@ -64,17 +67,19 @@ class _SettingViewState extends State<SettingView> {
 
   @override
   Widget build(BuildContext context) {
+    print('${context.language?.appVersion}');
+
     return Scaffold(
       backgroundColor: Colors.pink.shade50,
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Cài đặt').w600().text18().whiteColor().ellipsis(),
+        title: Text('${context.language?.settingTitle}').w600().text18().whiteColor().ellipsis(),
         backgroundColor: AppColors.pinkTextColor,
         leading: InkWell(
           onTap: () async {
-            final cycleLength = LocalStorageService.isUsingAverageValue()
+            int cycleLength = await LocalStorageService.isUsingAverageValue()
                 ? await DatabaseHandler.getAverageCycleLength()
-                : LocalStorageService.getCycleLength();
+                : await LocalStorageService.getCycleLength();
             CycleModel lastCycle = await DatabaseHandler.getLastCycle();
             DateTime cycleEndTime = lastCycle.cycleStartTime.add(Duration(days: cycleLength - 1));
 
@@ -100,7 +105,7 @@ class _SettingViewState extends State<SettingView> {
             _sectionCard(
               icon: Icons.favorite,
               color: Colors.pink.shade300,
-              title: "🎀 Chu kỳ",
+              title: "🎀 ${context.language?.cycleTitle}",
               children: [
                 _cycleSlider(),
                 _menstruationSlider(),
@@ -142,7 +147,7 @@ class _SettingViewState extends State<SettingView> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.phone_android, color: Colors.blue),
-                  title: const Text("Phiên bản ứng dụng"),
+                  title: Text('${context.language?.appVersion}'),
                   trailing: Text(_appVersion.isEmpty ? "..." : _appVersion).w600(),
                 ),
                 ListTile(
@@ -387,30 +392,103 @@ class _SettingViewState extends State<SettingView> {
     return BlocBuilder<SettingBloc, SettingState>(
       buildWhen: (previous, current) => current is UpdateLanguageState,
       builder: (context, state) {
-        String currentLang = (state is UpdateLanguageState) ? state.languageId : "en";
-        return DropdownButtonFormField<String>(
-          value: currentLang,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.pink.shade50,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: Colors.pink.shade200),
-            ),
+        String currentLang = (state is UpdateLanguageState) ? state.languageId : "vi";
+        final languages = Constants.languages; // Map<String, String>
+        print('currentLang $currentLang');
+        print('${context.language.appVersion}');
+        print('${context.language.goalTitle}');
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.pink.shade50),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.pink.shade100.withOpacity(0.6),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-          items: Constants.languages.entries
-              .map((e) => DropdownMenuItem<String>(
-            value: e.key,
-            child: Text(e.value),
-          ))
-              .toList(),
-          onChanged: (languageId) {
-            if (languageId != null) {
-              context.read<SettingBloc>().add(UpdateLanguageIdEvent(languageId));
-            }
-          },
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: DropdownButtonFormField<String>(
+            value: currentLang,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
+            ),
+            dropdownColor: Colors.white,
+            icon: Icon(Icons.expand_more, color: Colors.pink.shade400),
+            items: languages.entries.map((e) {
+              return DropdownMenuItem<String>(
+                value: e.key,
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 14,
+                      backgroundColor: Colors.pink.shade50,
+                      child: Text(
+                        e.key.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.pink.shade400,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      e.value,
+                      style: TextStyle(
+                        color: Colors.pink.shade900,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+            // Hiển thị selected item với style tương tự (mịn, pastel)
+            selectedItemBuilder: (BuildContext ctx) {
+              return languages.entries.map((e) {
+                return Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 12,
+                      backgroundColor: Colors.pink.shade50,
+                      child: Text(
+                        e.key.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.pink.shade400,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      e.value,
+                      style: TextStyle(
+                        color: Colors.pink.shade900,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                );
+              }).toList();
+            },
+            onChanged: (languageId) {
+              if (languageId != null) {
+                context.read<SettingBloc>().add(UpdateLanguageIdEvent(languageId));
+                context.read<AppBloc>().add(ChangeLanguageEvent(languageId));
+              }
+            },
+          ),
         );
       },
     );
   }
+
 }

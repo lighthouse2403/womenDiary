@@ -62,8 +62,8 @@ class DatabaseHandler {
     final db = await DatabaseHandler.db(cycleTable);
     final List<Map<String, dynamic>> list = await db.query(cycleTable);
     List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
-    int cycleDefaultLength = LocalStorageService.getCycleLength();
-    int menstruationDefaultLength = LocalStorageService.getCycleLength();
+    int cycleDefaultLength = await LocalStorageService.getCycleLength();
+    int menstruationDefaultLength = await LocalStorageService.getCycleLength();
 
     if (allCycle.isEmpty) {
       return CycleModel.init(
@@ -102,8 +102,8 @@ class DatabaseHandler {
     final db = await DatabaseHandler.db(cycleTable);
     final List<Map<String, dynamic>> list = await db.query(cycleTable);
     List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
-    int cycleDefaultLength = LocalStorageService.getCycleLength();
-    int menstruationDefaultLength = LocalStorageService.getCycleLength();
+    int cycleDefaultLength = await LocalStorageService.getCycleLength();
+    int menstruationDefaultLength = await LocalStorageService.getCycleLength();
 
     if (allCycle.isEmpty) {
       return CycleModel.init(
@@ -193,8 +193,8 @@ class DatabaseHandler {
     final List<Map<String, dynamic>> list = await db.query(cycleTable);
     List<CycleModel> allCycle = list.map((e) => CycleModel.fromDatabase(e)).toList();
 
-    int cycleDefaultLength = LocalStorageService.getCycleLength();
-    int menstruationDefaultLength = LocalStorageService.getCycleLength();
+    int cycleDefaultLength = await LocalStorageService.getCycleLength();
+    int menstruationDefaultLength = await LocalStorageService.getCycleLength();
     if (allCycle.isEmpty) {
       return CycleModel.init(
           DateTime.now(),

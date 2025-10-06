@@ -1,5 +1,7 @@
 {
-  "commonErrorTitle": "Oops, something went wrong",
-  "networkError": "Your network connection is unstable. Check your connection and try again.",
-  "accessDenied": "Access denied"
+  "cycleTitle": "Cycle length",
+  "settingTitle": "Setting",
+  "faceIdTitle": "FaceId",
+  "goalTitle": "Goal",
+  "appVersion": "App version"
 }

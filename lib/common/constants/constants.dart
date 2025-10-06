@@ -69,5 +69,6 @@ class Constants {
     "vi": "Tiếng Việt",
     "en": "English",
     "ko": "한국어",
+    "ja": "日本語",
   };
 }

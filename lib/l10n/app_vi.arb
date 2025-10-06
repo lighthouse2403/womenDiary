@@ -1,5 +1,7 @@
 {
-  "commonErrorTitle": "Oops, something went wrong",
-  "networkError": "Your network connection is unstable. Check your connection and try again.",
-  "accessDenied": "Access denied"
+  "cycleTitle": "Chu kỳ",
+  "settingTitle": "Cài đặt",
+  "faceIdTitle": "Face Id",
+  "goalTitle": "Mục tiêu",
+    "appVersion": "Phiên bản ứng dụng"
 }
