@@ -64,3 +64,10 @@ class UpdateGoalState extends SettingState {
   @override
   List<Object> get props => [goal];
 }
+
+class UpdateLanguageState extends SettingState {
+  const UpdateLanguageState(this.languageId);
+  final String languageId;
+  @override
+  List<Object> get props => [languageId];
+}

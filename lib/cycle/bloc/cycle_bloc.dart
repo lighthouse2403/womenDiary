@@ -146,7 +146,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
         0
     );
 
-    DateTime ovulationPhase = lastCycle.cycleEndTime.subtract(Duration(days: 18));
+    DateTime ovulationPhase = lastCycle.cycleEndTime.subtract(Duration(days: 17));
     DateTime ovulationNotification = DateTime(
         ovulationPhase.year,
         ovulationPhase.month,
@@ -155,7 +155,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
         0
     );
 
-    DateTime ovulationDate = lastCycle.cycleEndTime.subtract(Duration(days: 15));
+    DateTime ovulationDate = lastCycle.cycleEndTime.subtract(Duration(days: 14));
     DateTime ovulationDayNotification = DateTime(
         ovulationDate.year,
         ovulationDate.month,
@@ -164,7 +164,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
         0
     );
 
-    DateTime lutealDate = lastCycle.cycleEndTime.subtract(Duration(days: 13));
+    DateTime lutealDate = ovulationDate.add(Duration(days: 1));
     DateTime lutealNotification = DateTime(
         lutealDate.year,
         lutealDate.month,
@@ -187,7 +187,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
       await NotificationService().scheduleNotification(
         id: CycleNotificationType.ovulation.value,
         title: "Giai đoạn nguyên hiểm",
-        body: '${ovulationPhase.globalDateFormat()} ~ ${ovulationDate.add(Duration(days: 1)).globalDateFormat()}',
+        body: '${ovulationPhase.globalDateFormat()} ~ ${lutealDate.globalDateFormat()}',
         scheduledTime: ovulationNotification,
       );
     }
@@ -209,6 +209,5 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
         scheduledTime: lutealNotification,
       );
     }
-
   }
 }

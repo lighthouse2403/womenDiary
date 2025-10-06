@@ -5,9 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:women_diary/_gen/assets.gen.dart';
-import 'package:women_diary/common/base/base_app_bar.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
-import 'package:women_diary/common/extension/date_time_extension.dart';
+import 'package:women_diary/common/constants/constants.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/database/data_handler.dart';
@@ -15,8 +14,6 @@ import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/setting/bloc/setting_bloc.dart';
 import 'package:women_diary/setting/bloc/setting_event.dart';
 import 'package:women_diary/setting/bloc/setting_state.dart';
-import 'package:women_diary/setting/pin_input.dart';
-import 'package:women_diary/setting/slider_title.dart';
 import 'package:women_diary/setting/switch_title.dart';
 
 class Setting extends StatelessWidget {
@@ -89,9 +86,9 @@ class _SettingViewState extends State<SettingView> {
           child: Align(
             alignment: Alignment.center,
             child: Assets.icons.arrowBack.svg(
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn)
+              width: 24,
+              height: 24,
+              colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
             ),
           ),
         ),
@@ -130,6 +127,15 @@ class _SettingViewState extends State<SettingView> {
             ),
             const SizedBox(height: 20),
             _sectionCard(
+              icon: Icons.language,
+              color: Colors.teal.shade300,
+              title: "🌍 Ngôn ngữ",
+              children: [
+                _languagePicker(context),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _sectionCard(
               icon: Icons.info,
               color: Colors.blue.shade400,
               title: "ℹ️ Thông tin",
@@ -162,15 +168,11 @@ class _SettingViewState extends State<SettingView> {
             ),
             const SizedBox(height: 30),
             Center(
-              child: Text(
-                "💖 Designed for women\nwith love and care",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: CupertinoColors.systemGrey,
-                  fontSize: 14,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
+              child: Text("💖 Designed for women\nwith love and care")
+                  .text14()
+                  .italic()
+                  .customColor(CupertinoColors.systemGrey)
+                  .center(),
             )
           ],
         ),
@@ -178,7 +180,7 @@ class _SettingViewState extends State<SettingView> {
     );
   }
 
-  /// Reuse card UI
+  /// Reusable card UI
   Widget _sectionCard({
     required String title,
     required IconData icon,
@@ -201,14 +203,7 @@ class _SettingViewState extends State<SettingView> {
                   child: Icon(icon, color: color),
                 ),
                 const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    color: color,
-                  ),
-                ),
+                Text(title).text17().w600().customColor(color),
               ],
             ),
             const SizedBox(height: 12),
@@ -219,7 +214,8 @@ class _SettingViewState extends State<SettingView> {
     );
   }
 
-  // Bloc UI giữ nguyên
+  // --- Widgets từng phần ---
+
   Widget _cycleSlider() {
     return BlocBuilder<SettingBloc, SettingState>(
       buildWhen: (previous, current) => current is UpdateCycleLengthState,
@@ -267,9 +263,7 @@ class _SettingViewState extends State<SettingView> {
   }) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 2,
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -284,22 +278,12 @@ class _SettingViewState extends State<SettingView> {
                   child: Icon(icon, color: color ?? Colors.pink),
                 ),
                 const SizedBox(width: 10),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                Text(label).text16().w600(),
                 const Spacer(),
-                Text(
-                  "$value ngày",
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: CupertinoColors.systemPink,
-                  ),
-                ),
+                Text('$value ngày')
+                    .text15()
+                    .w500()
+                    .customColor(CupertinoColors.systemPink),
               ],
             ),
             const SizedBox(height: 10),
@@ -366,10 +350,8 @@ class _SettingViewState extends State<SettingView> {
       return SwitchTile(
         label: "Sử dụng Face ID",
         value: isEnabled,
-        onChanged: (value) async {
-          context
-              .read<SettingBloc>()
-              .add(UpdateUsingBiometricEvent(value));
+        onChanged: (value) {
+          context.read<SettingBloc>().add(UpdateUsingBiometricEvent(value));
         },
       );
     },
@@ -378,34 +360,57 @@ class _SettingViewState extends State<SettingView> {
   Widget _averageSwitch() => BlocBuilder<SettingBloc, SettingState>(
     buildWhen: (previous, current) => current is UpdateUsingAverageState,
     builder: (context, state) {
-      bool isEnabled =
-      (state is UpdateUsingAverageState) ? state.isUsingAverage : false;
+      bool isEnabled = (state is UpdateUsingAverageState) ? state.isUsingAverage : false;
       int avgLength = (state is UpdateUsingAverageState) ? state.averageCycle : 30;
-
-      print('avgLength: ${avgLength}');
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SwitchTile(
             label: "Sử dụng giá trị trung bình",
             value: isEnabled,
-            onChanged: (val) =>
-                context.read<SettingBloc>().add(ToggleAverageEvent(val)),
+            onChanged: (val) => context.read<SettingBloc>().add(ToggleAverageEvent(val)),
           ),
-          if (avgLength > 0) // chỉ hiển thị khi có dữ liệu
+          if (avgLength > 0)
             Padding(
               padding: const EdgeInsets.only(left: 16, top: 4),
-              child: Text(
-                "Giá trị trung bình hiện tại: $avgLength ngày",
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.grey,
-                ),
-              ),
+              child: Text("Giá trị trung bình hiện tại: $avgLength ngày")
+                  .text14()
+                  .greyColor()
+                  .italic(),
             ),
         ],
       );
     },
   );
+
+  Widget _languagePicker(BuildContext context) {
+    return BlocBuilder<SettingBloc, SettingState>(
+      buildWhen: (previous, current) => current is UpdateLanguageState,
+      builder: (context, state) {
+        String currentLang = (state is UpdateLanguageState) ? state.languageId : "en";
+        return DropdownButtonFormField<String>(
+          value: currentLang,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.pink.shade50,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide(color: Colors.pink.shade200),
+            ),
+          ),
+          items: Constants.languages.entries
+              .map((e) => DropdownMenuItem<String>(
+            value: e.key,
+            child: Text(e.value),
+          ))
+              .toList(),
+          onChanged: (languageId) {
+            if (languageId != null) {
+              context.read<SettingBloc>().add(UpdateLanguageIdEvent(languageId));
+            }
+          },
+        );
+      },
+    );
+  }
 }

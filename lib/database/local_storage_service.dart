@@ -12,7 +12,16 @@ class LocalStorageService {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  /// ----------------------------- FIXED VALUES -------------------------------
+  /// ----------------------------- LOCAL VALUES -------------------------------
+  static Future<void> updateLanguage(String languageId) async {
+    await _prefs?.setString('languageId', languageId);
+  }
+
+  static String getLanguage() {
+    return _prefs?.getString('languageId') ?? 'en';
+  }
+
+  /// ----------------------------- UUID VALUES -------------------------------
   static Future<void> updateUuid(String uuid) async {
     await _prefs?.setString('uuid', uuid);
   }
@@ -21,7 +30,7 @@ class LocalStorageService {
     return _prefs?.getString('uuid') ?? '';
   }
 
-  /// ----------------------------- FIXED VALUES -------------------------------
+  /// ----------------------------- CYCLE VALUES -------------------------------
   static Future<void> updateCycleLength(int cycleLength) async {
     await _prefs?.setInt('cycleLength', cycleLength);
   }

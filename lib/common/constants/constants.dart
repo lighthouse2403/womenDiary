@@ -64,4 +64,10 @@ class Constants {
     'Đà Nẵng',
     'Hải Phòng'
   ];
+
+  static final languages = {
+    "vi": "Tiếng Việt",
+    "en": "English",
+    "ko": "한국어",
+  };
 }

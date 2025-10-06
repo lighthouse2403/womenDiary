@@ -12,8 +12,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonErrorTitle => 'Oops, something went wrong';
 
   @override
-  String get networkError =>
-      'Your network connection is unstable. Check your connection and try again.';
+  String get networkError => 'Your network connection is unstable. Check your connection and try again.';
 
   @override
   String get accessDenied => 'Access denied';
