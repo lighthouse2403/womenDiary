@@ -14,6 +14,7 @@ import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/database/local_storage_service.dart';
+import 'package:women_diary/l10n_gen/app_localizations.dart';
 import 'package:women_diary/setting/bloc/setting_bloc.dart';
 import 'package:women_diary/setting/bloc/setting_event.dart';
 import 'package:women_diary/setting/bloc/setting_state.dart';
@@ -68,7 +69,8 @@ class _SettingViewState extends State<SettingView> {
   @override
   Widget build(BuildContext context) {
     print('${context.language.appVersion}');
-
+    print('${AppLocalizations.of(context).goalTitle}');
+    print('${AppLocalizations.of(context).settingTitle}');
     return Scaffold(
       backgroundColor: Colors.pink.shade50,
       appBar: AppBar(
