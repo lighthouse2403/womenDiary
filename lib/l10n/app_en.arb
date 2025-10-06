@@ -1,7 +1,7 @@
-{
+{ "@@locale": "en",
   "cycleTitle": "Cycle length",
   "settingTitle": "Setting",
   "faceIdTitle": "FaceId",
   "goalTitle": "Goal",
-  "appVersion": "App version"
+  "appVersion": "Phiên bản ứng dụng"
 }

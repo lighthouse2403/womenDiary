@@ -104,32 +104,32 @@ abstract class AppLocalizations {
 
   /// No description provided for @cycleTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Cycle length'**
+  /// In vi, this message translates to:
+  /// **'Chu kỳ'**
   String get cycleTitle;
 
   /// No description provided for @settingTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Setting'**
+  /// In vi, this message translates to:
+  /// **'Cài đặt'**
   String get settingTitle;
 
   /// No description provided for @faceIdTitle.
   ///
-  /// In en, this message translates to:
-  /// **'FaceId'**
+  /// In vi, this message translates to:
+  /// **'Face Id'**
   String get faceIdTitle;
 
   /// No description provided for @goalTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Goal'**
+  /// In vi, this message translates to:
+  /// **'Mục tiêu'**
   String get goalTitle;
 
   /// No description provided for @appVersion.
   ///
-  /// In en, this message translates to:
-  /// **'App version'**
+  /// In vi, this message translates to:
+  /// **'Phiên bản ứng dụng'**
   String get appVersion;
 }
 

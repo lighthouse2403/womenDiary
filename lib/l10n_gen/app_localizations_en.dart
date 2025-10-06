@@ -21,5 +21,5 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goalTitle => 'Goal';
 
   @override
-  String get appVersion => 'App version';
+  String get appVersion => 'Phiên bản ứng dụng';
 }

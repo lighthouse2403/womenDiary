@@ -1,7 +1,7 @@
 output-class: AppLocalizations
 arb-dir: lib/l10n
 output-dir: lib/l10n_gen
-template-arb-file: app_en.arb
+template-arb-file: app_vi.arb
 output-localization-file: app_localizations.dart
 use-escaping: true
 nullable-getter: false
