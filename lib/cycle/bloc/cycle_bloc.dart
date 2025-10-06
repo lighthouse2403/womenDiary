@@ -183,11 +183,11 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
       );
     }
 
-    if (ovulationNotification.isAfter(DateTime.now())) {
+    if (ovulationPhase.isAfter(DateTime.now())) {
       await NotificationService().scheduleNotification(
         id: CycleNotificationType.ovulation.value,
         title: "Giai đoạn nguyên hiểm",
-        body: '${lastCycle.menstruationEndTime.globalDateFormat()} ~ ${ovulationPhase.globalDateFormat()}',
+        body: '${ovulationPhase.globalDateFormat()} ~ ${ovulationDate.add(Duration(days: 1)).globalDateFormat()}',
         scheduledTime: ovulationNotification,
       );
     }
