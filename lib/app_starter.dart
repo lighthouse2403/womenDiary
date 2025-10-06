@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:women_diary/biometric_service.dart';
 import 'package:women_diary/database/local_storage_service.dart';
-import 'package:women_diary/l10n/app_localizations.dart';
+import 'package:women_diary/l10n_gen/app_localizations.dart';
 import 'package:women_diary/routes/routes.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/update_checker.dart';

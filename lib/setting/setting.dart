@@ -67,13 +67,13 @@ class _SettingViewState extends State<SettingView> {
 
   @override
   Widget build(BuildContext context) {
-    print('${context.language?.appVersion}');
+    print('${context.language.appVersion}');
 
     return Scaffold(
       backgroundColor: Colors.pink.shade50,
       appBar: AppBar(
         centerTitle: true,
-        title: Text('${context.language?.settingTitle}').w600().text18().whiteColor().ellipsis(),
+        title: Text('${context.language.settingTitle}').w600().text18().whiteColor().ellipsis(),
         backgroundColor: AppColors.pinkTextColor,
         leading: InkWell(
           onTap: () async {
@@ -125,7 +125,7 @@ class _SettingViewState extends State<SettingView> {
             _sectionCard(
               icon: Icons.flag,
               color: Colors.amber.shade400,
-              title: "🎯 Mục tiêu",
+              title: "🎯 ${context.language.goalTitle}",
               children: [
                 _goalSegmented(),
               ],
@@ -227,7 +227,7 @@ class _SettingViewState extends State<SettingView> {
       builder: (context, state) {
         int length = (state is UpdateCycleLengthState) ? state.value : 30;
         return _styledSlider(
-          label: "Độ dài chu kỳ",
+          label: "${context.language.cycleTitle}",
           value: length,
           min: 20,
           max: 120,

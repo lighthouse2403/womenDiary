@@ -9,7 +9,7 @@ import 'package:women_diary/common/firebase/firebase_option.dart';
 import 'package:women_diary/common/firebase/firebase_user.dart';
 import 'package:women_diary/common/notification_service.dart';
 import 'package:women_diary/database/local_storage_service.dart';
-import 'package:women_diary/l10n/app_localizations.dart';
+import 'package:women_diary/l10n_gen/app_localizations.dart';
 import 'app_starter.dart';
 
 void main() async {

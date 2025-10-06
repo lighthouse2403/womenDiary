@@ -1,4 +1,9 @@
+output-class: AppLocalizations
 arb-dir: lib/l10n
+output-dir: lib/l10n_gen
 template-arb-file: app_en.arb
 output-localization-file: app_localizations.dart
-output-class: AppLocalizations
+use-escaping: true
+nullable-getter: false
+suppress-warnings: true
+untranslated-messages-file: desiredFileName.txt
