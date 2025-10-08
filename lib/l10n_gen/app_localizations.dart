@@ -20,7 +20,7 @@ import 'app_localizations_vi.dart';
 /// `supportedLocales` list. For example:
 ///
 /// ```dart
-/// import 'l10n/app_localizations.dart';
+/// import 'l10n_gen/app_localizations.dart';
 ///
 /// return MaterialApp(
 ///   localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -102,23 +102,77 @@ abstract class AppLocalizations {
     Locale('vi'),
   ];
 
-  /// No description provided for @commonErrorTitle.
+  /// No description provided for @cycleTitle.
   ///
   /// In en, this message translates to:
-  /// **'Oops, something went wrong'**
-  String get commonErrorTitle;
+  /// **'Cycle length'**
+  String get cycleTitle;
 
-  /// No description provided for @networkError.
+  /// No description provided for @settingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Your network connection is unstable. Check your connection and try again.'**
-  String get networkError;
+  /// **'Setting'**
+  String get settingTitle;
 
-  /// No description provided for @accessDenied.
+  /// No description provided for @faceIdTitle.
   ///
   /// In en, this message translates to:
-  /// **'Access denied'**
-  String get accessDenied;
+  /// **'FaceId'**
+  String get faceIdTitle;
+
+  /// No description provided for @goalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal'**
+  String get goalTitle;
+
+  /// No description provided for @appVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'App version'**
+  String get appVersion;
+
+  /// No description provided for @languageSetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get languageSetting;
+
+  /// No description provided for @appInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'App Information'**
+  String get appInformation;
+
+  /// No description provided for @contactUs.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact us'**
+  String get contactUs;
+
+  /// No description provided for @scientificEvidence.
+  ///
+  /// In en, this message translates to:
+  /// **'Scientific evidence'**
+  String get scientificEvidence;
+
+  /// No description provided for @appSlogan.
+  ///
+  /// In en, this message translates to:
+  /// **'Designed for women\nwith love and care'**
+  String get appSlogan;
+
+  /// No description provided for @avoidPregnancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Avoid pregnancy'**
+  String get avoidPregnancy;
+
+  /// No description provided for @tryingToConceive.
+  ///
+  /// In en, this message translates to:
+  /// **'Trying to conceive'**
+  String get tryingToConceive;
 }
 
 class _AppLocalizationsDelegate

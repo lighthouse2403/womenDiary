@@ -43,9 +43,10 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
   Future<void> _createCycle(CreateCycleEvent event, Emitter<CycleState> emit) async {
     try {
       // Thêm chu kỳ mới vào DB
-      bool isUsingAverage = LocalStorageService.isUsingAverageValue();
+      bool isUsingAverage = await LocalStorageService.isUsingAverageValue();
       if (isUsingAverage) {
-        event.newCycle.cycleEndTime = event.newCycle.cycleStartTime.add(Duration(days: LocalStorageService.getAverageCycleLength() - 1));
+        int averageCycle = await LocalStorageService.getAverageCycleLength();
+        event.newCycle.cycleEndTime = event.newCycle.cycleStartTime.add(Duration(days: averageCycle - 1));
       }
       await DatabaseHandler.insertCycle(event.newCycle);
 
@@ -146,7 +147,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
         0
     );
 
-    DateTime ovulationPhase = lastCycle.cycleEndTime.subtract(Duration(days: 18));
+    DateTime ovulationPhase = lastCycle.cycleEndTime.subtract(Duration(days: 17));
     DateTime ovulationNotification = DateTime(
         ovulationPhase.year,
         ovulationPhase.month,
@@ -155,7 +156,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
         0
     );
 
-    DateTime ovulationDate = lastCycle.cycleEndTime.subtract(Duration(days: 15));
+    DateTime ovulationDate = lastCycle.cycleEndTime.subtract(Duration(days: 14));
     DateTime ovulationDayNotification = DateTime(
         ovulationDate.year,
         ovulationDate.month,
@@ -164,7 +165,7 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
         0
     );
 
-    DateTime lutealDate = lastCycle.cycleEndTime.subtract(Duration(days: 13));
+    DateTime lutealDate = ovulationDate.add(Duration(days: 1));
     DateTime lutealNotification = DateTime(
         lutealDate.year,
         lutealDate.month,
@@ -183,11 +184,11 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
       );
     }
 
-    if (ovulationNotification.isAfter(DateTime.now())) {
+    if (ovulationPhase.isAfter(DateTime.now())) {
       await NotificationService().scheduleNotification(
         id: CycleNotificationType.ovulation.value,
         title: "Giai đoạn nguyên hiểm",
-        body: '${lastCycle.menstruationEndTime.globalDateFormat()} ~ ${ovulationPhase.globalDateFormat()}',
+        body: '${ovulationPhase.globalDateFormat()} ~ ${lutealDate.globalDateFormat()}',
         scheduledTime: ovulationNotification,
       );
     }
@@ -209,6 +210,5 @@ class CycleBloc extends Bloc<CycleEvent, CycleState> {
         scheduledTime: lutealNotification,
       );
     }
-
   }
 }

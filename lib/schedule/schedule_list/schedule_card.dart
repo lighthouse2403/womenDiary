@@ -69,7 +69,7 @@ class _ScheduleCardState extends State<ScheduleCard> {
                   Text(widget.schedule.title)
                       .text16()
                       .w600()
-                      .customColor(Colors.black87),
+                      .black87Color(),
                   if (widget.schedule.note.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 4),

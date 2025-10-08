@@ -202,7 +202,7 @@ class _ActionDetailView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Chu kỳ liên quan").w600().text16().customColor(Colors.pink.shade700),
+                    Text("Chu kỳ liên quan").w600().text16().pink700Color(),
                     const SizedBox(height: 4),
                     Text(
                       "${cycle.cycleStartTime.globalDateFormat()} - ${cycle.cycleEndTime.globalDateFormat()}",

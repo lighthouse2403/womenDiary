@@ -65,3 +65,12 @@ class UpdateUserGoal extends SettingEvent {
   @override
   List<Object?> get props => [goal];
 }
+
+class UpdateLanguageIdEvent extends SettingEvent {
+  final String languageId;
+
+  const UpdateLanguageIdEvent(this.languageId);
+
+  @override
+  List<Object?> get props => [languageId];
+}

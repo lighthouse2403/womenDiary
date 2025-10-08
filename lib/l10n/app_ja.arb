@@ -1,5 +1,14 @@
 {
-  "commonErrorTitle": "Oops, something went wrong",
-  "networkError": "Your network connection is unstable. Check your connection and try again.",
-  "accessDenied": "Access denied"
+  "cycleTitle": "Cycle length",
+  "settingTitle": "Setting",
+  "faceIdTitle": "FaceId",
+  "goalTitle": "Goal",
+  "appVersion": "App version",
+  "languageSetting": "Language",
+  "appInformation": "App Information",
+  "contactUs": "Contact us",
+  "ScientificEvidence": "Scientific evidence",
+  "appSlogan": "Designed for women\nwith love and care",
+  "avoidPregnancy": "Avoid pregnancy",
+  "tryingToConceive": "Trying to conceive"
 }

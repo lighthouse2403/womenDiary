@@ -104,7 +104,7 @@ class ActionRow extends StatelessWidget {
                 child: Text(DateFormat('HH:mm').format(action.time))
                     .text12()
                     .w600()
-                    .customColor(Colors.pink.shade700),
+                    .pink700Color(),
               ),
             ],
           ),

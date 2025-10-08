@@ -13,22 +13,25 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
     on<ToggleAverageEvent>(_onToggleAverage);
     on<UpdateUsingBiometricEvent>(_onToggleBiometricEnabled);
     on<UpdateUserGoal>(_onUpdateUserGoal);
+    on<UpdateLanguageIdEvent>(_onUpdateLanguage);
   }
 
   void _onLoadLocalData(LoadLocalDataEvent event, Emitter<SettingState> emit) async {
-    bool isUsingAverageValue = LocalStorageService.isUsingAverageValue();
+    bool isUsingAverageValue = await LocalStorageService.isUsingAverageValue();
     int cycleLength = await LocalStorageService.getCycleLength();
     int menstruationLength = await LocalStorageService.getMenstruationLength();
     int averagecycle = await DatabaseHandler.getAverageCycleLength();
 
-    UserGoal goal = LocalStorageService.getGoal();
-    bool useBiometric = LocalStorageService.checkUsingBiometric();
+    UserGoal goal = await LocalStorageService.getGoal();
+    bool useBiometric = await LocalStorageService.checkUsingBiometric();
+    String languageId = await LocalStorageService.getLanguage();
 
     emit(UpdateCycleLengthState(cycleLength));
     emit(UpdateMenstruationLengthState(menstruationLength));
     emit(UpdateUsingAverageState(isUsingAverageValue, averagecycle));
     emit(UpdateUsingBiometricState(useBiometric));
     emit(UpdateGoalState(goal));
+    emit(UpdateLanguageState(languageId));
   }
 
   Future<void> _onUpdateCycleLength(UpdateCycleLengthEvent event, Emitter<SettingState> emit) async {
@@ -63,5 +66,15 @@ class SettingBloc extends Bloc<SettingEvent, SettingState> {
   Future<void> _onUpdateUserGoal(UpdateUserGoal event, Emitter<SettingState> emit) async {
     await LocalStorageService.updateGoal(event.goal);
     emit(UpdateGoalState(event.goal));
+  }
+
+  Future<void> _onUpdateLanguage(UpdateLanguageIdEvent event, Emitter<SettingState> emit) async {
+    print('_onUpdateLanguage: ${event.languageId}');
+
+    await LocalStorageService.updateLanguage(event.languageId);
+
+    print('GetLanguage: ${LocalStorageService.getLanguage()}');
+
+    emit(UpdateLanguageState(event.languageId));
   }
 }

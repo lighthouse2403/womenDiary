@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:women_diary/common/extension/font_size_extension.dart';
 import 'package:women_diary/common/extension/font_weight_extension.dart';
 import 'package:women_diary/common/extension/text_color_extension.dart';
+import 'package:women_diary/common/extension/text_style_extension.dart';
 
 
 extension TextExtension on Text? {
@@ -160,5 +161,9 @@ extension TextExtension on Text? {
 
   Text numberOfLines(int maxLines) {
     return Text(this?.data ?? '', style: this?.style, textAlign: this?.textAlign, maxLines: maxLines, overflow: this?.overflow);
+  }
+
+  Text italic() {
+    return Text(this?.data ?? '', style: this?.style.italicStyle(), textAlign: TextAlign.right, overflow: this?.overflow, maxLines: this?.maxLines);
   }
 }

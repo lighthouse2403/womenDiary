@@ -68,7 +68,7 @@ class FirebaseUser {
     final packageInfo = await PackageInfo.fromPlatform();
     var goal = await LocalStorageService.getGoal();
 
-    String identifier = LocalStorageService.getUuid();
+    String identifier = await LocalStorageService.getUuid();
     final screen = ui.PlatformDispatcher.instance.views.first;
 
     String? ip;
