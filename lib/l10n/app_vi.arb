@@ -1,7 +1,14 @@
 {
-  "cycleTitle": "Độ dài chu kỳ",
-  "settingTitle": "Cài đặt",
+  "cycleTitle": "Cycle length",
+  "settingTitle": "Setting",
   "faceIdTitle": "FaceId",
-  "goalTitle": "Mục tiêu",
-  "appVersion": "Phiên bản ứng dụng"
+  "goalTitle": "Goal",
+  "appVersion": "App version",
+  "languageSetting": "Language",
+  "appInformation": "App Information",
+  "contactUs": "Contact us",
+  "ScientificEvidence": "Scientific evidence",
+  "appSlogan": "Designed for women\nwith love and care",
+  "avoidPregnancy": "Avoid pregnancy",
+  "tryingToConceive": "Trying to conceive"
 }

@@ -131,6 +131,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'App version'**
   String get appVersion;
+
+  /// No description provided for @languageSetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get languageSetting;
+
+  /// No description provided for @appInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'App Information'**
+  String get appInformation;
+
+  /// No description provided for @contactUs.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact us'**
+  String get contactUs;
+
+  /// No description provided for @scientificEvidence.
+  ///
+  /// In en, this message translates to:
+  /// **'Scientific evidence'**
+  String get scientificEvidence;
+
+  /// No description provided for @appSlogan.
+  ///
+  /// In en, this message translates to:
+  /// **'Designed for women\nwith love and care'**
+  String get appSlogan;
+
+  /// No description provided for @avoidPregnancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Avoid pregnancy'**
+  String get avoidPregnancy;
+
+  /// No description provided for @tryingToConceive.
+  ///
+  /// In en, this message translates to:
+  /// **'Trying to conceive'**
+  String get tryingToConceive;
 }
 
 class _AppLocalizationsDelegate

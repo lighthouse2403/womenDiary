@@ -3,5 +3,12 @@
   "settingTitle": "Setting",
   "faceIdTitle": "FaceId",
   "goalTitle": "Goal",
-  "appVersion": "App version"
+  "appVersion": "App version",
+  "languageSetting": "Language",
+  "appInformation": "App Information",
+  "contactUs": "Contact us",
+  "scientificEvidence": "Scientific evidence",
+  "appSlogan": "Designed for women\nwith love and care",
+  "avoidPregnancy": "Avoid pregnancy",
+  "tryingToConceive": "Trying to conceive"
 }

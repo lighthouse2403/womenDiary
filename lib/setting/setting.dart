@@ -15,7 +15,6 @@ import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/cycle/cycle_model.dart';
 import 'package:women_diary/database/data_handler.dart';
 import 'package:women_diary/database/local_storage_service.dart';
-import 'package:women_diary/l10n_gen/app_localizations.dart';
 import 'package:women_diary/setting/bloc/setting_bloc.dart';
 import 'package:women_diary/setting/bloc/setting_event.dart';
 import 'package:women_diary/setting/bloc/setting_state.dart';
@@ -89,13 +88,13 @@ class _SettingViewState extends State<SettingView> {
 
   @override
   Widget build(BuildContext context) {
-    final loc = context.language; // your extension
+    final language = context.language; // your extension
 
     return Scaffold(
       backgroundColor: Colors.pink.shade50,
       appBar: AppBar(
         centerTitle: true,
-        title: Text(loc.settingTitle).w600().text18().whiteColor().ellipsis(),
+        title: Text(language.settingTitle).w600().text18().whiteColor().ellipsis(),
         backgroundColor: AppColors.pinkTextColor,
         leading: InkWell(
           onTap: () => _updateLastCycleAndPop(context),
@@ -116,7 +115,7 @@ class _SettingViewState extends State<SettingView> {
             _sectionCard(
               icon: Icons.favorite,
               color: Colors.pink.shade300,
-              title: "🎀 ${loc.cycleTitle}",
+              title: "🎀 ${language.cycleTitle}",
               children: [
                 _cycleSlider(),
                 _menstruationSlider(),
@@ -127,7 +126,7 @@ class _SettingViewState extends State<SettingView> {
             _sectionCard(
               icon: Icons.lock,
               color: Colors.purple.shade300,
-              title: "🔐 ${loc.settingTitle}", // keep consistent
+              title: "🔐 ${language.settingTitle}", // keep consistent
               children: [
                 _pin(context),
               ],
@@ -136,7 +135,7 @@ class _SettingViewState extends State<SettingView> {
             _sectionCard(
               icon: Icons.flag,
               color: Colors.amber.shade400,
-              title: "🎯 ${loc.goalTitle}",
+              title: "🎯 ${language.goalTitle}",
               children: [
                 _goalSegmented(),
               ],
@@ -145,7 +144,7 @@ class _SettingViewState extends State<SettingView> {
             _sectionCard(
               icon: Icons.language,
               color: Colors.teal.shade300,
-              title: "🌍 Ngôn ngữ",
+              title: "🌍 ${language.languageSetting}",
               children: [
                 _languagePicker(context),
               ],
@@ -154,22 +153,22 @@ class _SettingViewState extends State<SettingView> {
             _sectionCard(
               icon: Icons.info,
               color: Colors.blue.shade400,
-              title: "ℹ️ Thông tin",
+              title: "ℹ️ ${language.appInformation}",
               children: [
                 ListTile(
                   leading: const Icon(Icons.phone_android, color: Colors.blue),
-                  title: Text(loc.appVersion),
+                  title: Text(language.appVersion),
                   trailing: Text(_appVersion.isEmpty ? "..." : _appVersion).w600(),
                 ),
                 ListTile(
                   leading: const Icon(Icons.email, color: Colors.green),
-                  title: const Text("Liên hệ nhà phát triển"),
+                  title: Text(language.contactUs),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: _contactDeveloper,
                 ),
                 ListTile(
                   leading: const Icon(Icons.science, color: Colors.deepPurple),
-                  title: const Text("Cơ sở khoa học tính chu kỳ"),
+                  title: Text(language.scientificEvidence),
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () async {
                     final uri = Uri.parse(
@@ -184,7 +183,7 @@ class _SettingViewState extends State<SettingView> {
             ),
             const SizedBox(height: 30),
             Center(
-              child: Text("💖 Designed for women\nwith love and care")
+              child: Text("💖 ${language.appSlogan}")
                   .text14()
                   .italic()
                   .customColor(CupertinoColors.systemGrey)
@@ -237,7 +236,7 @@ class _SettingViewState extends State<SettingView> {
       builder: (context, state) {
         int length = (state is UpdateCycleLengthState) ? state.value : 30;
         return _styledSlider(
-          label: "${context.language.cycleTitle}",
+          label: context.language.cycleTitle,
           value: length,
           min: 20,
           max: 120,
@@ -340,14 +339,14 @@ class _SettingViewState extends State<SettingView> {
           groupValue: goal,
           thumbColor: Colors.pink.shade200,
           backgroundColor: Colors.pink.shade50,
-          children: const {
+          children: {
             UserGoal.avoidPregnancy: Padding(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Text("Tránh thai"),
+              child: Text(context.language.avoidPregnancy),
             ),
             UserGoal.tryingToConceive: Padding(
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Text("Muốn có thai"),
+              child: Text(context.language.tryingToConceive),
             ),
           },
           onValueChanged: (value) {
