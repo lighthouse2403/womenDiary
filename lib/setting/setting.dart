@@ -1,3 +1,4 @@
+// lib/setting/setting.dart
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -49,49 +50,55 @@ class _SettingViewState extends State<SettingView> {
   }
 
   Future<void> _loadVersion() async {
-    final info = await PackageInfo.fromPlatform();
-    setState(() {
-      _appVersion = info.version;
-    });
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (mounted) {
+        setState(() {
+          _appVersion = info.version;
+        });
+      }
+    } catch (_) {
+      // ignore errors, keep _appVersion empty
+    }
   }
 
   Future<void> _contactDeveloper() async {
     final uri = Uri(
       scheme: 'mailto',
       path: 'developer@example.com',
-      query: 'subject=Hỗ trợ ứng dụng Women Diary',
+      query: Uri(queryParameters: {
+        'subject': 'Hỗ trợ ứng dụng Women Diary'
+      }).query,
     );
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }
   }
 
+  // Helper: update last cycle end time before popping (keeps your original logic)
+  Future<void> _updateLastCycleAndPop(BuildContext context) async {
+    int cycleLength = await LocalStorageService.isUsingAverageValue()
+        ? await DatabaseHandler.getAverageCycleLength()
+        : await LocalStorageService.getCycleLength();
+    CycleModel lastCycle = await DatabaseHandler.getLastCycle();
+    DateTime cycleEndTime = lastCycle.cycleStartTime.add(Duration(days: cycleLength - 1));
+    lastCycle.cycleEndTime = cycleEndTime;
+    await DatabaseHandler.updateCycle(lastCycle);
+    context.pop();
+  }
+
   @override
   Widget build(BuildContext context) {
-    print('${context.language.appVersion}');
-    print('${AppLocalizations.of(context).goalTitle}');
-    print('${AppLocalizations.of(context).settingTitle}');
-    print(AppLocalizations.of(context).cycleTitle);
+    final loc = context.language; // your extension
 
     return Scaffold(
       backgroundColor: Colors.pink.shade50,
       appBar: AppBar(
         centerTitle: true,
-        title: Text('${context.language.settingTitle}').w600().text18().whiteColor().ellipsis(),
+        title: Text(loc.settingTitle).w600().text18().whiteColor().ellipsis(),
         backgroundColor: AppColors.pinkTextColor,
         leading: InkWell(
-          onTap: () async {
-            int cycleLength = await LocalStorageService.isUsingAverageValue()
-                ? await DatabaseHandler.getAverageCycleLength()
-                : await LocalStorageService.getCycleLength();
-            CycleModel lastCycle = await DatabaseHandler.getLastCycle();
-            DateTime cycleEndTime = lastCycle.cycleStartTime.add(Duration(days: cycleLength - 1));
-
-            lastCycle.cycleEndTime = cycleEndTime;
-            DatabaseHandler.updateCycle(lastCycle);
-
-            context.pop();
-          },
+          onTap: () => _updateLastCycleAndPop(context),
           child: Align(
             alignment: Alignment.center,
             child: Assets.icons.arrowBack.svg(
@@ -109,7 +116,7 @@ class _SettingViewState extends State<SettingView> {
             _sectionCard(
               icon: Icons.favorite,
               color: Colors.pink.shade300,
-              title: "🎀 ${context.language.cycleTitle}",
+              title: "🎀 ${loc.cycleTitle}",
               children: [
                 _cycleSlider(),
                 _menstruationSlider(),
@@ -120,7 +127,7 @@ class _SettingViewState extends State<SettingView> {
             _sectionCard(
               icon: Icons.lock,
               color: Colors.purple.shade300,
-              title: "🔐 Bảo mật",
+              title: "🔐 ${loc.settingTitle}", // keep consistent
               children: [
                 _pin(context),
               ],
@@ -129,7 +136,7 @@ class _SettingViewState extends State<SettingView> {
             _sectionCard(
               icon: Icons.flag,
               color: Colors.amber.shade400,
-              title: "🎯 ${context.language.goalTitle}",
+              title: "🎯 ${loc.goalTitle}",
               children: [
                 _goalSegmented(),
               ],
@@ -151,7 +158,7 @@ class _SettingViewState extends State<SettingView> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.phone_android, color: Colors.blue),
-                  title: Text('${context.language?.appVersion}'),
+                  title: Text(loc.appVersion),
                   trailing: Text(_appVersion.isEmpty ? "..." : _appVersion).w600(),
                 ),
                 ListTile(
@@ -182,7 +189,7 @@ class _SettingViewState extends State<SettingView> {
                   .italic()
                   .customColor(CupertinoColors.systemGrey)
                   .center(),
-            )
+            ),
           ],
         ),
       ),
@@ -223,8 +230,7 @@ class _SettingViewState extends State<SettingView> {
     );
   }
 
-  // --- Widgets từng phần ---
-
+  // --- Cycle slider ---
   Widget _cycleSlider() {
     return BlocBuilder<SettingBloc, SettingState>(
       buildWhen: (previous, current) => current is UpdateCycleLengthState,
@@ -243,6 +249,7 @@ class _SettingViewState extends State<SettingView> {
     );
   }
 
+  // --- Menstruation slider ---
   Widget _menstruationSlider() {
     return BlocBuilder<SettingBloc, SettingState>(
       buildWhen: (previous, current) => current is UpdateMenstruationLengthState,
@@ -270,12 +277,13 @@ class _SettingViewState extends State<SettingView> {
     required IconData icon,
     Color? color,
   }) {
+    final accent = color ?? Colors.pink;
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -283,12 +291,12 @@ class _SettingViewState extends State<SettingView> {
               children: [
                 CircleAvatar(
                   radius: 18,
-                  backgroundColor: (color ?? Colors.pink).withAlpha(30),
-                  child: Icon(icon, color: color ?? Colors.pink),
+                  backgroundColor: accent.withAlpha(30),
+                  child: Icon(icon, color: accent),
                 ),
                 const SizedBox(width: 10),
-                Text(label).text16().w600(),
-                const Spacer(),
+                Expanded(child: Text(label).text16().w600()),
+                const SizedBox(width: 10),
                 Text('$value ngày')
                     .text15()
                     .w500()
@@ -298,10 +306,10 @@ class _SettingViewState extends State<SettingView> {
             const SizedBox(height: 10),
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
-                activeTrackColor: color ?? Colors.pink,
-                inactiveTrackColor: (color ?? Colors.pink).withAlpha(50),
-                thumbColor: color ?? Colors.pink,
-                overlayColor: (color ?? Colors.pink).withAlpha(30),
+                activeTrackColor: accent,
+                inactiveTrackColor: accent.withAlpha(50),
+                thumbColor: accent,
+                overlayColor: accent.withAlpha(30),
                 trackHeight: 6,
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
                 overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
@@ -310,7 +318,7 @@ class _SettingViewState extends State<SettingView> {
                 value: value.toDouble(),
                 min: min.toDouble(),
                 max: max.toDouble(),
-                divisions: max - min,
+                divisions: (max - min),
                 onChanged: (v) => onChanged(v.round()),
               ),
             ),
@@ -320,52 +328,52 @@ class _SettingViewState extends State<SettingView> {
     );
   }
 
+  // --- Goal segmented control ---
   Widget _goalSegmented() => BlocBuilder<SettingBloc, SettingState>(
     buildWhen: (previous, current) => current is UpdateGoalState,
     builder: (context, state) {
-      UserGoal goal = (state is UpdateGoalState)
-          ? state.goal
-          : UserGoal.avoidPregnancy;
+      UserGoal goal = (state is UpdateGoalState) ? state.goal : UserGoal.avoidPregnancy;
 
-      return CupertinoSlidingSegmentedControl<UserGoal>(
-        groupValue: goal,
-        thumbColor: Colors.pink.shade200,
-        backgroundColor: Colors.pink.shade50,
-        children: const {
-          UserGoal.avoidPregnancy: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            child: Text("Tránh thai"),
-          ),
-          UserGoal.tryingToConceive: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            child: Text("Muốn có thai"),
-          ),
-        },
-        onValueChanged: (value) {
-          if (value != null) {
-            context.read<SettingBloc>().add(UpdateUserGoal(value));
-          }
-        },
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: CupertinoSlidingSegmentedControl<UserGoal>(
+          groupValue: goal,
+          thumbColor: Colors.pink.shade200,
+          backgroundColor: Colors.pink.shade50,
+          children: const {
+            UserGoal.avoidPregnancy: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Text("Tránh thai"),
+            ),
+            UserGoal.tryingToConceive: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Text("Muốn có thai"),
+            ),
+          },
+          onValueChanged: (value) {
+            if (value != null) {
+              context.read<SettingBloc>().add(UpdateUserGoal(value));
+            }
+          },
+        ),
       );
     },
   );
 
+  // --- PIN / Biometric switch ---
   Widget _pin(BuildContext context) => BlocBuilder<SettingBloc, SettingState>(
     buildWhen: (previous, current) => current is UpdateUsingBiometricState,
     builder: (context, state) {
-      final isEnabled = state is UpdateUsingBiometricState
-          ? state.isUsingBiometric
-          : false;
+      final isEnabled = state is UpdateUsingBiometricState ? state.isUsingBiometric : false;
       return SwitchTile(
         label: "Sử dụng Face ID",
         value: isEnabled,
-        onChanged: (value) {
-          context.read<SettingBloc>().add(UpdateUsingBiometricEvent(value));
-        },
+        onChanged: (value) => context.read<SettingBloc>().add(UpdateUsingBiometricEvent(value)),
       );
     },
   );
 
+  // --- Average value switch ---
   Widget _averageSwitch() => BlocBuilder<SettingBloc, SettingState>(
     buildWhen: (previous, current) => current is UpdateUsingAverageState,
     builder: (context, state) {
@@ -381,118 +389,139 @@ class _SettingViewState extends State<SettingView> {
           ),
           if (avgLength > 0)
             Padding(
-              padding: const EdgeInsets.only(left: 16, top: 4),
-              child: Text("Giá trị trung bình hiện tại: $avgLength ngày")
-                  .text14()
-                  .greyColor()
-                  .italic(),
+              padding: const EdgeInsets.only(left: 16, top: 6),
+              child: Text("Giá trị trung bình hiện tại: $avgLength ngày").text14().greyColor().italic(),
             ),
         ],
       );
     },
   );
 
+  // --- Language picker (fixed baseline issue & feminine style) ---
   Widget _languagePicker(BuildContext context) {
     return BlocBuilder<SettingBloc, SettingState>(
       buildWhen: (previous, current) => current is UpdateLanguageState,
       builder: (context, state) {
         String currentLang = (state is UpdateLanguageState) ? state.languageId : "vi";
-        final languages = Constants.languages; // Map<String, String>
-        print('currentLang $currentLang');
-        print('${context.language.appVersion}');
-        print('${context.language.goalTitle}');
+        final languages = Constants.languages; // Map<String,String>
 
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.pink.shade50),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.pink.shade100.withOpacity(0.6),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            elevation: 2,
+            shadowColor: Colors.pink.shade100.withOpacity(0.4),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 18,
+                    backgroundColor: Colors.pink.shade50,
+                    child: Icon(Icons.language, color: Colors.pink.shade400, size: 18),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Ngôn ngữ").text14().w600().customColor(Colors.pink.shade700),
+                        const SizedBox(height: 6),
+                        // Fixed-height dropdown to avoid baseline computation errors
+                        SizedBox(
+                          height: 48,
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: currentLang,
+                              isExpanded: true,
+                              icon: Icon(Icons.expand_more, color: Colors.pink.shade400),
+                              dropdownColor: Colors.white,
+                              items: languages.entries.map((e) {
+                                return DropdownMenuItem<String>(
+                                  value: e.key,
+                                  // align contents to center to avoid baseline requests
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 14,
+                                          backgroundColor: Colors.pink.shade50,
+                                          child: Text(
+                                            e.key.toUpperCase(),
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.pink.shade400,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          e.value,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.pink.shade900,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              // ensure selected item shows similarly without baseline issues
+                              selectedItemBuilder: (context) {
+                                return languages.entries.map((e) {
+                                  return Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 12,
+                                          backgroundColor: Colors.pink.shade50,
+                                          child: Text(
+                                            e.key.toUpperCase(),
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.pink.shade400,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          e.value,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.pink.shade900,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList();
+                              },
+                              onChanged: (languageId) {
+                                if (languageId != null) {
+                                  context.read<SettingBloc>().add(UpdateLanguageIdEvent(languageId));
+                                  context.read<AppBloc>().add(ChangeLanguageEvent(languageId));
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: DropdownButtonFormField<String>(
-            value: currentLang,
-            decoration: const InputDecoration(
-              border: InputBorder.none,
-              isDense: true,
-              contentPadding: EdgeInsets.zero,
             ),
-            dropdownColor: Colors.white,
-            icon: Icon(Icons.expand_more, color: Colors.pink.shade400),
-            items: languages.entries.map((e) {
-              return DropdownMenuItem<String>(
-                value: e.key,
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 14,
-                      backgroundColor: Colors.pink.shade50,
-                      child: Text(
-                        e.key.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.pink.shade400,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      e.value,
-                      style: TextStyle(
-                        color: Colors.pink.shade900,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
-            // Hiển thị selected item với style tương tự (mịn, pastel)
-            selectedItemBuilder: (BuildContext ctx) {
-              return languages.entries.map((e) {
-                return Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 12,
-                      backgroundColor: Colors.pink.shade50,
-                      child: Text(
-                        e.key.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.pink.shade400,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      e.value,
-                      style: TextStyle(
-                        color: Colors.pink.shade900,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                );
-              }).toList();
-            },
-            onChanged: (languageId) {
-              if (languageId != null) {
-                context.read<SettingBloc>().add(UpdateLanguageIdEvent(languageId));
-                context.read<AppBloc>().add(ChangeLanguageEvent(languageId));
-              }
-            },
           ),
         );
       },
     );
   }
-
 }
