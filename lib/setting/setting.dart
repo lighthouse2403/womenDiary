@@ -402,122 +402,65 @@ class _SettingViewState extends State<SettingView> {
     return BlocBuilder<SettingBloc, SettingState>(
       buildWhen: (previous, current) => current is UpdateLanguageState,
       builder: (context, state) {
-        String currentLang = (state is UpdateLanguageState) ? state.languageId : "vi";
-        final languages = Constants.languages; // Map<String,String>
+        final currentLang = (state is UpdateLanguageState) ? state.languageId : "vi";
+        final languages = Constants.languages;
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            elevation: 2,
-            shadowColor: Colors.pink.shade100.withOpacity(0.4),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 18,
-                    backgroundColor: Colors.pink.shade50,
-                    child: Icon(Icons.language, color: Colors.pink.shade400, size: 18),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Ngôn ngữ").text14().w600().customColor(Colors.pink.shade700),
-                        const SizedBox(height: 6),
-                        // Fixed-height dropdown to avoid baseline computation errors
-                        SizedBox(
-                          height: 48,
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: currentLang,
-                              isExpanded: true,
-                              icon: Icon(Icons.expand_more, color: Colors.pink.shade400),
-                              dropdownColor: Colors.white,
-                              items: languages.entries.map((e) {
-                                return DropdownMenuItem<String>(
-                                  value: e.key,
-                                  // align contents to center to avoid baseline requests
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 14,
-                                          backgroundColor: Colors.pink.shade50,
-                                          child: Text(
-                                            e.key.toUpperCase(),
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: Colors.pink.shade400,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Text(
-                                          e.value,
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.pink.shade900,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              // ensure selected item shows similarly without baseline issues
-                              selectedItemBuilder: (context) {
-                                return languages.entries.map((e) {
-                                  return Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Row(
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 12,
-                                          backgroundColor: Colors.pink.shade50,
-                                          child: Text(
-                                            e.key.toUpperCase(),
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.pink.shade400,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          e.value,
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.pink.shade900,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList();
-                              },
-                              onChanged: (languageId) {
-                                if (languageId != null) {
-                                  context.read<SettingBloc>().add(UpdateLanguageIdEvent(languageId));
-                                  context.read<AppBloc>().add(ChangeLanguageEvent(languageId));
-                                }
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            gradient: LinearGradient(
+              colors: [Colors.pink.shade50, Colors.purple.shade50],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            border: Border.all(color: Colors.pink.shade200, width: 1.2),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: currentLang,
+              isExpanded: true,
+              icon: Icon(Icons.expand_more, color: Colors.pink.shade400),
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: Colors.pink.shade900,
+              ),
+              dropdownColor: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+
+              items: languages.entries.map((e) {
+                return DropdownMenuItem<String>(
+                  value: e.key,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: e.key == currentLang
+                          ? Colors.pink.shade50
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                      border: e.key == currentLang
+                          ? Border.all(color: Colors.pink.shade300, width: 1)
+                          : null,
+                    ),
+                    child: Text(
+                      e.value,
+                      style: TextStyle(
+                        color: e.key == currentLang
+                            ? Colors.pink.shade700
+                            : Colors.grey.shade800,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ],
-              ),
+                );
+              }).toList(),
+
+              onChanged: (languageId) {
+                if (languageId == null) return;
+                context.read<SettingBloc>().add(UpdateLanguageIdEvent(languageId));
+                context.read<AppBloc>().add(ChangeLanguageEvent(languageId));
+              },
             ),
           ),
         );
