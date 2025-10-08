@@ -71,6 +71,8 @@ class _SettingViewState extends State<SettingView> {
     print('${context.language.appVersion}');
     print('${AppLocalizations.of(context).goalTitle}');
     print('${AppLocalizations.of(context).settingTitle}');
+    print(AppLocalizations.of(context).cycleTitle);
+
     return Scaffold(
       backgroundColor: Colors.pink.shade50,
       appBar: AppBar(
@@ -107,7 +109,7 @@ class _SettingViewState extends State<SettingView> {
             _sectionCard(
               icon: Icons.favorite,
               color: Colors.pink.shade300,
-              title: "🎀 ${context.language?.cycleTitle}",
+              title: "🎀 ${context.language.cycleTitle}",
               children: [
                 _cycleSlider(),
                 _menstruationSlider(),

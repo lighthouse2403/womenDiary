@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:women_diary/common/constants/constants.dart';
+import 'package:women_diary/common/extension/context_extension.dart';
 import 'package:women_diary/common/extension/text_extension.dart';
 import 'package:women_diary/home/bloc/home_bloc.dart';
 import 'package:women_diary/home/bloc/home_event.dart';
@@ -9,6 +10,7 @@ import 'package:women_diary/home/cycle_progress/cycle_progress.dart';
 import 'package:women_diary/home/home_component/quick_action.dart';
 import 'package:women_diary/home/home_component/quick_stats.dart';
 import 'package:women_diary/home/home_component/upcoming_schedule.dart';
+import 'package:women_diary/l10n_gen/app_localizations.dart';
 import 'package:women_diary/routes/route_name.dart';
 import 'package:women_diary/routes/routes.dart';
 import 'package:women_diary/schedule/schedule_model.dart';
@@ -36,6 +38,11 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    print('${context.language.appVersion}');
+    print('${AppLocalizations.of(context).goalTitle}');
+    print('${AppLocalizations.of(context).settingTitle}');
+    print(AppLocalizations.of(context).cycleTitle);
+
     return Scaffold(
       backgroundColor: Colors.pink.shade50,
       body: SafeArea(

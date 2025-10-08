@@ -40,22 +40,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     /// ✅ Dùng ValueListenableBuilder để rebuild MaterialApp khi đổi ngôn ngữ
-    return BlocBuilder<AppBloc,AppState>(
-      builder: (context, state) {
-        String languageId = state is LanguageUpdatedState ? state.languageId : 'vi';
-
-        print('State: ${state} -- language: ${languageId}');
-
-        return MaterialApp(
-          title: 'Women period tracker',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(primarySwatch: Colors.pink),
-          locale: Locale('vi'),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: const AppStarter(),
-        );
-      },
-    );
+    return const AppStarter();
   }
 }

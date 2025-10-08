@@ -1,8 +1,7 @@
 {
-  "@@locale": "vi",
-  "cycleTitle": "Chu kỳ",
+  "cycleTitle": "Độ dài chu kỳ",
   "settingTitle": "Cài đặt",
-  "faceIdTitle": "Face Id",
+  "faceIdTitle": "FaceId",
   "goalTitle": "Mục tiêu",
   "appVersion": "Phiên bản ứng dụng"
 }

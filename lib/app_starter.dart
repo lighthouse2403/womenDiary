@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:women_diary/app_bloc/app_bloc.dart';
+import 'package:women_diary/app_bloc/app_state.dart';
 import 'package:women_diary/biometric_service.dart';
 import 'package:women_diary/database/local_storage_service.dart';
 import 'package:women_diary/l10n_gen/app_localizations.dart';
@@ -215,16 +218,26 @@ class _AppStarterState extends State<AppStarter> with WidgetsBindingObserver {
       );
     }
 
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.light,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      routerConfig: Routes.generateRouter(_initialRoute!),
-      builder: (materialContext, child) {
-        _maybeShowUpdatePopup(materialContext);
-        return child!;
+    return BlocBuilder<AppBloc,AppState>(
+      builder: (context, state) {
+        String languageId = state is LanguageUpdatedState ? state.languageId : 'en';
+
+        print('State: ${state} -- language: ${languageId}');
+
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          themeMode: ThemeMode.light,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: Locale(languageId),
+          routerConfig: Routes.generateRouter(_initialRoute!),
+          builder: (materialContext, child) {
+            _maybeShowUpdatePopup(materialContext);
+            return child!;
+          },
+        );
       },
     );
+
   }
 }

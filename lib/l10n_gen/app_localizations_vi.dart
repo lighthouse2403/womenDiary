@@ -9,13 +9,13 @@ class AppLocalizationsVi extends AppLocalizations {
   AppLocalizationsVi([String locale = 'vi']) : super(locale);
 
   @override
-  String get cycleTitle => 'Chu kỳ';
+  String get cycleTitle => 'Độ dài chu kỳ';
 
   @override
   String get settingTitle => 'Cài đặt';
 
   @override
-  String get faceIdTitle => 'Face Id';
+  String get faceIdTitle => 'FaceId';
 
   @override
   String get goalTitle => 'Mục tiêu';

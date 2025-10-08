@@ -6,8 +6,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
-import 'app_localizations_ja.dart';
-import 'app_localizations_ko.dart';
 import 'app_localizations_vi.dart';
 
 // ignore_for_file: type=lint
@@ -97,39 +95,37 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale('ja'),
-    Locale('ko'),
     Locale('vi'),
   ];
 
   /// No description provided for @cycleTitle.
   ///
-  /// In vi, this message translates to:
-  /// **'Chu kỳ'**
+  /// In en, this message translates to:
+  /// **'Cycle length'**
   String get cycleTitle;
 
   /// No description provided for @settingTitle.
   ///
-  /// In vi, this message translates to:
-  /// **'Cài đặt'**
+  /// In en, this message translates to:
+  /// **'Setting'**
   String get settingTitle;
 
   /// No description provided for @faceIdTitle.
   ///
-  /// In vi, this message translates to:
-  /// **'Face Id'**
+  /// In en, this message translates to:
+  /// **'FaceId'**
   String get faceIdTitle;
 
   /// No description provided for @goalTitle.
   ///
-  /// In vi, this message translates to:
-  /// **'Mục tiêu'**
+  /// In en, this message translates to:
+  /// **'Goal'**
   String get goalTitle;
 
   /// No description provided for @appVersion.
   ///
-  /// In vi, this message translates to:
-  /// **'Phiên bản ứng dụng'**
+  /// In en, this message translates to:
+  /// **'App version'**
   String get appVersion;
 }
 
@@ -144,7 +140,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'ja', 'ko', 'vi'].contains(locale.languageCode);
+      <String>['en', 'vi'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -155,10 +151,6 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
-    case 'ja':
-      return AppLocalizationsJa();
-    case 'ko':
-      return AppLocalizationsKo();
     case 'vi':
       return AppLocalizationsVi();
   }
