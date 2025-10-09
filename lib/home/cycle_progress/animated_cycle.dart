@@ -30,7 +30,7 @@ class _AnimatedCycleViewState extends State<AnimatedCycleView>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 8),
-    )..repeat(); // Lặp vô hạn để tạo hiệu ứng xoay gradient
+    )..repeat();
   }
 
   @override

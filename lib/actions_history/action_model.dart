@@ -16,12 +16,12 @@ class ActionModel {
   });
 
   ActionModel.init(String title, DateTime time, String emoji, String note) {
-    this.id = '${DateTime.now().millisecondsSinceEpoch}';
-    this.emoji  = emoji;
-    this.title  = title;
-    this.note   = note;
-    this.time   = time;
-    this.typeId = '';
+    id = '${DateTime.now().millisecondsSinceEpoch}';
+    emoji  = emoji;
+    title  = title;
+    note   = note;
+    time   = time;
+    typeId = '';
   }
 
   ActionModel.fromDatabase(Map<String, dynamic> json) {

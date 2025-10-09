@@ -1,5 +1,6 @@
 import 'package:women_diary/_gen/assets.gen.dart';
 import 'package:women_diary/common/constants/app_colors.dart';
+import 'package:women_diary/common/extension/context_extension.dart';
 import 'package:women_diary/common/extension/font_size_extension.dart';
 import 'package:women_diary/common/extension/font_weight_extension.dart';
 import 'package:women_diary/common/extension/text_color_extension.dart';
@@ -20,11 +21,19 @@ class MainBottomTabBarState extends State<MainBottomTabBar> {
   int selectedIndex = 0;
 
   List<String> routeNames = [RoutesName.home, RoutesName.cycleList, RoutesName.schedules, RoutesName.actionHistory];
-  List<String> labels = ['Trang chủ','Lịch sử', 'Kế hoạch', 'Hoạt động'];
+  late List<String> labels;
   List<SvgGenImage> images = [Assets.icons.home, Assets.icons.history, Assets.icons.calendar, Assets.icons.actions];
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final lang = context.language;
+    labels = ['Trang chủ','Lịch sử', 'Kế hoạch', 'Hoạt động'];
     return Scaffold(
       body: widget.child,
       bottomNavigationBar: BottomNavigationBar(
