@@ -34,23 +34,7 @@ class CycleAlert extends StatelessWidget {
               .text14()
               .black87Color(),
           Constants.vSpacer12,
-          hasStarted
-              ? ElevatedButton.icon(
-            icon: const Text("🧘‍♀️").text18(),
-            label: const Text("Kết thúc kỳ kinh"),
-            style: ElevatedButton.styleFrom(
-              elevation: 4,
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.pink,
-              shadowColor: Colors.pinkAccent.withAlpha(80),
-              side: BorderSide(color: Colors.pink.shade300),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
-            onPressed: () =>
-                context.read<HomeBloc>().add(EndCycleEvent()),
-          )
-              : ElevatedButton.icon(
+          ElevatedButton.icon(
             icon: const Text("🌸").text18(),
             label: const Text("Bắt đầu chu kỳ mới"),
             style: ElevatedButton.styleFrom(

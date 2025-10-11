@@ -10,7 +10,7 @@ import 'package:women_diary/home/phase_model.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(const HomeState()) {
     on<LoadCycleEvent>(_onLoadLocalData);
-    on<EndCycleEvent>(_onEndCycle);
+    on<StartNewCycleEvent>(_onStartNewCycle);
 
   }
 
@@ -37,7 +37,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
-  Future<void> _onEndCycle(EndCycleEvent event, Emitter<HomeState> emit) async {
+  Future<void> _onStartNewCycle(StartNewCycleEvent event, Emitter<HomeState> emit) async {
     final lastCycleFuture = await DatabaseHandler.getLastCycle();
     lastCycleFuture.cycleEndTime = DateTime.now().subtract(Duration(days: 1));
     DatabaseHandler.updateCycle(lastCycleFuture);

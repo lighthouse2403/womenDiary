@@ -59,5 +59,19 @@
   "cycleDuration": "Cycle duration: {count}} days",
   "remainingDays": "Remaining: {number}} days",
   "currentPhase": "Phase: {phase}",
-
+  "quickNote": "Quick note",
+  "newAction": "New action",
+  "newSchedule": "New Schedule",
+  "nextSchedule": "Next schedule",
+  "viewDetails": "View details",
+  "averageCycleLength": "Average cycle length",
+  "currentCycleLength": "Current cycle length",
+  "currentDate": "Current Date",
+  "ovulationDateTitle": "Ovulation date",
+  "longestCycle": "Longest cycle",
+  "shortestCycle": "shortest cycle",
+  "numberOfDays": "{count} days",
+  "newMenstrualCycleIsApproaching": "The new menstrual cycle is approaching",
+  "confirmToTrackYourCycle": "Please confirm to track your cycle more accurately.",
+  "startNewCycle": "Start a new cycle now"
 }

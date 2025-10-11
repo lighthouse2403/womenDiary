@@ -38,11 +38,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    print('${context.language.appVersion}');
-    print('${AppLocalizations.of(context).goalTitle}');
-    print('${AppLocalizations.of(context).settingTitle}');
-    print(AppLocalizations.of(context).cycleTitle);
-
     return Scaffold(
       backgroundColor: Colors.pink.shade50,
       body: SafeArea(
